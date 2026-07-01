@@ -8,14 +8,14 @@ import { MapPin } from "lucide-react";
 export const Route = createFileRoute("/region")({
   head: () => ({
     meta: [
-      { title: "지역 선택 · 농사 도우미" },
-      { name: "description", content: "먼저 살고 계신 지역을 선택해 주세요." },
+      { title: "농지 위치 선택 · 농사 도우미" },
+      { name: "description", content: "농지의 위치를 선택해 주세요." },
     ],
   }),
   component: RegionPage,
 });
 
-const PROMPT = "먼저 고객님이 살고 계신 지역을 눌러 주세요.";
+const PROMPT = "농지가 있는 지역을 눌러 주세요. 담당 기관을 정확하게 안내해 드립니다.";
 
 function RegionPage() {
   const region = useApp((s) => s.region);
@@ -24,17 +24,17 @@ function RegionPage() {
 
   const pick = (r: string) => {
     setRegion(r);
-    nav({ to: "/listen" });
+    nav({ to: "/result" });
   };
 
   return (
-    <PageShell back="/" step={{ current: 1, total: 5 }}>
+    <PageShell back="/intent" step={{ current: 4, total: 5 }}>
       <div className="mt-2 flex items-center gap-2 text-primary">
         <MapPin className="h-6 w-6" />
-        <span className="text-lg font-bold">1단계 · 지역 선택</span>
+        <span className="text-lg font-bold">4단계 · 농지 위치</span>
       </div>
       <h1 className="mt-2 text-[30px] leading-tight font-black">
-        어디에 살고 계세요?
+        농지의 위치가<br />어디인가요?
       </h1>
       <div className="mt-2">
         <SpeakButton text={PROMPT} auto label="안내 듣기" />

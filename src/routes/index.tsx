@@ -1,8 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { Mic, Phone } from "lucide-react";
+import { Mic } from "lucide-react";
 import { PageShell } from "@/components/PageShell";
 import { SpeakButton } from "@/components/SpeakButton";
-import { HUMAN_SUPPORT_PHONE } from "@/lib/data";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -35,7 +34,7 @@ function Home() {
             <Mic className="h-11 w-11 text-primary" />
           </div>
           <p className="text-[20px] font-bold tracking-wide text-primary/80">
-            AI Voice Civil Service Guide
+            AI 음성 민원 안내
           </p>
           <h1 className="mt-1 text-[44px] leading-tight font-black text-primary">
             말해농
@@ -49,7 +48,7 @@ function Home() {
 
         <div className="w-full space-y-4">
           <Link
-            to="/region"
+            to="/listen"
             className="btn-huge block w-full bg-primary text-center text-primary-foreground shadow-lg active:scale-[0.98]"
             style={{ minHeight: 88, fontSize: 28 }}
           >
@@ -59,14 +58,6 @@ function Home() {
           <div className="flex items-center justify-center gap-3">
             <SpeakButton text={WELCOME} label="안내 듣기" />
           </div>
-
-          <a
-            href={`tel:${HUMAN_SUPPORT_PHONE}`}
-            className="btn-huge flex w-full items-center justify-center gap-2 bg-accent text-accent-foreground shadow-md"
-          >
-            <Phone className="h-6 w-6" />
-            상담원 바로 통화
-          </a>
         </div>
       </section>
     </PageShell>

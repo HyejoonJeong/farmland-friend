@@ -20,7 +20,6 @@ const PROMPT =
   "지금 상황을 편하게 말씀해 주세요. 예를 들어, 농지를 맡기고 싶다, 농지연금 상담 받고 싶다, 이렇게 말씀하시면 됩니다. 말씀이 끝나시면 자동으로 다음 단계로 넘어갑니다. 말씀이 불편하시면 아래에 글로 적으셔도 됩니다.";
 
 function ListenPage() {
-  const region = useApp((s) => s.region);
   const setTranscript = useApp((s) => s.setTranscript);
   const nav = useNavigate();
   const [status, setStatus] = useState<"idle" | "recording" | "processing" | "error">(
@@ -36,10 +35,6 @@ function ListenPage() {
   const lastVoiceAt = useRef(0);
   const spokeRef = useRef(false);
   const vadTimer = useRef<number | null>(null);
-
-  useEffect(() => {
-    if (!region) nav({ to: "/region" });
-  }, [region, nav]);
 
   const clearVad = () => {
     if (vadTimer.current) {
@@ -141,10 +136,10 @@ function ListenPage() {
   const processing = status === "processing";
 
   return (
-    <PageShell back="/region" step={{ current: 2, total: 5 }}>
+    <PageShell back="/" step={{ current: 1, total: 5 }}>
       <div className="mt-2 flex items-center gap-2 text-primary">
         <Mic className="h-6 w-6" />
-        <span className="text-lg font-bold">2단계 · 말씀하기 ({region})</span>
+        <span className="text-lg font-bold">1단계 · 말씀하기</span>
       </div>
       <h1 className="mt-2 text-[30px] leading-tight font-black">
         {recording ? "듣고 있어요..." : "무엇을 도와 드릴까요, 고객님?"}

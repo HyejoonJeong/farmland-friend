@@ -50,7 +50,7 @@ function SituationPage() {
   const speakText = `이렇게 말씀하신 게 맞을까요? ${transcript}`;
 
   return (
-    <PageShell back="/listen" step={{ current: 3, total: 5 }}>
+    <PageShell back="/listen" step={{ current: 2, total: 5 }}>
       <h1 className="mt-4 text-[30px] leading-tight font-black">
         이렇게 말씀하신 게<br />
         맞을까요?

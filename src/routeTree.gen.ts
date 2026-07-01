@@ -9,11 +9,23 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as RegionRouteImport } from './routes/region'
+import { Route as ListenRouteImport } from './routes/listen'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as ApiTtsRouteImport } from './routes/api/tts'
 import { Route as ApiSttRouteImport } from './routes/api/stt'
 import { Route as ApiIntentRouteImport } from './routes/api/intent'
 
+const RegionRoute = RegionRouteImport.update({
+  id: '/region',
+  path: '/region',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ListenRoute = ListenRouteImport.update({
+  id: '/listen',
+  path: '/listen',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
@@ -37,12 +49,16 @@ const ApiIntentRoute = ApiIntentRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/listen': typeof ListenRoute
+  '/region': typeof RegionRoute
   '/api/intent': typeof ApiIntentRoute
   '/api/stt': typeof ApiSttRoute
   '/api/tts': typeof ApiTtsRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/listen': typeof ListenRoute
+  '/region': typeof RegionRoute
   '/api/intent': typeof ApiIntentRoute
   '/api/stt': typeof ApiSttRoute
   '/api/tts': typeof ApiTtsRoute
@@ -50,20 +66,37 @@ export interface FileRoutesByTo {
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/listen': typeof ListenRoute
+  '/region': typeof RegionRoute
   '/api/intent': typeof ApiIntentRoute
   '/api/stt': typeof ApiSttRoute
   '/api/tts': typeof ApiTtsRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/api/intent' | '/api/stt' | '/api/tts'
+  fullPaths:
+    | '/'
+    | '/listen'
+    | '/region'
+    | '/api/intent'
+    | '/api/stt'
+    | '/api/tts'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/api/intent' | '/api/stt' | '/api/tts'
-  id: '__root__' | '/' | '/api/intent' | '/api/stt' | '/api/tts'
+  to: '/' | '/listen' | '/region' | '/api/intent' | '/api/stt' | '/api/tts'
+  id:
+    | '__root__'
+    | '/'
+    | '/listen'
+    | '/region'
+    | '/api/intent'
+    | '/api/stt'
+    | '/api/tts'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  ListenRoute: typeof ListenRoute
+  RegionRoute: typeof RegionRoute
   ApiIntentRoute: typeof ApiIntentRoute
   ApiSttRoute: typeof ApiSttRoute
   ApiTtsRoute: typeof ApiTtsRoute
@@ -71,6 +104,20 @@ export interface RootRouteChildren {
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/region': {
+      id: '/region'
+      path: '/region'
+      fullPath: '/region'
+      preLoaderRoute: typeof RegionRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/listen': {
+      id: '/listen'
+      path: '/listen'
+      fullPath: '/listen'
+      preLoaderRoute: typeof ListenRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/': {
       id: '/'
       path: '/'
@@ -104,6 +151,8 @@ declare module '@tanstack/react-router' {
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  ListenRoute: ListenRoute,
+  RegionRoute: RegionRoute,
   ApiIntentRoute: ApiIntentRoute,
   ApiSttRoute: ApiSttRoute,
   ApiTtsRoute: ApiTtsRoute,

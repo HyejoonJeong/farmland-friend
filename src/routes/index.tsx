@@ -24,7 +24,7 @@ export const Route = createFileRoute("/")({
 });
 
 const WELCOME =
-  "안녕하세요, 어르신. 농사 도우미입니다. 말씀만 하시면 어디로 전화해야 하는지 알려드릴게요. 시작하려면 아래 큰 초록색 버튼을 눌러 주세요.";
+  "안녕하세요, 고객님. 말해농입니다. 상황을 편하게 말씀하시거나 글로 적어 주시면 어디로 전화해야 하는지 알려드릴게요. 시작하려면 아래 큰 초록색 버튼을 눌러 주세요.";
 
 function Home() {
   return (
@@ -34,16 +34,16 @@ function Home() {
           <div className="mx-auto mb-4 grid h-20 w-20 place-items-center rounded-3xl bg-primary/10">
             <Mic className="h-11 w-11 text-primary" />
           </div>
-          <h1 className="text-[34px] leading-tight font-black text-primary">
-            농사 도우미
+          <p className="text-[20px] font-bold tracking-wide text-primary/80">
+            AI Voice Civil Service Guide
+          </p>
+          <h1 className="mt-1 text-[44px] leading-tight font-black text-primary">
+            말해농
           </h1>
           <p className="mt-3 text-[22px] font-semibold text-foreground/80">
             말씀만 하시면
             <br />
             담당자에게 연결해 드립니다
-          </p>
-          <p className="mt-5 text-[19px] text-muted-foreground">
-            농지은행 · 농업기술센터 · 품질관리원
           </p>
         </div>
 

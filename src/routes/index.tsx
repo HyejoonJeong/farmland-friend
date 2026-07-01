@@ -1,29 +1,74 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
+import { Mic, Phone } from "lucide-react";
+import { PageShell } from "@/components/PageShell";
+import { SpeakButton } from "@/components/SpeakButton";
+import { HUMAN_SUPPORT_PHONE } from "@/lib/data";
 
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
-      { title: "Your App" },
-      { name: "description", content: "Replace this with a one-sentence description of your app." },
-      { property: "og:title", content: "Your App" },
-      { property: "og:description", content: "Replace this with a one-sentence description of your app." },
+      { title: "농사 도우미 · 말로 신청하세요" },
+      {
+        name: "description",
+        content:
+          "어르신을 위한 음성 기반 농업 민원 도우미. 말로 상황을 설명하면 담당 기관과 부서를 바로 연결해드립니다.",
+      },
+      { property: "og:title", content: "농사 도우미" },
+      {
+        property: "og:description",
+        content: "말로 신청하는 농업 민원 도우미 · 농지은행 · 농업기술센터 · 품관원",
+      },
     ],
   }),
-  component: Index,
+  component: Home,
 });
 
-// IMPORTANT: Replace this placeholder. See ./README.md for routing conventions.
-function Index() {
+const WELCOME =
+  "안녕하세요, 어르신. 농사 도우미입니다. 말씀만 하시면 어디로 전화해야 하는지 알려드릴게요. 시작하려면 아래 큰 초록색 버튼을 눌러 주세요.";
+
+function Home() {
   return (
-    <div
-      className="flex min-h-screen items-center justify-center"
-      style={{ backgroundColor: "#fcfbf8" }}
-    >
-      <img
-        data-lovable-blank-page-placeholder="REMOVE_THIS"
-        src="https://cdn.gpteng.co/blank-app-v1.svg"
-        alt="Your app will live here!"
-      />
-    </div>
+    <PageShell back={null}>
+      <section className="flex flex-1 flex-col items-center justify-between gap-8 pt-6">
+        <div className="text-center">
+          <div className="mx-auto mb-4 grid h-20 w-20 place-items-center rounded-3xl bg-primary/10">
+            <Mic className="h-11 w-11 text-primary" />
+          </div>
+          <h1 className="text-[34px] leading-tight font-black text-primary">
+            농사 도우미
+          </h1>
+          <p className="mt-3 text-[22px] font-semibold text-foreground/80">
+            말씀만 하시면
+            <br />
+            담당자에게 연결해 드립니다
+          </p>
+          <p className="mt-5 text-[19px] text-muted-foreground">
+            농지은행 · 농업기술센터 · 품질관리원
+          </p>
+        </div>
+
+        <div className="w-full space-y-4">
+          <Link
+            to="/region"
+            className="btn-huge block w-full bg-primary text-center text-primary-foreground shadow-lg active:scale-[0.98]"
+            style={{ minHeight: 88, fontSize: 28 }}
+          >
+            시작하기
+          </Link>
+
+          <div className="flex items-center justify-center gap-3">
+            <SpeakButton text={WELCOME} label="안내 듣기" />
+          </div>
+
+          <a
+            href={`tel:${HUMAN_SUPPORT_PHONE}`}
+            className="btn-huge flex w-full items-center justify-center gap-2 bg-accent text-accent-foreground shadow-md"
+          >
+            <Phone className="h-6 w-6" />
+            상담원 바로 통화
+          </a>
+        </div>
+      </section>
+    </PageShell>
   );
 }

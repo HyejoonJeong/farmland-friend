@@ -32,7 +32,7 @@ function Home() {
   return (
     <PageShell back={null}>
       <div className="flex items-center justify-start pt-2">
-        <img src={krcLogo} alt="KRC 한국농어촌공사" className="h-10 w-auto" />
+        <img src={krcLogo} alt="KRC 한국농어촌공사" className="h-8 w-auto" />
       </div>
       <section className="flex flex-1 flex-col items-center justify-between gap-8 pt-6">
         <div className="text-center">

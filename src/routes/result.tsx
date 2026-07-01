@@ -88,6 +88,9 @@ function ResultPage() {
             </li>
           ))}
         </ul>
+        <p className="mt-4 text-[18px] font-semibold text-foreground/70">
+          자세한 서류는 담당직원에게 문의
+        </p>
       </section>
 
       <div className="mt-6 grid grid-cols-2 gap-3 pb-2">

@@ -11,7 +11,7 @@ export const Route = createFileRoute("/")({
       {
         name: "description",
         content:
-          "어르신을 위한 음성 기반 농업 민원 도우미. 말로 상황을 설명하면 담당 기관과 부서를 바로 연결해드립니다.",
+          "고객님을 위한 음성 기반 농업 민원 도우미. 말로 상황을 설명하면 담당 기관과 부서를 바로 연결해드립니다.",
       },
       { property: "og:title", content: "농사 도우미" },
       {

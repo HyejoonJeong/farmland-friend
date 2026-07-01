@@ -31,8 +31,8 @@ function IntentPage() {
   const conf = Math.round(intent.confidence * 100);
 
   return (
-    <PageShell back="/situation" step={{ current: 4, total: 5 }}>
-      <div className="mt-3 text-lg font-bold text-primary">4단계 · 담당 업무 확인</div>
+    <PageShell back="/situation" step={{ current: 3, total: 5 }}>
+      <div className="mt-3 text-lg font-bold text-primary">3단계 · 담당 업무 확인</div>
       <h1 className="mt-1 text-[30px] leading-tight font-black">
         이 일이 맞으실까요?
       </h1>
@@ -68,7 +68,7 @@ function IntentPage() {
 
       <div className="mt-auto space-y-3 pt-8">
         <Link
-          to="/result"
+          to="/region"
           className="btn-huge flex w-full items-center justify-center gap-2 bg-primary text-primary-foreground shadow-lg active:scale-[0.98]"
           style={{ minHeight: 80, fontSize: 26 }}
         >

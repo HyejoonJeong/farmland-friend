@@ -119,7 +119,7 @@ function ClarifyPage() {
   const processing = status === "processing";
 
   return (
-    <PageShell back="/situation" step={{ current: 3, total: 5 }}>
+    <PageShell back="/situation" step={{ current: 2, total: 5 }}>
       <h1 className="mt-4 text-[30px] leading-tight font-black">
         한 가지만 더 여쭐게요
       </h1>

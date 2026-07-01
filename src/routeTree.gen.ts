@@ -10,8 +10,11 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as SituationRouteImport } from './routes/situation'
+import { Route as ResultRouteImport } from './routes/result'
 import { Route as RegionRouteImport } from './routes/region'
 import { Route as ListenRouteImport } from './routes/listen'
+import { Route as IntentRouteImport } from './routes/intent'
+import { Route as HelpRouteImport } from './routes/help'
 import { Route as ClarifyRouteImport } from './routes/clarify'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as ApiTtsRouteImport } from './routes/api/tts'
@@ -23,6 +26,11 @@ const SituationRoute = SituationRouteImport.update({
   path: '/situation',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ResultRoute = ResultRouteImport.update({
+  id: '/result',
+  path: '/result',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const RegionRoute = RegionRouteImport.update({
   id: '/region',
   path: '/region',
@@ -31,6 +39,16 @@ const RegionRoute = RegionRouteImport.update({
 const ListenRoute = ListenRouteImport.update({
   id: '/listen',
   path: '/listen',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const IntentRoute = IntentRouteImport.update({
+  id: '/intent',
+  path: '/intent',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const HelpRoute = HelpRouteImport.update({
+  id: '/help',
+  path: '/help',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ClarifyRoute = ClarifyRouteImport.update({
@@ -62,8 +80,11 @@ const ApiIntentRoute = ApiIntentRouteImport.update({
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/clarify': typeof ClarifyRoute
+  '/help': typeof HelpRoute
+  '/intent': typeof IntentRoute
   '/listen': typeof ListenRoute
   '/region': typeof RegionRoute
+  '/result': typeof ResultRoute
   '/situation': typeof SituationRoute
   '/api/intent': typeof ApiIntentRoute
   '/api/stt': typeof ApiSttRoute
@@ -72,8 +93,11 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/clarify': typeof ClarifyRoute
+  '/help': typeof HelpRoute
+  '/intent': typeof IntentRoute
   '/listen': typeof ListenRoute
   '/region': typeof RegionRoute
+  '/result': typeof ResultRoute
   '/situation': typeof SituationRoute
   '/api/intent': typeof ApiIntentRoute
   '/api/stt': typeof ApiSttRoute
@@ -83,8 +107,11 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/clarify': typeof ClarifyRoute
+  '/help': typeof HelpRoute
+  '/intent': typeof IntentRoute
   '/listen': typeof ListenRoute
   '/region': typeof RegionRoute
+  '/result': typeof ResultRoute
   '/situation': typeof SituationRoute
   '/api/intent': typeof ApiIntentRoute
   '/api/stt': typeof ApiSttRoute
@@ -95,8 +122,11 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/clarify'
+    | '/help'
+    | '/intent'
     | '/listen'
     | '/region'
+    | '/result'
     | '/situation'
     | '/api/intent'
     | '/api/stt'
@@ -105,8 +135,11 @@ export interface FileRouteTypes {
   to:
     | '/'
     | '/clarify'
+    | '/help'
+    | '/intent'
     | '/listen'
     | '/region'
+    | '/result'
     | '/situation'
     | '/api/intent'
     | '/api/stt'
@@ -115,8 +148,11 @@ export interface FileRouteTypes {
     | '__root__'
     | '/'
     | '/clarify'
+    | '/help'
+    | '/intent'
     | '/listen'
     | '/region'
+    | '/result'
     | '/situation'
     | '/api/intent'
     | '/api/stt'
@@ -126,8 +162,11 @@ export interface FileRouteTypes {
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   ClarifyRoute: typeof ClarifyRoute
+  HelpRoute: typeof HelpRoute
+  IntentRoute: typeof IntentRoute
   ListenRoute: typeof ListenRoute
   RegionRoute: typeof RegionRoute
+  ResultRoute: typeof ResultRoute
   SituationRoute: typeof SituationRoute
   ApiIntentRoute: typeof ApiIntentRoute
   ApiSttRoute: typeof ApiSttRoute
@@ -143,6 +182,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof SituationRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/result': {
+      id: '/result'
+      path: '/result'
+      fullPath: '/result'
+      preLoaderRoute: typeof ResultRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/region': {
       id: '/region'
       path: '/region'
@@ -155,6 +201,20 @@ declare module '@tanstack/react-router' {
       path: '/listen'
       fullPath: '/listen'
       preLoaderRoute: typeof ListenRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/intent': {
+      id: '/intent'
+      path: '/intent'
+      fullPath: '/intent'
+      preLoaderRoute: typeof IntentRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/help': {
+      id: '/help'
+      path: '/help'
+      fullPath: '/help'
+      preLoaderRoute: typeof HelpRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/clarify': {
@@ -198,8 +258,11 @@ declare module '@tanstack/react-router' {
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   ClarifyRoute: ClarifyRoute,
+  HelpRoute: HelpRoute,
+  IntentRoute: IntentRoute,
   ListenRoute: ListenRoute,
   RegionRoute: RegionRoute,
+  ResultRoute: ResultRoute,
   SituationRoute: SituationRoute,
   ApiIntentRoute: ApiIntentRoute,
   ApiSttRoute: ApiSttRoute,

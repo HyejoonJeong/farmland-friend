@@ -62,26 +62,31 @@
 }
 
 :root {
-  --radius: 0.625rem;
-  --background: oklch(1 0 0);
-  --foreground: oklch(0.129 0.042 264.695);
+  --radius: 1rem;
+  /* High-contrast, warm palette tuned for outdoor readability by seniors */
+  --background: oklch(0.985 0.01 95);
+  --foreground: oklch(0.18 0.03 150);
   --card: oklch(1 0 0);
-  --card-foreground: oklch(0.129 0.042 264.695);
+  --card-foreground: oklch(0.18 0.03 150);
   --popover: oklch(1 0 0);
-  --popover-foreground: oklch(0.129 0.042 264.695);
-  --primary: oklch(0.208 0.042 265.755);
-  --primary-foreground: oklch(0.984 0.003 247.858);
-  --secondary: oklch(0.968 0.007 247.896);
-  --secondary-foreground: oklch(0.208 0.042 265.755);
-  --muted: oklch(0.968 0.007 247.896);
-  --muted-foreground: oklch(0.554 0.046 257.417);
-  --accent: oklch(0.968 0.007 247.896);
-  --accent-foreground: oklch(0.208 0.042 265.755);
-  --destructive: oklch(0.577 0.245 27.325);
-  --destructive-foreground: oklch(0.984 0.003 247.858);
-  --border: oklch(0.929 0.013 255.508);
-  --input: oklch(0.929 0.013 255.508);
-  --ring: oklch(0.704 0.04 256.788);
+  --popover-foreground: oklch(0.18 0.03 150);
+  /* Deep field green — trusted, agricultural */
+  --primary: oklch(0.48 0.14 150);
+  --primary-foreground: oklch(0.99 0.01 95);
+  --primary-strong: oklch(0.4 0.15 150);
+  /* Warm amber accent for CTAs / voice */
+  --accent: oklch(0.78 0.17 70);
+  --accent-foreground: oklch(0.2 0.04 60);
+  --secondary: oklch(0.94 0.03 130);
+  --secondary-foreground: oklch(0.2 0.03 150);
+  --muted: oklch(0.94 0.02 100);
+  --muted-foreground: oklch(0.42 0.03 150);
+  --destructive: oklch(0.55 0.22 27);
+  --destructive-foreground: oklch(0.99 0.01 95);
+  --success: oklch(0.55 0.16 150);
+  --border: oklch(0.85 0.03 130);
+  --input: oklch(0.9 0.02 130);
+  --ring: oklch(0.55 0.16 150);
   --chart-1: oklch(0.646 0.222 41.116);
   --chart-2: oklch(0.6 0.118 184.704);
   --chart-3: oklch(0.398 0.07 227.392);
@@ -140,5 +145,33 @@
   body {
     background-color: var(--color-background);
     color: var(--color-foreground);
+    font-family: "Pretendard", "Noto Sans KR", -apple-system, BlinkMacSystemFont,
+      "Apple SD Gothic Neo", "Malgun Gothic", sans-serif;
+    font-size: 20px;
+    line-height: 1.55;
+    -webkit-font-smoothing: antialiased;
+  }
+  h1 { font-size: 32px; font-weight: 800; letter-spacing: -0.01em; }
+  h2 { font-size: 26px; font-weight: 700; letter-spacing: -0.01em; }
+  button, a { touch-action: manipulation; }
+}
+
+@layer utilities {
+  .btn-huge {
+    min-height: 64px;
+    padding: 18px 22px;
+    border-radius: 18px;
+    font-size: 22px;
+    font-weight: 700;
+  }
+  .safe-bottom { padding-bottom: max(1rem, env(safe-area-inset-bottom)); }
+}
+
+@keyframes mic-pulse {
+  0%, 100% { transform: scale(1); opacity: 0.55; }
+  50% { transform: scale(1.45); opacity: 0; }
+}
+.mic-ring {
+  animation: mic-pulse 1.6s ease-out infinite;
   }
 }

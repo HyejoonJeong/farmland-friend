@@ -2,6 +2,9 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { Mic } from "lucide-react";
 import { PageShell } from "@/components/PageShell";
 import { SpeakButton } from "@/components/SpeakButton";
+import krcLogo from "@/assets/krc-logo.png";
+import characterGreen from "@/assets/character-green.png";
+import characterYellow from "@/assets/character-yellow.png";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -28,6 +31,9 @@ const WELCOME =
 function Home() {
   return (
     <PageShell back={null}>
+      <div className="flex items-center justify-start pt-2">
+        <img src={krcLogo} alt="KRC 한국농어촌공사" className="h-10 w-auto" />
+      </div>
       <section className="flex flex-1 flex-col items-center justify-between gap-8 pt-6">
         <div className="text-center">
           <div className="mx-auto mb-4 grid h-20 w-20 place-items-center rounded-3xl bg-primary/10">
@@ -36,9 +42,23 @@ function Home() {
           <p className="text-[20px] font-bold tracking-wide text-primary/80">
             AI 음성 민원 안내
           </p>
-          <h1 className="mt-1 text-[44px] leading-tight font-black text-primary">
-            말해농
-          </h1>
+          <div className="mt-1 flex items-center justify-center gap-2">
+            <img
+              src={characterGreen}
+              alt=""
+              aria-hidden="true"
+              className="h-24 w-auto"
+            />
+            <h1 className="text-[44px] leading-tight font-black text-primary">
+              말해농
+            </h1>
+            <img
+              src={characterYellow}
+              alt=""
+              aria-hidden="true"
+              className="h-24 w-auto"
+            />
+          </div>
           <p className="mt-3 text-[22px] font-semibold text-foreground/80">
             말씀만 하시면
             <br />

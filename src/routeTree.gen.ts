@@ -9,38 +9,221 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as SituationRouteImport } from './routes/situation'
+import { Route as ResultRouteImport } from './routes/result'
+import { Route as RegionRouteImport } from './routes/region'
+import { Route as ListenRouteImport } from './routes/listen'
+import { Route as IntentRouteImport } from './routes/intent'
+import { Route as HelpRouteImport } from './routes/help'
+import { Route as ClarifyRouteImport } from './routes/clarify'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as ApiTtsRouteImport } from './routes/api/tts'
+import { Route as ApiSttRouteImport } from './routes/api/stt'
+import { Route as ApiIntentRouteImport } from './routes/api/intent'
 
+const SituationRoute = SituationRouteImport.update({
+  id: '/situation',
+  path: '/situation',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ResultRoute = ResultRouteImport.update({
+  id: '/result',
+  path: '/result',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const RegionRoute = RegionRouteImport.update({
+  id: '/region',
+  path: '/region',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ListenRoute = ListenRouteImport.update({
+  id: '/listen',
+  path: '/listen',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const IntentRoute = IntentRouteImport.update({
+  id: '/intent',
+  path: '/intent',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const HelpRoute = HelpRouteImport.update({
+  id: '/help',
+  path: '/help',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ClarifyRoute = ClarifyRouteImport.update({
+  id: '/clarify',
+  path: '/clarify',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiTtsRoute = ApiTtsRouteImport.update({
+  id: '/api/tts',
+  path: '/api/tts',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiSttRoute = ApiSttRouteImport.update({
+  id: '/api/stt',
+  path: '/api/stt',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiIntentRoute = ApiIntentRouteImport.update({
+  id: '/api/intent',
+  path: '/api/intent',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/clarify': typeof ClarifyRoute
+  '/help': typeof HelpRoute
+  '/intent': typeof IntentRoute
+  '/listen': typeof ListenRoute
+  '/region': typeof RegionRoute
+  '/result': typeof ResultRoute
+  '/situation': typeof SituationRoute
+  '/api/intent': typeof ApiIntentRoute
+  '/api/stt': typeof ApiSttRoute
+  '/api/tts': typeof ApiTtsRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/clarify': typeof ClarifyRoute
+  '/help': typeof HelpRoute
+  '/intent': typeof IntentRoute
+  '/listen': typeof ListenRoute
+  '/region': typeof RegionRoute
+  '/result': typeof ResultRoute
+  '/situation': typeof SituationRoute
+  '/api/intent': typeof ApiIntentRoute
+  '/api/stt': typeof ApiSttRoute
+  '/api/tts': typeof ApiTtsRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/clarify': typeof ClarifyRoute
+  '/help': typeof HelpRoute
+  '/intent': typeof IntentRoute
+  '/listen': typeof ListenRoute
+  '/region': typeof RegionRoute
+  '/result': typeof ResultRoute
+  '/situation': typeof SituationRoute
+  '/api/intent': typeof ApiIntentRoute
+  '/api/stt': typeof ApiSttRoute
+  '/api/tts': typeof ApiTtsRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/'
+  fullPaths:
+    | '/'
+    | '/clarify'
+    | '/help'
+    | '/intent'
+    | '/listen'
+    | '/region'
+    | '/result'
+    | '/situation'
+    | '/api/intent'
+    | '/api/stt'
+    | '/api/tts'
   fileRoutesByTo: FileRoutesByTo
-  to: '/'
-  id: '__root__' | '/'
+  to:
+    | '/'
+    | '/clarify'
+    | '/help'
+    | '/intent'
+    | '/listen'
+    | '/region'
+    | '/result'
+    | '/situation'
+    | '/api/intent'
+    | '/api/stt'
+    | '/api/tts'
+  id:
+    | '__root__'
+    | '/'
+    | '/clarify'
+    | '/help'
+    | '/intent'
+    | '/listen'
+    | '/region'
+    | '/result'
+    | '/situation'
+    | '/api/intent'
+    | '/api/stt'
+    | '/api/tts'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  ClarifyRoute: typeof ClarifyRoute
+  HelpRoute: typeof HelpRoute
+  IntentRoute: typeof IntentRoute
+  ListenRoute: typeof ListenRoute
+  RegionRoute: typeof RegionRoute
+  ResultRoute: typeof ResultRoute
+  SituationRoute: typeof SituationRoute
+  ApiIntentRoute: typeof ApiIntentRoute
+  ApiSttRoute: typeof ApiSttRoute
+  ApiTtsRoute: typeof ApiTtsRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/situation': {
+      id: '/situation'
+      path: '/situation'
+      fullPath: '/situation'
+      preLoaderRoute: typeof SituationRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/result': {
+      id: '/result'
+      path: '/result'
+      fullPath: '/result'
+      preLoaderRoute: typeof ResultRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/region': {
+      id: '/region'
+      path: '/region'
+      fullPath: '/region'
+      preLoaderRoute: typeof RegionRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/listen': {
+      id: '/listen'
+      path: '/listen'
+      fullPath: '/listen'
+      preLoaderRoute: typeof ListenRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/intent': {
+      id: '/intent'
+      path: '/intent'
+      fullPath: '/intent'
+      preLoaderRoute: typeof IntentRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/help': {
+      id: '/help'
+      path: '/help'
+      fullPath: '/help'
+      preLoaderRoute: typeof HelpRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/clarify': {
+      id: '/clarify'
+      path: '/clarify'
+      fullPath: '/clarify'
+      preLoaderRoute: typeof ClarifyRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/': {
       id: '/'
       path: '/'
@@ -48,22 +231,43 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/tts': {
+      id: '/api/tts'
+      path: '/api/tts'
+      fullPath: '/api/tts'
+      preLoaderRoute: typeof ApiTtsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/stt': {
+      id: '/api/stt'
+      path: '/api/stt'
+      fullPath: '/api/stt'
+      preLoaderRoute: typeof ApiSttRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/intent': {
+      id: '/api/intent'
+      path: '/api/intent'
+      fullPath: '/api/intent'
+      preLoaderRoute: typeof ApiIntentRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  ClarifyRoute: ClarifyRoute,
+  HelpRoute: HelpRoute,
+  IntentRoute: IntentRoute,
+  ListenRoute: ListenRoute,
+  RegionRoute: RegionRoute,
+  ResultRoute: ResultRoute,
+  SituationRoute: SituationRoute,
+  ApiIntentRoute: ApiIntentRoute,
+  ApiSttRoute: ApiSttRoute,
+  ApiTtsRoute: ApiTtsRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { startInstance } from './start.ts'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-    config: Awaited<ReturnType<typeof startInstance.getOptions>>
-  }
-}

@@ -22,7 +22,7 @@ export const Route = createFileRoute("/api/tts")({
             input: text,
             voice: "alloy",
             response_format: "mp3",
-            instructions: "따뜻하고 또렷하게, 어르신이 알아듣기 쉽게 천천히 말하세요.",
+            instructions: "따뜻하고 또렷하게, 고객님이 알아듣기 쉽게 천천히 말하세요.",
           }),
         });
 

@@ -21,7 +21,7 @@ export const Route = createFileRoute("/api/intent")({
             `- ${i.key}: ${i.label} (담당업무: ${i.business}). 예: ${i.examples.slice(0, 4).join(" / ")}`,
         ).join("\n");
 
-        const system = `당신은 한국 농촌 어르신의 민원 음성 발화를 이해해 담당 업무 카테고리로 분류하는 도우미입니다.
+        const system = `당신은 한국 농촌 고객님의 민원 음성 발화를 이해해 담당 업무 카테고리로 분류하는 도우미입니다.
 지역 방언과 완곡한 표현을 모두 이해합니다. 지역: ${body.region ?? "미상"}.
 아래 카테고리 중 정확히 하나를 고르세요:
 ${catalogue}
@@ -30,11 +30,11 @@ ${catalogue}
 {
   "intent": "카테고리 key",
   "confidence": 0~1 사이 소수,
-  "summary": "한 문장으로 어르신의 상황을 쉬운 말로 요약 (존댓말)",
+  "summary": "한 문장으로 고객님의 상황을 쉬운 말로 요약 (존댓말)",
   "needsClarification": true/false,
   "followUp": "확신이 낮을 때만 한 문장 후속 질문, 아니면 빈 문자열"
 }
-confidence가 0.7 미만이거나 두 카테고리 중 헷갈리면 needsClarification=true 로 하고 followUp에 어르신이 예/아니오로 답할 수 있는 짧은 질문을 넣으세요.`;
+confidence가 0.7 미만이거나 두 카테고리 중 헷갈리면 needsClarification=true 로 하고 followUp에 고객님이 예/아니오로 답할 수 있는 짧은 질문을 넣으세요.`;
 
         const userMsg = body.clarification
           ? `발화: "${text}"\n추가 답변: "${body.clarification}"`

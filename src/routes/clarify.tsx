@@ -4,7 +4,7 @@ import { PageShell } from "@/components/PageShell";
 import { SpeakButton } from "@/components/SpeakButton";
 import { useApp } from "@/lib/store";
 import { startRecorder, type Recorder } from "@/lib/recorder";
-import { Mic, Square, Loader2 } from "lucide-react";
+import { Mic, Loader2 } from "lucide-react";
 
 export const Route = createFileRoute("/clarify")({
   head: () => ({
@@ -24,6 +24,16 @@ function ClarifyPage() {
   const [level, setLevel] = useState(0);
   const recRef = useRef<Recorder | null>(null);
   const startedAt = useRef(0);
+  const lastVoiceAt = useRef(0);
+  const spokeRef = useRef(false);
+  const vadTimer = useRef<number | null>(null);
+
+  const clearVad = () => {
+    if (vadTimer.current) {
+      window.clearInterval(vadTimer.current);
+      vadTimer.current = null;
+    }
+  };
 
   useEffect(() => {
     if (!intent) nav({ to: "/situation" });
@@ -35,11 +45,28 @@ function ClarifyPage() {
 
   const start = async () => {
     setError(null);
+    spokeRef.current = false;
     try {
-      const rec = await startRecorder(setLevel);
+      const rec = await startRecorder((v) => {
+        setLevel(v);
+        if (v > 0.12) {
+          lastVoiceAt.current = Date.now();
+          if (!spokeRef.current && Date.now() - startedAt.current > 300) {
+            spokeRef.current = true;
+          }
+        }
+      });
       recRef.current = rec;
       startedAt.current = Date.now();
+      lastVoiceAt.current = Date.now();
       setStatus("recording");
+      vadTimer.current = window.setInterval(() => {
+        const now = Date.now();
+        const elapsed = now - startedAt.current;
+        const silence = now - lastVoiceAt.current;
+        if (elapsed > 15000) return void stop();
+        if (spokeRef.current && silence > 1600 && elapsed > 1500) stop();
+      }, 200);
     } catch {
       setError("마이크를 사용할 수 없어요.");
     }
@@ -48,6 +75,7 @@ function ClarifyPage() {
   const stop = async () => {
     const rec = recRef.current;
     if (!rec) return;
+    clearVad();
     setStatus("processing");
     const dur = Date.now() - startedAt.current;
     const blob = await rec.stop();
@@ -79,7 +107,13 @@ function ClarifyPage() {
     }
   };
 
-  useEffect(() => () => recRef.current?.cancel(), []);
+  useEffect(
+    () => () => {
+      clearVad();
+      recRef.current?.cancel();
+    },
+    [],
+  );
 
   const recording = status === "recording";
   const processing = status === "processing";
@@ -103,22 +137,20 @@ function ClarifyPage() {
           )}
           <button
             type="button"
-            onClick={recording ? stop : start}
+            onClick={recording ? undefined : start}
             disabled={processing}
             className={`relative grid h-36 w-36 place-items-center rounded-full shadow-xl active:scale-95 ${
               recording
-                ? "bg-destructive text-destructive-foreground"
+                ? "bg-primary text-primary-foreground"
                 : "bg-primary text-primary-foreground"
             }`}
             style={{
               transform: recording ? `scale(${1 + level * 0.15})` : undefined,
             }}
-            aria-label={recording ? "정지" : "답변 녹음"}
+            aria-label={recording ? "듣는 중" : "답변 녹음"}
           >
             {processing ? (
               <Loader2 className="h-14 w-14 animate-spin" />
-            ) : recording ? (
-              <Square className="h-14 w-14" />
             ) : (
               <Mic className="h-14 w-14" />
             )}
@@ -128,7 +160,7 @@ function ClarifyPage() {
           {processing
             ? "정리하는 중..."
             : recording
-              ? "다 답하시면 눌러 주세요"
+              ? "다 말씀하시면 자동으로 넘어갑니다"
               : "답을 말씀해 주세요"}
         </p>
       </div>

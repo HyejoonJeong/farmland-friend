@@ -15,7 +15,7 @@ export const Route = createFileRoute("/region")({
   component: RegionPage,
 });
 
-const PROMPT = "먼저 어르신이 살고 계신 지역을 눌러 주세요.";
+const PROMPT = "먼저 고객님이 살고 계신 지역을 눌러 주세요.";
 
 function RegionPage() {
   const region = useApp((s) => s.region);

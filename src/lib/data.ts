@@ -6,6 +6,7 @@ export type IntentKey =
   | "retirement_subsidy"
   | "farmland_acquire"
   | "farmland_sell"
+  | "farm_recovery"
   | "farming_tech"
   | "gap_certification";
 
@@ -80,6 +81,19 @@ export const INTENTS: IntentInfo[] = [
     ],
   },
   {
+    key: "farm_recovery",
+    label: "경영회생 지원",
+    business: "경영회생사업",
+    org: "farmland_bank",
+    examples: [
+      "경영회생 신청하려고 합니다",
+      "빚이 많아서 농지를 맡기려고 합니다",
+      "농지를 팔고 다시 빌려 쓸 수 있나요?",
+      "농사 빚 때문에 상담받고 싶습니다",
+      "부채 때문에 농지를 활용하고 싶습니다",
+    ],
+  },
+  {
     key: "farming_tech",
     label: "영농기술·교육·청년농",
     business: "영농기술 지도, 귀농귀촌, 청년농, 스마트팜, 병해충 상담",
@@ -112,6 +126,7 @@ export const REQUIRED_DOCS: Record<IntentKey, string[]> = {
   retirement_subsidy: ["신분증", "농업경영체 등록확인서", "농지 등기부등본", "경영이양 신청서"],
   farmland_acquire: ["신분증", "농업경영체 등록확인서 (해당 시)", "농지구입 계획서"],
   farmland_sell: ["신분증", "농지 등기부등본", "토지대장", "매도 신청서"],
+  farm_recovery: ["신분증", "농지 등기부등본", "토지대장", "부채 증빙서류", "농업경영체 등록확인서", "경영회생 신청서"],
   farming_tech: ["신분증"],
   gap_certification: ["신분증", "농업경영체 등록증", "농지 관련 서류", "인증 신청서"],
 };

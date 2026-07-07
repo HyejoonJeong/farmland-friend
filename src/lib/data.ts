@@ -187,11 +187,13 @@ export const FARMLAND_BANK: FarmlandContact[] = [
   { branch: "익산", phone: "063-860-0035", duty: "경영회생, 과원, 선임대후매도" },
   { branch: "익산", phone: "063-860-0042", duty: "채권 사후관리" },
   { branch: "익산", phone: "063-860-0087", duty: "농지임대수탁사업" },
+  { branch: "익산", phone: "063-860-0087", duty: "지사 농지사업" },
   { branch: "전완임", phone: "063-270-0520", duty: "공공임대용농지매입사업, 선임대후매도" },
   { branch: "전완임", phone: "063-270-0525", duty: "농지연금, 맞춤형매매임대" },
   { branch: "전완임", phone: "063-270-0521", duty: "경영회생, 과원규모화, 농지이양" },
   { branch: "전완임", phone: "063-270-0522", duty: "농지임대수탁" },
   { branch: "전완임", phone: "063-270-0526", duty: "농지보전부담금관리, 규모화채권관리" },
+  { branch: "고창", phone: "063-560-0000", duty: "지사 농지사업" },
   { branch: "고창", phone: "063-560-1004", duty: "공공임대용 농지매입, 농지연금" },
   { branch: "고창", phone: "063-560-1556", duty: "공공임대용 농지 임대, 과원규모화" },
   { branch: "고창", phone: "063-560-1555", duty: "농지총괄, 공공임대" },
@@ -200,11 +202,13 @@ export const FARMLAND_BANK: FarmlandContact[] = [
   { branch: "고창", phone: "063-560-1509", duty: "경영회생, 경영이양은퇴지불" },
   { branch: "고창", phone: "063-560-1560", duty: "농지임대수탁" },
   { branch: "정읍", phone: "063-530-0323", duty: "농지사업(경영회생지원사업)" },
+  { branch: "정읍", phone: "063-530-0000", duty: "농지사업(공공임대용농지매입)" },
   { branch: "정읍", phone: "063-530-0303", duty: "농지사업(공공임대용농지매입)" },
   { branch: "정읍", phone: "063-530-0365", duty: "농지사업(공공임대용농지임대)" },
   { branch: "정읍", phone: "063-534-6819", duty: "농지사업(채권, 농지보전부담금)" },
   { branch: "정읍", phone: "063-530-0324", duty: "농지사업(임대수탁)" },
   { branch: "정읍", phone: "063-530-0326", duty: "농지사업(규모화, 연금)" },
+  { branch: "정읍", phone: "063-530-0322", duty: "농지사업(경영이양은퇴직불, 임대수탁)" },
 ];
 
 // Map region → farmland bank branch

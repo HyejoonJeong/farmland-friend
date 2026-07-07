@@ -83,7 +83,7 @@ export const INTENTS: IntentInfo[] = [
   {
     key: "farm_recovery",
     label: "경영회생 지원",
-    business: "경영회생사업",
+    business: "경영회생",
     org: "farmland_bank",
     examples: [
       "경영회생 신청하려고 합니다",

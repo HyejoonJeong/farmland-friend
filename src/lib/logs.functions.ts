@@ -30,7 +30,7 @@ export const getUsageLogs = createServerFn({ method: "POST" })
   .handler(async ({ data }) => {
     const expected = process.env["ADMIN_ACCESS_KEY"];
     if (!expected || data.key !== expected) {
-      throw new Error("UNAUTHORIZED");
+      return { authorized: false as const, logs: [] as UsageLogRow[], stats: null };
     }
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
     const { data: rows, error } = await supabaseAdmin
@@ -72,5 +72,5 @@ export const getUsageLogs = createServerFn({ method: "POST" })
       byRegion: count((r) => r.region),
     };
 
-    return { logs, stats };
+    return { authorized: true as const, logs, stats };
   });

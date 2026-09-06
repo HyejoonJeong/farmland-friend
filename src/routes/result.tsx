@@ -36,19 +36,24 @@ function ResultPage() {
     if (logged.current || !intent || !region || !contact) return;
     logged.current = true;
     const label = INTENTS.find((i) => i.key === intent.intent)?.label ?? intent.intent;
-    void supabase.from("usage_logs").insert({
-      transcript,
-      clarification: clarification || null,
-      summary: intent.summary || null,
-      intent: intent.intent,
-      intent_label: label,
-      confidence: intent.confidence,
-      region,
-      branch: contact.orgName,
-      department: contact.department,
-      phone: contact.phone,
-      source: transcript ? "app" : null,
-    });
+    void supabase
+      .from("usage_logs")
+      .insert({
+        transcript,
+        clarification: clarification || null,
+        summary: intent.summary || null,
+        intent: intent.intent,
+        intent_label: label,
+        confidence: intent.confidence,
+        region,
+        branch: contact.orgName,
+        department: contact.department,
+        phone: contact.phone,
+        source: transcript ? "app" : null,
+      })
+      .then(({ error }) => {
+        if (error) console.error("[usage_logs] insert failed", error.message);
+      });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [intent, region, contact]);
 

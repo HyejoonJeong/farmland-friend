@@ -75,7 +75,7 @@ function AdminPage() {
     );
   }
 
-  if (error || !data) {
+  if (error || !data || !data.authorized || !data.stats) {
     return (
       <div className="mx-auto grid min-h-screen max-w-md place-items-center p-6 text-center">
         <div>

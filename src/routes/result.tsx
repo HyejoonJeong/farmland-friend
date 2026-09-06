@@ -1,9 +1,10 @@
 import { createFileRoute, useNavigate, Link } from "@tanstack/react-router";
-import { useEffect, useMemo } from "react";
+import { useEffect, useMemo, useRef } from "react";
 import { PageShell } from "@/components/PageShell";
 import { SpeakButton } from "@/components/SpeakButton";
 import { useApp } from "@/lib/store";
 import { INTENTS, REQUIRED_DOCS, matchContact } from "@/lib/data";
+import { supabase } from "@/integrations/supabase/client";
 import { Phone, FileText, Building2, Home } from "lucide-react";
 
 export const Route = createFileRoute("/result")({
@@ -17,8 +18,9 @@ export const Route = createFileRoute("/result")({
 });
 
 function ResultPage() {
-  const { intent, region, reset } = useApp();
+  const { intent, region, transcript, clarification, reset } = useApp();
   const nav = useNavigate();
+  const logged = useRef(false);
 
   useEffect(() => {
     if (!intent || !region) nav({ to: "/" });
@@ -28,6 +30,28 @@ function ResultPage() {
     () => (intent && region ? matchContact(intent.intent, region) : null),
     [intent, region],
   );
+
+  // Accumulate anonymous usage data to improve classification accuracy.
+  useEffect(() => {
+    if (logged.current || !intent || !region || !contact) return;
+    logged.current = true;
+    const label = INTENTS.find((i) => i.key === intent.intent)?.label ?? intent.intent;
+    void supabase.from("usage_logs").insert({
+      transcript,
+      clarification: clarification || null,
+      summary: intent.summary || null,
+      intent: intent.intent,
+      intent_label: label,
+      confidence: intent.confidence,
+      region,
+      branch: contact.orgName,
+      department: contact.department,
+      phone: contact.phone,
+      source: transcript ? "app" : null,
+    });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [intent, region, contact]);
+
 
   if (!intent || !region || !contact) return null;
   const info = INTENTS.find((i) => i.key === intent.intent)!;

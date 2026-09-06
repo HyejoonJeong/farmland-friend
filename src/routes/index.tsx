@@ -78,6 +78,15 @@ function Home() {
           <div className="flex items-center justify-center gap-3">
             <SpeakButton text={WELCOME} label="안내 듣기" />
           </div>
+
+          <div className="pt-6 text-center">
+            <Link
+              to="/admin"
+              className="text-[13px] text-muted-foreground/70 underline"
+            >
+              관리자 페이지
+            </Link>
+          </div>
         </div>
       </section>
     </PageShell>

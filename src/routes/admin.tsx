@@ -1,10 +1,11 @@
-import { createFileRoute } from "@tanstack/react-router";
-import { useQuery } from "@tanstack/react-query";
+import { createFileRoute, Link } from "@tanstack/react-router";
+import { useMutation } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
+import { useState } from "react";
 import { getUsageLogs, type UsageLogRow } from "@/lib/logs.functions";
-import { BarChart3, Download, Loader2, RefreshCw, ShieldAlert } from "lucide-react";
+import { BarChart3, Download, Loader2, Lock, RefreshCw } from "lucide-react";
 
-export const Route = createFileRoute("/admin/$key")({
+export const Route = createFileRoute("/admin")({
   head: () => ({
     meta: [
       { title: "운영 데이터 · 말해농 관리자" },
@@ -59,35 +60,67 @@ function toCsv(rows: UsageLogRow[]) {
 }
 
 function AdminPage() {
-  const { key } = Route.useParams();
   const fetchLogs = useServerFn(getUsageLogs);
-  const { data, isPending, error, refetch, isFetching } = useQuery({
-    queryKey: ["usage-logs", key],
-    queryFn: () => fetchLogs({ data: { key } }),
-    retry: false,
+  const [password, setPassword] = useState("");
+  const [denied, setDenied] = useState(false);
+
+  const login = useMutation({
+    mutationFn: (key: string) => fetchLogs({ data: { key } }),
+    onSuccess: (res) => setDenied(!res.authorized),
   });
 
-  if (isPending) {
+  const data = login.data?.authorized ? login.data : null;
+
+  if (!data || !data.stats) {
     return (
-      <div className="grid min-h-screen place-items-center">
-        <Loader2 className="h-10 w-10 animate-spin text-primary" />
+      <div className="mx-auto grid min-h-screen max-w-md place-items-center p-6">
+        <form
+          onSubmit={(e) => {
+            e.preventDefault();
+            setDenied(false);
+            login.mutate(password);
+          }}
+          className="w-full text-center"
+        >
+          <Lock className="mx-auto h-12 w-12 text-primary" />
+          <h1 className="mt-3 text-[24px] font-black">관리자 페이지</h1>
+          <p className="mt-2 text-[16px] text-muted-foreground">
+            비밀번호를 입력해 주세요.
+          </p>
+          <input
+            type="password"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            autoComplete="current-password"
+            className="mt-5 w-full rounded-2xl border-2 border-border bg-card px-4 py-4 text-center text-[20px] font-bold outline-none focus:border-primary"
+            placeholder="비밀번호"
+          />
+          {(denied || login.isError) && (
+            <p className="mt-3 text-[16px] font-semibold text-destructive">
+              비밀번호가 올바르지 않습니다.
+            </p>
+          )}
+          <button
+            type="submit"
+            disabled={login.isPending || password.length === 0}
+            className="mt-4 inline-flex w-full items-center justify-center gap-2 rounded-2xl bg-primary px-4 py-4 text-[20px] font-bold text-primary-foreground disabled:opacity-50"
+          >
+            {login.isPending && <Loader2 className="h-5 w-5 animate-spin" />}
+            들어가기
+          </button>
+          <Link
+            to="/"
+            className="mt-5 inline-block text-[16px] font-semibold text-muted-foreground underline"
+          >
+            처음 화면으로
+          </Link>
+        </form>
       </div>
     );
   }
 
-  if (error || !data || !data.authorized || !data.stats) {
-    return (
-      <div className="mx-auto grid min-h-screen max-w-md place-items-center p-6 text-center">
-        <div>
-          <ShieldAlert className="mx-auto h-12 w-12 text-destructive" />
-          <p className="mt-3 text-[22px] font-black">접근 권한이 없습니다</p>
-          <p className="mt-2 text-[17px] text-muted-foreground">
-            주소가 올바른지 확인해 주세요.
-          </p>
-        </div>
-      </div>
-    );
-  }
+  const refetch = () => login.mutate(password);
+  const isFetching = login.isPending;
 
   const { logs, stats } = data;
 

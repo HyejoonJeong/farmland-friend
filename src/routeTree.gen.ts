@@ -20,6 +20,7 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as ApiTtsRouteImport } from './routes/api/tts'
 import { Route as ApiSttRouteImport } from './routes/api/stt'
 import { Route as ApiIntentRouteImport } from './routes/api/intent'
+import { Route as AdminKeyRouteImport } from './routes/admin.$key'
 
 const SituationRoute = SituationRouteImport.update({
   id: '/situation',
@@ -76,6 +77,11 @@ const ApiIntentRoute = ApiIntentRouteImport.update({
   path: '/api/intent',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AdminKeyRoute = AdminKeyRouteImport.update({
+  id: '/admin/$key',
+  path: '/admin/$key',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -86,6 +92,7 @@ export interface FileRoutesByFullPath {
   '/region': typeof RegionRoute
   '/result': typeof ResultRoute
   '/situation': typeof SituationRoute
+  '/admin/$key': typeof AdminKeyRoute
   '/api/intent': typeof ApiIntentRoute
   '/api/stt': typeof ApiSttRoute
   '/api/tts': typeof ApiTtsRoute
@@ -99,6 +106,7 @@ export interface FileRoutesByTo {
   '/region': typeof RegionRoute
   '/result': typeof ResultRoute
   '/situation': typeof SituationRoute
+  '/admin/$key': typeof AdminKeyRoute
   '/api/intent': typeof ApiIntentRoute
   '/api/stt': typeof ApiSttRoute
   '/api/tts': typeof ApiTtsRoute
@@ -113,6 +121,7 @@ export interface FileRoutesById {
   '/region': typeof RegionRoute
   '/result': typeof ResultRoute
   '/situation': typeof SituationRoute
+  '/admin/$key': typeof AdminKeyRoute
   '/api/intent': typeof ApiIntentRoute
   '/api/stt': typeof ApiSttRoute
   '/api/tts': typeof ApiTtsRoute
@@ -128,6 +137,7 @@ export interface FileRouteTypes {
     | '/region'
     | '/result'
     | '/situation'
+    | '/admin/$key'
     | '/api/intent'
     | '/api/stt'
     | '/api/tts'
@@ -141,6 +151,7 @@ export interface FileRouteTypes {
     | '/region'
     | '/result'
     | '/situation'
+    | '/admin/$key'
     | '/api/intent'
     | '/api/stt'
     | '/api/tts'
@@ -154,6 +165,7 @@ export interface FileRouteTypes {
     | '/region'
     | '/result'
     | '/situation'
+    | '/admin/$key'
     | '/api/intent'
     | '/api/stt'
     | '/api/tts'
@@ -168,6 +180,7 @@ export interface RootRouteChildren {
   RegionRoute: typeof RegionRoute
   ResultRoute: typeof ResultRoute
   SituationRoute: typeof SituationRoute
+  AdminKeyRoute: typeof AdminKeyRoute
   ApiIntentRoute: typeof ApiIntentRoute
   ApiSttRoute: typeof ApiSttRoute
   ApiTtsRoute: typeof ApiTtsRoute
@@ -252,6 +265,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiIntentRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/admin/$key': {
+      id: '/admin/$key'
+      path: '/admin/$key'
+      fullPath: '/admin/$key'
+      preLoaderRoute: typeof AdminKeyRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
@@ -264,6 +284,7 @@ const rootRouteChildren: RootRouteChildren = {
   RegionRoute: RegionRoute,
   ResultRoute: ResultRoute,
   SituationRoute: SituationRoute,
+  AdminKeyRoute: AdminKeyRoute,
   ApiIntentRoute: ApiIntentRoute,
   ApiSttRoute: ApiSttRoute,
   ApiTtsRoute: ApiTtsRoute,

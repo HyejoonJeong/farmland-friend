@@ -14,7 +14,54 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      usage_logs: {
+        Row: {
+          branch: string | null
+          clarification: string | null
+          confidence: number | null
+          created_at: string
+          department: string | null
+          id: string
+          intent: string | null
+          intent_label: string | null
+          phone: string | null
+          region: string | null
+          source: string | null
+          summary: string | null
+          transcript: string
+        }
+        Insert: {
+          branch?: string | null
+          clarification?: string | null
+          confidence?: number | null
+          created_at?: string
+          department?: string | null
+          id?: string
+          intent?: string | null
+          intent_label?: string | null
+          phone?: string | null
+          region?: string | null
+          source?: string | null
+          summary?: string | null
+          transcript: string
+        }
+        Update: {
+          branch?: string | null
+          clarification?: string | null
+          confidence?: number | null
+          created_at?: string
+          department?: string | null
+          id?: string
+          intent?: string | null
+          intent_label?: string | null
+          phone?: string | null
+          region?: string | null
+          source?: string | null
+          summary?: string | null
+          transcript?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never

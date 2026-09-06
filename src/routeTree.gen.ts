@@ -16,11 +16,11 @@ import { Route as ListenRouteImport } from './routes/listen'
 import { Route as IntentRouteImport } from './routes/intent'
 import { Route as HelpRouteImport } from './routes/help'
 import { Route as ClarifyRouteImport } from './routes/clarify'
+import { Route as AdminRouteImport } from './routes/admin'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as ApiTtsRouteImport } from './routes/api/tts'
 import { Route as ApiSttRouteImport } from './routes/api/stt'
 import { Route as ApiIntentRouteImport } from './routes/api/intent'
-import { Route as AdminKeyRouteImport } from './routes/admin.$key'
 
 const SituationRoute = SituationRouteImport.update({
   id: '/situation',
@@ -57,6 +57,11 @@ const ClarifyRoute = ClarifyRouteImport.update({
   path: '/clarify',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AdminRoute = AdminRouteImport.update({
+  id: '/admin',
+  path: '/admin',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
@@ -77,14 +82,10 @@ const ApiIntentRoute = ApiIntentRouteImport.update({
   path: '/api/intent',
   getParentRoute: () => rootRouteImport,
 } as any)
-const AdminKeyRoute = AdminKeyRouteImport.update({
-  id: '/admin/$key',
-  path: '/admin/$key',
-  getParentRoute: () => rootRouteImport,
-} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/admin': typeof AdminRoute
   '/clarify': typeof ClarifyRoute
   '/help': typeof HelpRoute
   '/intent': typeof IntentRoute
@@ -92,13 +93,13 @@ export interface FileRoutesByFullPath {
   '/region': typeof RegionRoute
   '/result': typeof ResultRoute
   '/situation': typeof SituationRoute
-  '/admin/$key': typeof AdminKeyRoute
   '/api/intent': typeof ApiIntentRoute
   '/api/stt': typeof ApiSttRoute
   '/api/tts': typeof ApiTtsRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/admin': typeof AdminRoute
   '/clarify': typeof ClarifyRoute
   '/help': typeof HelpRoute
   '/intent': typeof IntentRoute
@@ -106,7 +107,6 @@ export interface FileRoutesByTo {
   '/region': typeof RegionRoute
   '/result': typeof ResultRoute
   '/situation': typeof SituationRoute
-  '/admin/$key': typeof AdminKeyRoute
   '/api/intent': typeof ApiIntentRoute
   '/api/stt': typeof ApiSttRoute
   '/api/tts': typeof ApiTtsRoute
@@ -114,6 +114,7 @@ export interface FileRoutesByTo {
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/admin': typeof AdminRoute
   '/clarify': typeof ClarifyRoute
   '/help': typeof HelpRoute
   '/intent': typeof IntentRoute
@@ -121,7 +122,6 @@ export interface FileRoutesById {
   '/region': typeof RegionRoute
   '/result': typeof ResultRoute
   '/situation': typeof SituationRoute
-  '/admin/$key': typeof AdminKeyRoute
   '/api/intent': typeof ApiIntentRoute
   '/api/stt': typeof ApiSttRoute
   '/api/tts': typeof ApiTtsRoute
@@ -130,6 +130,7 @@ export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
+    | '/admin'
     | '/clarify'
     | '/help'
     | '/intent'
@@ -137,13 +138,13 @@ export interface FileRouteTypes {
     | '/region'
     | '/result'
     | '/situation'
-    | '/admin/$key'
     | '/api/intent'
     | '/api/stt'
     | '/api/tts'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
+    | '/admin'
     | '/clarify'
     | '/help'
     | '/intent'
@@ -151,13 +152,13 @@ export interface FileRouteTypes {
     | '/region'
     | '/result'
     | '/situation'
-    | '/admin/$key'
     | '/api/intent'
     | '/api/stt'
     | '/api/tts'
   id:
     | '__root__'
     | '/'
+    | '/admin'
     | '/clarify'
     | '/help'
     | '/intent'
@@ -165,7 +166,6 @@ export interface FileRouteTypes {
     | '/region'
     | '/result'
     | '/situation'
-    | '/admin/$key'
     | '/api/intent'
     | '/api/stt'
     | '/api/tts'
@@ -173,6 +173,7 @@ export interface FileRouteTypes {
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  AdminRoute: typeof AdminRoute
   ClarifyRoute: typeof ClarifyRoute
   HelpRoute: typeof HelpRoute
   IntentRoute: typeof IntentRoute
@@ -180,7 +181,6 @@ export interface RootRouteChildren {
   RegionRoute: typeof RegionRoute
   ResultRoute: typeof ResultRoute
   SituationRoute: typeof SituationRoute
-  AdminKeyRoute: typeof AdminKeyRoute
   ApiIntentRoute: typeof ApiIntentRoute
   ApiSttRoute: typeof ApiSttRoute
   ApiTtsRoute: typeof ApiTtsRoute
@@ -237,6 +237,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ClarifyRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/admin': {
+      id: '/admin'
+      path: '/admin'
+      fullPath: '/admin'
+      preLoaderRoute: typeof AdminRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/': {
       id: '/'
       path: '/'
@@ -265,18 +272,12 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiIntentRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/admin/$key': {
-      id: '/admin/$key'
-      path: '/admin/$key'
-      fullPath: '/admin/$key'
-      preLoaderRoute: typeof AdminKeyRouteImport
-      parentRoute: typeof rootRouteImport
-    }
   }
 }
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  AdminRoute: AdminRoute,
   ClarifyRoute: ClarifyRoute,
   HelpRoute: HelpRoute,
   IntentRoute: IntentRoute,
@@ -284,7 +285,6 @@ const rootRouteChildren: RootRouteChildren = {
   RegionRoute: RegionRoute,
   ResultRoute: ResultRoute,
   SituationRoute: SituationRoute,
-  AdminKeyRoute: AdminKeyRoute,
   ApiIntentRoute: ApiIntentRoute,
   ApiSttRoute: ApiSttRoute,
   ApiTtsRoute: ApiTtsRoute,

@@ -17,8 +17,7 @@ export const Route = createFileRoute("/clarify")({
 });
 
 function ClarifyPage() {
-  const { intent, transcript, region, category, appendClarification, setIntent } =
-    useApp();
+  const { intent, transcript, region, appendClarification, setIntent } = useApp();
   const nav = useNavigate();
   const [status, setStatus] = useState<"idle" | "recording" | "processing">("idle");
   const [error, setError] = useState<string | null>(null);
@@ -96,7 +95,7 @@ function ClarifyPage() {
       const res = await fetch("/api/intent", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ text: transcript, region, category, clarification: text }),
+        body: JSON.stringify({ text: transcript, region, clarification: text }),
       });
       if (!res.ok) throw new Error();
       const data = await res.json();

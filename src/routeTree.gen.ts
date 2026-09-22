@@ -16,7 +16,6 @@ import { Route as ListenRouteImport } from './routes/listen'
 import { Route as IntentRouteImport } from './routes/intent'
 import { Route as HelpRouteImport } from './routes/help'
 import { Route as ClarifyRouteImport } from './routes/clarify'
-import { Route as CategoryRouteImport } from './routes/category'
 import { Route as AdminRouteImport } from './routes/admin'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as ApiTtsRouteImport } from './routes/api/tts'
@@ -58,11 +57,6 @@ const ClarifyRoute = ClarifyRouteImport.update({
   path: '/clarify',
   getParentRoute: () => rootRouteImport,
 } as any)
-const CategoryRoute = CategoryRouteImport.update({
-  id: '/category',
-  path: '/category',
-  getParentRoute: () => rootRouteImport,
-} as any)
 const AdminRoute = AdminRouteImport.update({
   id: '/admin',
   path: '/admin',
@@ -92,7 +86,6 @@ const ApiIntentRoute = ApiIntentRouteImport.update({
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/admin': typeof AdminRoute
-  '/category': typeof CategoryRoute
   '/clarify': typeof ClarifyRoute
   '/help': typeof HelpRoute
   '/intent': typeof IntentRoute
@@ -107,7 +100,6 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/admin': typeof AdminRoute
-  '/category': typeof CategoryRoute
   '/clarify': typeof ClarifyRoute
   '/help': typeof HelpRoute
   '/intent': typeof IntentRoute
@@ -123,7 +115,6 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/admin': typeof AdminRoute
-  '/category': typeof CategoryRoute
   '/clarify': typeof ClarifyRoute
   '/help': typeof HelpRoute
   '/intent': typeof IntentRoute
@@ -140,7 +131,6 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/admin'
-    | '/category'
     | '/clarify'
     | '/help'
     | '/intent'
@@ -155,7 +145,6 @@ export interface FileRouteTypes {
   to:
     | '/'
     | '/admin'
-    | '/category'
     | '/clarify'
     | '/help'
     | '/intent'
@@ -170,7 +159,6 @@ export interface FileRouteTypes {
     | '__root__'
     | '/'
     | '/admin'
-    | '/category'
     | '/clarify'
     | '/help'
     | '/intent'
@@ -186,7 +174,6 @@ export interface FileRouteTypes {
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AdminRoute: typeof AdminRoute
-  CategoryRoute: typeof CategoryRoute
   ClarifyRoute: typeof ClarifyRoute
   HelpRoute: typeof HelpRoute
   IntentRoute: typeof IntentRoute
@@ -250,13 +237,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ClarifyRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/category': {
-      id: '/category'
-      path: '/category'
-      fullPath: '/category'
-      preLoaderRoute: typeof CategoryRouteImport
-      parentRoute: typeof rootRouteImport
-    }
     '/admin': {
       id: '/admin'
       path: '/admin'
@@ -298,7 +278,6 @@ declare module '@tanstack/react-router' {
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AdminRoute: AdminRoute,
-  CategoryRoute: CategoryRoute,
   ClarifyRoute: ClarifyRoute,
   HelpRoute: HelpRoute,
   IntentRoute: IntentRoute,

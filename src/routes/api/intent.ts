@@ -1,5 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { INTENTS, type CategoryKey, type IntentKey } from "@/lib/data";
+import { INTENTS, type IntentKey } from "@/lib/data";
 
 export const Route = createFileRoute("/api/intent")({
   server: {
@@ -11,24 +11,18 @@ export const Route = createFileRoute("/api/intent")({
         const body = (await request.json().catch(() => ({}))) as {
           text?: string;
           region?: string;
-          category?: CategoryKey;
           clarification?: string;
         };
         const text = (body.text ?? "").trim();
         if (!text) return new Response("Missing text", { status: 400 });
 
-        const category: CategoryKey =
-          body.category === "census" ? "census" : "general";
-        const pool = INTENTS.filter((i) => i.category === category);
-
-        const catalogue = pool.map(
+        const catalogue = INTENTS.map(
           (i) =>
             `- ${i.key}: ${i.label} (담당업무: ${i.business}). 예: ${i.examples.slice(0, 4).join(" / ")}`,
         ).join("\n");
 
         const system = `당신은 한국 농촌 고객님의 민원 음성 발화를 이해해 담당 업무 카테고리로 분류하는 도우미입니다.
 지역 방언과 완곡한 표현을 모두 이해합니다. 지역: ${body.region ?? "미상"}.
-고객님이 선택한 민원 종류: ${category === "census" ? "농지전수조사 관련 민원" : "농지은행 일반 민원"}.
 아래 카테고리 중 정확히 하나를 고르세요:
 ${catalogue}
 
@@ -84,12 +78,10 @@ confidence가 0.7 미만이거나 두 카테고리 중 헷갈리면 needsClarifi
           parsed = {};
         }
 
-        const validKeys = pool.map((i) => i.key) as string[];
-        const fallback: IntentKey =
-          category === "census" ? "census_target" : "farmland_rent_out";
+        const validKeys = INTENTS.map((i) => i.key) as string[];
         const intent = (validKeys.includes(parsed.intent ?? "")
           ? parsed.intent
-          : fallback) as IntentKey;
+          : "farmland_rent_out") as IntentKey;
         const confidence = Math.max(0, Math.min(1, parsed.confidence ?? 0.5));
         const needsClar =
           Boolean(parsed.needsClarification) || confidence < 0.7;

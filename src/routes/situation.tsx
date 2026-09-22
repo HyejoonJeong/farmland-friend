@@ -16,7 +16,7 @@ export const Route = createFileRoute("/situation")({
 });
 
 function SituationPage() {
-  const { transcript, region, category, setIntent } = useApp();
+  const { transcript, region, setIntent } = useApp();
   const nav = useNavigate();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -32,7 +32,7 @@ function SituationPage() {
       const res = await fetch("/api/intent", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ text: transcript, region, category }),
+        body: JSON.stringify({ text: transcript, region }),
       });
       if (!res.ok) throw new Error(await res.text());
       const data = await res.json();

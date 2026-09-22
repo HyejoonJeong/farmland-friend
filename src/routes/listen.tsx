@@ -5,7 +5,6 @@ import { PageShell } from "@/components/PageShell";
 import { SpeakButton } from "@/components/SpeakButton";
 import { useApp } from "@/lib/store";
 import { startRecorder, type Recorder } from "@/lib/recorder";
-import { CATEGORIES } from "@/lib/data";
 
 export const Route = createFileRoute("/listen")({
   head: () => ({
@@ -20,19 +19,9 @@ export const Route = createFileRoute("/listen")({
 const PROMPT =
   "지금 상황을 편하게 말씀해 주세요. 예를 들어, 농지를 맡기고 싶다, 농지연금 상담 받고 싶다, 이렇게 말씀하시면 됩니다. 말씀이 끝나시면 자동으로 다음 단계로 넘어갑니다. 말씀이 불편하시면 아래에 글로 적으셔도 됩니다.";
 
-const CENSUS_PROMPT =
-  "농지전수조사와 관련해 여쭤보실 내용을 편하게 말씀해 주세요. 예를 들어, 조사 안내문을 받았다, 조사 결과가 사실과 다르다, 이렇게 말씀하시면 됩니다. 말씀이 끝나시면 자동으로 다음 단계로 넘어갑니다.";
-
 function ListenPage() {
   const setTranscript = useApp((s) => s.setTranscript);
-  const category = useApp((s) => s.category);
   const nav = useNavigate();
-  const categoryLabel = CATEGORIES.find((c) => c.key === category)?.label ?? null;
-  const census = category === "census";
-
-  useEffect(() => {
-    if (!category) nav({ to: "/category" });
-  }, [category, nav]);
   const [status, setStatus] = useState<"idle" | "recording" | "processing" | "error">(
     "idle",
   );
@@ -147,13 +136,10 @@ function ListenPage() {
   const processing = status === "processing";
 
   return (
-    <PageShell back="/category" step={{ current: 1, total: 5 }}>
+    <PageShell back="/" step={{ current: 1, total: 5 }}>
       <div className="mt-2 flex items-center gap-2 text-primary">
         <Mic className="h-6 w-6" />
-        <span className="text-lg font-bold">
-          1단계 · 말씀하기
-          {categoryLabel ? ` (${categoryLabel})` : ""}
-        </span>
+        <span className="text-lg font-bold">1단계 · 말씀하기</span>
       </div>
       <h1 className="mt-2 text-[30px] leading-tight font-black">
         {recording ? "듣고 있어요..." : "무엇을 도와 드릴까요, 고객님?"}
@@ -162,23 +148,13 @@ function ListenPage() {
         말씀이 끝나면 자동으로 다음 단계로 넘어갑니다.
       </p>
       <div className="mt-2">
-        <SpeakButton text={census ? CENSUS_PROMPT : PROMPT} auto label="안내 다시 듣기" />
+        <SpeakButton text={PROMPT} auto label="안내 다시 듣기" />
       </div>
 
       <div className="mt-6 rounded-2xl bg-secondary/60 p-5 text-[19px] text-foreground/80">
-        {census ? (
-          <>
-            예) “농지전수조사 안내문을 받았는데 무슨 뜻인지 모르겠습니다.”
-            <br />예) “조사 결과가 사실과 다릅니다.”
-            <br />예) “조사원이 언제 오는지 알고 싶어요.”
-          </>
-        ) : (
-          <>
-            예) “농사를 못 짓게 돼서 논을 좀 맡기려고 합니다.”
-            <br />예) “농지연금 상담 좀 받으려고요.”
-            <br />예) “청년농인데 밭 좀 알아봐 주세요.”
-          </>
-        )}
+        예) “농사를 못 짓게 돼서 논을 좀 맡기려고 합니다.”
+        <br />예) “농지연금 상담 좀 받으려고요.”
+        <br />예) “청년농인데 밭 좀 알아봐 주세요.”
       </div>
 
       <div className="mt-8 grid place-items-center">

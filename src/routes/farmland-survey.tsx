@@ -6,6 +6,7 @@ import {
   CircleAlert,
   ClipboardCheck,
   Database,
+  Landmark,
   MapPin,
   Phone,
   Sprout,
@@ -23,6 +24,8 @@ import { Button } from "@/components/ui/button";
 import {
   FARMLAND_BANK,
   HUMAN_SUPPORT_PHONE,
+  MUNICIPAL_FALLBACK,
+  MUNICIPAL_OFFICES,
   REGIONS,
   REGION_TO_FB_BRANCH,
 } from "@/lib/data";

@@ -20,6 +20,9 @@ export const Route = createFileRoute("/listen")({
 const PROMPT =
   "지금 상황을 편하게 말씀해 주세요. 예를 들어, 농지를 맡기고 싶다, 농지연금 상담 받고 싶다, 이렇게 말씀하시면 됩니다. 말씀이 끝나시면 자동으로 다음 단계로 넘어갑니다. 말씀이 불편하시면 아래에 글로 적으셔도 됩니다.";
 
+const CENSUS_PROMPT =
+  "농지전수조사와 관련해 궁금한 점을 편하게 말씀해 주세요. 예를 들어, 조사 안내문을 받았다, 조사 결과가 사실과 다르다, 이렇게 말씀하시면 됩니다. 말씀이 끝나시면 자동으로 다음 단계로 넘어갑니다.";
+
 function ListenPage() {
   const setTranscript = useApp((s) => s.setTranscript);
   const category = useApp((s) => s.category);
@@ -159,13 +162,23 @@ function ListenPage() {
         말씀이 끝나면 자동으로 다음 단계로 넘어갑니다.
       </p>
       <div className="mt-2">
-        <SpeakButton text={PROMPT} auto label="안내 다시 듣기" />
+        <SpeakButton text={census ? CENSUS_PROMPT : PROMPT} auto label="안내 다시 듣기" />
       </div>
 
       <div className="mt-6 rounded-2xl bg-secondary/60 p-5 text-[19px] text-foreground/80">
-        예) “농사를 못 짓게 돼서 논을 좀 맡기려고 합니다.”
-        <br />예) “농지연금 상담 좀 받으려고요.”
-        <br />예) “청년농인데 밭 좀 알아봐 주세요.”
+        {census ? (
+          <>
+            예) “농지전수조사 안내문을 받았는데 무슨 뜻인지 모르겠습니다.”
+            <br />예) “조사 결과가 사실과 다릅니다.”
+            <br />예) “조사원이 언제 오는지 알고 싶어요.”
+          </>
+        ) : (
+          <>
+            예) “농사를 못 짓게 돼서 논을 좀 맡기려고 합니다.”
+            <br />예) “농지연금 상담 좀 받으려고요.”
+            <br />예) “청년농인데 밭 좀 알아봐 주세요.”
+          </>
+        )}
       </div>
 
       <div className="mt-8 grid place-items-center">

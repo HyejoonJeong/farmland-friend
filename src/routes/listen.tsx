@@ -5,6 +5,7 @@ import { PageShell } from "@/components/PageShell";
 import { SpeakButton } from "@/components/SpeakButton";
 import { useApp } from "@/lib/store";
 import { startRecorder, type Recorder } from "@/lib/recorder";
+import { CATEGORIES } from "@/lib/data";
 
 export const Route = createFileRoute("/listen")({
   head: () => ({
@@ -21,7 +22,14 @@ const PROMPT =
 
 function ListenPage() {
   const setTranscript = useApp((s) => s.setTranscript);
+  const category = useApp((s) => s.category);
   const nav = useNavigate();
+  const categoryLabel = CATEGORIES.find((c) => c.key === category)?.label ?? null;
+  const census = category === "census";
+
+  useEffect(() => {
+    if (!category) nav({ to: "/category" });
+  }, [category, nav]);
   const [status, setStatus] = useState<"idle" | "recording" | "processing" | "error">(
     "idle",
   );

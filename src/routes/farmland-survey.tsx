@@ -6,6 +6,7 @@ import {
   CircleAlert,
   ClipboardCheck,
   Database,
+  Landmark,
   MapPin,
   Phone,
   Sprout,
@@ -23,6 +24,8 @@ import { Button } from "@/components/ui/button";
 import {
   FARMLAND_BANK,
   HUMAN_SUPPORT_PHONE,
+  MUNICIPAL_FALLBACK,
+  MUNICIPAL_OFFICES,
   REGIONS,
   REGION_TO_FB_BRANCH,
 } from "@/lib/data";
@@ -98,17 +101,39 @@ const USES = [
 ];
 
 const SPEAK_TEXT =
-  "2026년도 농지전수조사는 법 위반 농지를 모두 처분하기 위한 것이 아닙니다. 전국 농지의 소유와 이용 실태를 정확히 파악하고 농지 데이터를 구축하여 현실에 맞는 농지 관리와 제도 개선에 활용하기 위한 조사입니다. 고의적인 투기나 중대한 불법 전용은 농지법 원칙에 따라 조치하지만, 일반적이고 경미한 위반은 정상화 기회를 제공합니다. 더 궁금한 점은 화면 아래에서 농지 소재지를 선택해 관할 농지은행에 문의해 주세요.";
+  "2026년도 농지전수조사는 법 위반 농지를 모두 처분하기 위한 것이 아닙니다. 전국 농지의 소유와 이용 실태를 정확히 파악하고 농지 데이터를 구축하여 현실에 맞는 농지 관리와 제도 개선에 활용하기 위한 조사입니다. 고의적인 투기나 중대한 불법 전용은 농지법 원칙에 따라 조치하지만, 일반적이고 경미한 위반은 정상화 기회를 제공합니다. 더 궁금한 점은 화면 아래에서 농지 소재지와 문의 내용을 선택해 주세요. 조사 일정이나 방식은 관할 시군청에, 임대나 연금 등 농지 관리는 농지은행에 문의하시면 됩니다.";
+
+const TOPICS = [
+  {
+    key: "survey" as const,
+    title: "조사 일정·방식 등 전반적인 문의",
+    description: "농지전수조사는 정부와 지자체가 시행합니다. 조사 시기, 대상, 방법 등은 관할 시·군청에 문의하세요.",
+  },
+  {
+    key: "bank" as const,
+    title: "농지 관리·제도 상담",
+    description: "임대·위탁, 농지연금, 은퇴직불, 매입 등 제도권 농지 관리는 한국농어촌공사 농지은행이 안내합니다.",
+  },
+];
 
 function FarmlandSurveyPage() {
   const [region, setRegion] = useState<string | null>(null);
+  const [topic, setTopic] = useState<"survey" | "bank" | null>(null);
   const contact = useMemo(() => {
-    if (!region || region === "기타 지역") {
-      return region
-        ? { branch: "농지은행 대표상담", duty: "농지전수조사·농지 관련 문의", phone: HUMAN_SUPPORT_PHONE }
-        : null;
+    if (!region || !topic) return null;
+    if (topic === "survey") {
+      const office =
+        MUNICIPAL_OFFICES.find((item) => item.region === region) ?? MUNICIPAL_FALLBACK;
+      return {
+        kind: "지자체",
+        branch: office.name,
+        duty: "농지전수조사 담당 부서 연결 (대표번호)",
+        phone: office.phone,
+      };
     }
-
+    if (region === "기타 지역") {
+      return { kind: "농지은행", branch: "농지은행 대표상담", duty: "농지 관리·제도 관련 문의", phone: HUMAN_SUPPORT_PHONE };
+    }
     const branch = REGION_TO_FB_BRANCH[region];
     if (!branch) return null;
     const candidates = FARMLAND_BANK.filter((item) => item.branch === branch);
@@ -117,8 +142,8 @@ function FarmlandSurveyPage() {
       candidates.find((item) => item.duty.includes("농지총괄")) ??
       candidates[0];
     if (!preferred) return null;
-    return { branch: `한국농어촌공사 ${branch}지사`, duty: preferred.duty, phone: preferred.phone };
-  }, [region]);
+    return { kind: "농지은행", branch: `한국농어촌공사 ${branch}지사`, duty: preferred.duty, phone: preferred.phone };
+  }, [region, topic]);
 
   return (
     <PageShell back="/">
@@ -212,7 +237,9 @@ function FarmlandSurveyPage() {
           <MapPin className="h-6 w-6" />
           <h2 className="text-[25px] font-black">더 궁금한 점이 있으신가요?</h2>
         </div>
-        <p className="mt-2 text-[18px] font-semibold text-foreground/75">농지 소재지를 선택하면 관할 농지은행 문의처를 알려드립니다.</p>
+        <p className="mt-2 text-[18px] font-semibold text-foreground/75">
+          농지 소재지를 선택한 뒤, 어떤 점이 궁금한지 골라주세요. 내용에 맞는 문의처를 알려드립니다.
+        </p>
         <div className="mt-4 grid grid-cols-2 gap-2">
           {REGIONS.map((item) => (
             <Button
@@ -227,11 +254,36 @@ function FarmlandSurveyPage() {
           ))}
         </div>
 
+        {region && (
+          <div className="mt-5 grid gap-3">
+            {TOPICS.map((item) => {
+              const active = topic === item.key;
+              return (
+                <button
+                  key={item.key}
+                  type="button"
+                  onClick={() => setTopic(item.key)}
+                  className={`rounded-2xl border-2 p-5 text-left transition-colors ${
+                    active ? "border-primary bg-primary/[0.06]" : "border-border bg-card"
+                  }`}
+                >
+                  <p className={`text-[20px] font-black ${active ? "text-primary" : "text-foreground"}`}>
+                    {item.title}
+                  </p>
+                  <p className="mt-1 text-[16px] font-semibold leading-relaxed text-foreground/70">
+                    {item.description}
+                  </p>
+                </button>
+              );
+            })}
+          </div>
+        )}
+
         {contact && (
           <div className="mt-5 rounded-2xl border-2 border-primary bg-primary/[0.06] p-5" aria-live="polite">
             <div className="flex items-center gap-2 text-primary">
-              <Building2 className="h-6 w-6" />
-              <p className="text-[17px] font-bold">{region} 관할 문의처</p>
+              {contact.kind === "지자체" ? <Landmark className="h-6 w-6" /> : <Building2 className="h-6 w-6" />}
+              <p className="text-[17px] font-bold">{region} 관할 {contact.kind} 문의처</p>
             </div>
             <h3 className="mt-2 text-[23px] leading-tight font-black">{contact.branch}</h3>
             <p className="mt-1 text-[17px] font-semibold text-foreground/75">{contact.duty}</p>

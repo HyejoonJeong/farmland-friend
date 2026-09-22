@@ -8,17 +8,44 @@ export type IntentKey =
   | "farmland_sell"
   | "farm_recovery"
   | "farming_tech"
-  | "gap_certification";
+  | "gap_certification"
+  | "census_target"
+  | "census_visit"
+  | "census_correction"
+  | "census_idle";
+
+export type CategoryKey = "general" | "census";
+
+export interface CategoryInfo {
+  key: CategoryKey;
+  label: string;
+  desc: string;
+}
+
+export const CATEGORIES: CategoryInfo[] = [
+  {
+    key: "general",
+    label: "농지은행 일반 민원",
+    desc: "농지 임대·위탁, 농지연금, 은퇴직불, 농지 구입·매도, 경영회생, 영농기술·인증",
+  },
+  {
+    key: "census",
+    label: "농지전수조사 민원",
+    desc: "조사 대상·일정 안내, 조사원 방문, 조사 결과 정정·이의신청, 휴경·이용실태",
+  },
+];
 
 export interface IntentInfo {
   key: IntentKey;
   label: string;
   business: string;
   org: "farmland_bank" | "extension" | "naqs";
+  category: CategoryKey;
   examples: string[];
 }
 
 export const INTENTS: IntentInfo[] = [
+
   {
     key: "farmland_rent_out",
     label: "농지 내놓기 (임대·위탁)",

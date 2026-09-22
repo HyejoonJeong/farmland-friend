@@ -240,65 +240,105 @@ function FarmlandSurveyPage() {
         </p>
       </section>
 
-      <section className="mt-8 pb-8">
+      <section ref={askRef} className="mt-8 scroll-mt-4 pb-8">
         <div className="flex items-center gap-2 text-primary">
           <MapPin className="h-6 w-6" />
           <h2 className="text-[25px] font-black">더 궁금한 점이 있으신가요?</h2>
         </div>
-        <p className="mt-2 text-[18px] font-semibold text-foreground/75">
-          농지 소재지를 선택한 뒤, 어떤 점이 궁금한지 골라주세요. 내용에 맞는 문의처를 알려드립니다.
-        </p>
-        <div className="mt-4 grid grid-cols-2 gap-2">
-          {REGIONS.map((item) => (
-            <Button
-              key={item}
-              type="button"
-              variant={region === item ? "default" : "outline"}
-              onClick={() => setRegion(item)}
-              className="h-14 rounded-xl text-[18px] font-bold"
-            >
-              {item}
-            </Button>
-          ))}
-        </div>
 
-        {region && (
-          <div className="mt-5 grid gap-3">
-            {TOPICS.map((item) => {
-              const active = topic === item.key;
-              return (
+        {step === "region" && (
+          <div className="animate-in fade-in slide-in-from-bottom-4 duration-300" aria-live="polite">
+            <p className="mt-2 text-[18px] font-semibold text-foreground/75">
+              농지 소재지(시·군)를 선택해 주세요.
+            </p>
+            <div className="mt-4 grid grid-cols-2 gap-2">
+              {REGIONS.map((item) => (
+                <Button
+                  key={item}
+                  type="button"
+                  variant="outline"
+                  onClick={() => {
+                    setRegion(item);
+                    goToStep("topic");
+                  }}
+                  className="h-14 rounded-xl text-[18px] font-bold"
+                >
+                  {item}
+                </Button>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {step === "topic" && region && (
+          <div className="mt-2 animate-in fade-in slide-in-from-bottom-4 duration-300" aria-live="polite">
+            <div className="flex items-center justify-between gap-3 rounded-2xl bg-secondary px-4 py-3">
+              <p className="text-[18px] font-black text-primary">
+                선택하신 농지 소재지: {region}
+              </p>
+              <Button
+                type="button"
+                variant="ghost"
+                size="sm"
+                onClick={() => {
+                  setTopic(null);
+                  setStep("region");
+                }}
+                className="h-10 shrink-0 rounded-xl text-[16px] font-bold"
+              >
+                지역 다시 선택
+              </Button>
+            </div>
+            <p className="mt-4 text-[18px] font-semibold text-foreground/75">
+              어떤 점이 궁금하신가요? 내용에 맞는 문의처를 알려드립니다.
+            </p>
+            <div className="mt-4 grid gap-3">
+              {TOPICS.map((item) => (
                 <button
                   key={item.key}
                   type="button"
-                  onClick={() => setTopic(item.key)}
-                  className={`rounded-2xl border-2 p-5 text-left transition-colors ${
-                    active ? "border-primary bg-primary/[0.06]" : "border-border bg-card"
-                  }`}
+                  onClick={() => {
+                    setTopic(item.key);
+                    goToStep("contact");
+                  }}
+                  className="rounded-2xl border-2 border-border bg-card p-5 text-left transition-colors hover:border-primary"
                 >
-                  <p className={`text-[20px] font-black ${active ? "text-primary" : "text-foreground"}`}>
-                    {item.title}
-                  </p>
+                  <p className="text-[20px] font-black text-foreground">{item.title}</p>
                   <p className="mt-1 text-[16px] font-semibold leading-relaxed text-foreground/70">
                     {item.description}
                   </p>
                 </button>
-              );
-            })}
+              ))}
+            </div>
           </div>
         )}
 
-        {contact && (
-          <div className="mt-5 rounded-2xl border-2 border-primary bg-primary/[0.06] p-5" aria-live="polite">
-            <div className="flex items-center gap-2 text-primary">
-              {contact.kind === "지자체" ? <Landmark className="h-6 w-6" /> : <Building2 className="h-6 w-6" />}
-              <p className="text-[17px] font-bold">{region} 관할 {contact.kind} 문의처</p>
-            </div>
-            <h3 className="mt-2 text-[23px] leading-tight font-black">{contact.branch}</h3>
-            <p className="mt-1 text-[17px] font-semibold text-foreground/75">{contact.duty}</p>
-            <p className="mt-3 text-[30px] font-black text-primary">{contact.phone}</p>
-            <Button asChild className="mt-4 h-16 w-full rounded-xl text-[22px] font-black">
-              <a href={`tel:${contact.phone}`}><Phone className="h-6 w-6" />전화로 문의하기</a>
+        {step === "contact" && contact && (
+          <div className="mt-2 animate-in fade-in slide-in-from-bottom-4 duration-300" aria-live="polite">
+            <Button
+              type="button"
+              variant="ghost"
+              size="sm"
+              onClick={() => {
+                setTopic(null);
+                setStep("topic");
+              }}
+              className="mb-3 h-10 rounded-xl text-[16px] font-bold"
+            >
+              ← 문의 주제 다시 선택
             </Button>
+            <div className="rounded-2xl border-2 border-primary bg-primary/[0.06] p-5">
+              <div className="flex items-center gap-2 text-primary">
+                {contact.kind === "지자체" ? <Landmark className="h-6 w-6" /> : <Building2 className="h-6 w-6" />}
+                <p className="text-[17px] font-bold">{region} 관할 {contact.kind} 문의처</p>
+              </div>
+              <h3 className="mt-2 text-[23px] leading-tight font-black">{contact.branch}</h3>
+              <p className="mt-1 text-[17px] font-semibold text-foreground/75">{contact.duty}</p>
+              <p className="mt-3 text-[30px] font-black text-primary">{contact.phone}</p>
+              <Button asChild className="mt-4 h-16 w-full rounded-xl text-[22px] font-black">
+                <a href={`tel:${contact.phone}`}><Phone className="h-6 w-6" />전화로 문의하기</a>
+              </Button>
+            </div>
           </div>
         )}
       </section>

@@ -1,5 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { ClipboardSearch, Mic } from "lucide-react";
+import { ClipboardList, Mic } from "lucide-react";
 import { PageShell } from "@/components/PageShell";
 import { SpeakButton } from "@/components/SpeakButton";
 import krcLogo from "@/assets/krc-logo.png";
@@ -82,7 +82,7 @@ function Home() {
             className="flex min-h-20 w-full items-center gap-4 rounded-2xl border-2 border-primary/30 bg-secondary px-5 py-4 text-left text-secondary-foreground shadow-sm transition active:scale-[0.98]"
           >
             <span className="grid h-12 w-12 shrink-0 place-items-center rounded-xl bg-primary text-primary-foreground">
-              <ClipboardSearch className="h-7 w-7" />
+              <ClipboardList className="h-7 w-7" />
             </span>
             <span>
               <strong className="block text-[21px] leading-tight">2026년도 농지전수조사</strong>

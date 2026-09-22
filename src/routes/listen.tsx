@@ -136,10 +136,13 @@ function ListenPage() {
   const processing = status === "processing";
 
   return (
-    <PageShell back="/" step={{ current: 1, total: 5 }}>
+    <PageShell back="/category" step={{ current: 1, total: 5 }}>
       <div className="mt-2 flex items-center gap-2 text-primary">
         <Mic className="h-6 w-6" />
-        <span className="text-lg font-bold">1단계 · 말씀하기</span>
+        <span className="text-lg font-bold">
+          1단계 · 말씀하기
+          {categoryLabel ? ` (${categoryLabel})` : ""}
+        </span>
       </div>
       <h1 className="mt-2 text-[30px] leading-tight font-black">
         {recording ? "듣고 있어요..." : "무엇을 도와 드릴까요, 고객님?"}

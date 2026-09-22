@@ -119,6 +119,14 @@ const TOPICS = [
 function FarmlandSurveyPage() {
   const [region, setRegion] = useState<string | null>(null);
   const [topic, setTopic] = useState<"survey" | "bank" | null>(null);
+  const [step, setStep] = useState<"region" | "topic" | "contact">("region");
+  const askRef = useRef<HTMLDivElement>(null);
+  const goToStep = (next: "topic" | "contact") => {
+    setStep(next);
+    requestAnimationFrame(() => {
+      askRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+    });
+  };
   const contact = useMemo(() => {
     if (!region || !topic) return null;
     if (topic === "survey") {

@@ -28,6 +28,7 @@ export const Route = createFileRoute("/api/intent")({
 
         const system = `당신은 한국 농촌 고객님의 민원 음성 발화를 이해해 담당 업무 카테고리로 분류하는 도우미입니다.
 지역 방언과 완곡한 표현을 모두 이해합니다. 지역: ${body.region ?? "미상"}.
+고객님이 선택한 민원 종류: ${category === "census" ? "농지전수조사 관련 민원" : "농지은행 일반 민원"}.
 아래 카테고리 중 정확히 하나를 고르세요:
 ${catalogue}
 

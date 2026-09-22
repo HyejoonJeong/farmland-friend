@@ -15,6 +15,7 @@ import { Route as RegionRouteImport } from './routes/region'
 import { Route as ListenRouteImport } from './routes/listen'
 import { Route as IntentRouteImport } from './routes/intent'
 import { Route as HelpRouteImport } from './routes/help'
+import { Route as FarmlandSurveyRouteImport } from './routes/farmland-survey'
 import { Route as ClarifyRouteImport } from './routes/clarify'
 import { Route as AdminRouteImport } from './routes/admin'
 import { Route as IndexRouteImport } from './routes/index'
@@ -52,6 +53,11 @@ const HelpRoute = HelpRouteImport.update({
   path: '/help',
   getParentRoute: () => rootRouteImport,
 } as any)
+const FarmlandSurveyRoute = FarmlandSurveyRouteImport.update({
+  id: '/farmland-survey',
+  path: '/farmland-survey',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ClarifyRoute = ClarifyRouteImport.update({
   id: '/clarify',
   path: '/clarify',
@@ -87,6 +93,7 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/admin': typeof AdminRoute
   '/clarify': typeof ClarifyRoute
+  '/farmland-survey': typeof FarmlandSurveyRoute
   '/help': typeof HelpRoute
   '/intent': typeof IntentRoute
   '/listen': typeof ListenRoute
@@ -101,6 +108,7 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/admin': typeof AdminRoute
   '/clarify': typeof ClarifyRoute
+  '/farmland-survey': typeof FarmlandSurveyRoute
   '/help': typeof HelpRoute
   '/intent': typeof IntentRoute
   '/listen': typeof ListenRoute
@@ -116,6 +124,7 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/admin': typeof AdminRoute
   '/clarify': typeof ClarifyRoute
+  '/farmland-survey': typeof FarmlandSurveyRoute
   '/help': typeof HelpRoute
   '/intent': typeof IntentRoute
   '/listen': typeof ListenRoute
@@ -132,6 +141,7 @@ export interface FileRouteTypes {
     | '/'
     | '/admin'
     | '/clarify'
+    | '/farmland-survey'
     | '/help'
     | '/intent'
     | '/listen'
@@ -146,6 +156,7 @@ export interface FileRouteTypes {
     | '/'
     | '/admin'
     | '/clarify'
+    | '/farmland-survey'
     | '/help'
     | '/intent'
     | '/listen'
@@ -160,6 +171,7 @@ export interface FileRouteTypes {
     | '/'
     | '/admin'
     | '/clarify'
+    | '/farmland-survey'
     | '/help'
     | '/intent'
     | '/listen'
@@ -175,6 +187,7 @@ export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AdminRoute: typeof AdminRoute
   ClarifyRoute: typeof ClarifyRoute
+  FarmlandSurveyRoute: typeof FarmlandSurveyRoute
   HelpRoute: typeof HelpRoute
   IntentRoute: typeof IntentRoute
   ListenRoute: typeof ListenRoute
@@ -230,6 +243,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof HelpRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/farmland-survey': {
+      id: '/farmland-survey'
+      path: '/farmland-survey'
+      fullPath: '/farmland-survey'
+      preLoaderRoute: typeof FarmlandSurveyRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/clarify': {
       id: '/clarify'
       path: '/clarify'
@@ -279,6 +299,7 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AdminRoute: AdminRoute,
   ClarifyRoute: ClarifyRoute,
+  FarmlandSurveyRoute: FarmlandSurveyRoute,
   HelpRoute: HelpRoute,
   IntentRoute: IntentRoute,
   ListenRoute: ListenRoute,

@@ -127,7 +127,7 @@ function FarmlandSurveyPage() {
       return {
         kind: "지자체",
         branch: office.name,
-        duty: "농지전수조사 담당 부서 연결 (대표번호)",
+        duty: "농지이용실태조사 담당 (농업정책과)",
         phone: office.phone,
       };
     }

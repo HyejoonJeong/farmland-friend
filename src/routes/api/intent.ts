@@ -1,5 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { INTENTS, type IntentKey } from "@/lib/data";
+import { INTENTS, type CategoryKey, type IntentKey } from "@/lib/data";
 
 export const Route = createFileRoute("/api/intent")({
   server: {
@@ -11,12 +11,17 @@ export const Route = createFileRoute("/api/intent")({
         const body = (await request.json().catch(() => ({}))) as {
           text?: string;
           region?: string;
+          category?: CategoryKey;
           clarification?: string;
         };
         const text = (body.text ?? "").trim();
         if (!text) return new Response("Missing text", { status: 400 });
 
-        const catalogue = INTENTS.map(
+        const category: CategoryKey =
+          body.category === "census" ? "census" : "general";
+        const pool = INTENTS.filter((i) => i.category === category);
+
+        const catalogue = pool.map(
           (i) =>
             `- ${i.key}: ${i.label} (담당업무: ${i.business}). 예: ${i.examples.slice(0, 4).join(" / ")}`,
         ).join("\n");

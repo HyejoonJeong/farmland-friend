@@ -351,3 +351,33 @@ export function matchContact(intent: IntentKey, region: string): ContactMatch {
 }
 
 export const HUMAN_SUPPORT_PHONE = "1577-7770"; // 농지은행 대표번호
+
+// 농지전수조사 지자체 문의처 — 각 시·군청 대표번호 (농지전수조사 담당 부서 연결)
+export interface MunicipalOffice {
+  region: string;
+  name: string;
+  phone: string;
+}
+export const MUNICIPAL_OFFICES: MunicipalOffice[] = [
+  { region: "전주시", name: "전주시청", phone: "063-281-2114" },
+  { region: "군산시", name: "군산시청", phone: "063-454-3114" },
+  { region: "익산시", name: "익산시청", phone: "063-859-5114" },
+  { region: "정읍시", name: "정읍시청", phone: "063-539-5114" },
+  { region: "김제시", name: "김제시청", phone: "063-540-3114" },
+  { region: "남원시", name: "남원시청", phone: "063-620-6114" },
+  { region: "완주군", name: "완주군청", phone: "063-290-3114" },
+  { region: "진안군", name: "진안군청", phone: "063-430-7114" },
+  { region: "무주군", name: "무주군청", phone: "063-320-2114" },
+  { region: "장수군", name: "장수군청", phone: "063-350-5114" },
+  { region: "임실군", name: "임실군청", phone: "063-640-4114" },
+  { region: "순창군", name: "순창군청", phone: "063-650-1114" },
+  { region: "고창군", name: "고창군청", phone: "063-560-2114" },
+  { region: "부안군", name: "부안군청", phone: "063-580-7114" },
+];
+
+// 기타 지역 농지전수조사 문의 — 전북특별자치도청 대표번호
+export const MUNICIPAL_FALLBACK: MunicipalOffice = {
+  region: "기타 지역",
+  name: "전북특별자치도청",
+  phone: "063-280-2114",
+};

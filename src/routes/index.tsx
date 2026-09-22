@@ -68,7 +68,7 @@ function Home() {
 
         <div className="w-full space-y-4">
           <Link
-            to="/listen"
+            to="/category"
             className="btn-huge block w-full bg-primary text-center text-primary-foreground shadow-lg active:scale-[0.98]"
             style={{ minHeight: 88, fontSize: 28 }}
           >

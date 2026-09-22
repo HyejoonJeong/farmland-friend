@@ -8,22 +8,50 @@ export type IntentKey =
   | "farmland_sell"
   | "farm_recovery"
   | "farming_tech"
-  | "gap_certification";
+  | "gap_certification"
+  | "census_target"
+  | "census_visit"
+  | "census_correction"
+  | "census_idle";
+
+export type CategoryKey = "general" | "census";
+
+export interface CategoryInfo {
+  key: CategoryKey;
+  label: string;
+  desc: string;
+}
+
+export const CATEGORIES: CategoryInfo[] = [
+  {
+    key: "general",
+    label: "농지은행 일반 민원",
+    desc: "농지 임대·위탁, 농지연금, 은퇴직불, 농지 구입·매도, 경영회생, 영농기술·인증",
+  },
+  {
+    key: "census",
+    label: "농지전수조사 민원",
+    desc: "조사 대상·일정 안내, 조사원 방문, 조사 결과 정정·이의신청, 휴경·이용실태",
+  },
+];
 
 export interface IntentInfo {
   key: IntentKey;
   label: string;
   business: string;
   org: "farmland_bank" | "extension" | "naqs";
+  category: CategoryKey;
   examples: string[];
 }
 
 export const INTENTS: IntentInfo[] = [
+
   {
     key: "farmland_rent_out",
     label: "농지 내놓기 (임대·위탁)",
     business: "임대수탁",
     org: "farmland_bank",
+    category: "general",
     examples: [
       "농사를 못 짓게 돼서 땅을 맡기려고 합니다",
       "논을 빌려주고 싶어요",
@@ -37,6 +65,7 @@ export const INTENTS: IntentInfo[] = [
     label: "농지연금 상담",
     business: "농지연금",
     org: "farmland_bank",
+    category: "general",
     examples: [
       "농지연금 상담받고 싶습니다",
       "농지로 연금 받을 수 있나요?",
@@ -49,6 +78,7 @@ export const INTENTS: IntentInfo[] = [
     label: "은퇴·경영이양 직불",
     business: "경영이양직불·농지이양은퇴직불",
     org: "farmland_bank",
+    category: "general",
     examples: [
       "은퇴직불 신청하려고 합니다",
       "농사 그만두려고 하는데 지원 있나요?",
@@ -61,6 +91,7 @@ export const INTENTS: IntentInfo[] = [
     label: "농지 구하기 (매입·임대)",
     business: "농지매매·맞춤형매매임대, 공공임대용 농지임대, 선임대후매도, 청년농 지원",
     org: "farmland_bank",
+    category: "general",
     examples: [
       "농지를 구하고 있습니다",
       "논을 사고 싶습니다",
@@ -73,6 +104,7 @@ export const INTENTS: IntentInfo[] = [
     label: "농지 팔기 (공사 매입)",
     business: "공공임대용 농지매입(매입비축)",
     org: "farmland_bank",
+    category: "general",
     examples: [
       "농지를 공사에 팔려고 합니다",
       "공사에서 농지를 사주나요?",
@@ -85,6 +117,7 @@ export const INTENTS: IntentInfo[] = [
     label: "경영회생 지원",
     business: "경영회생",
     org: "farmland_bank",
+    category: "general",
     examples: [
       "경영회생 신청하려고 합니다",
       "빚이 많아서 농지를 맡기려고 합니다",
@@ -98,6 +131,7 @@ export const INTENTS: IntentInfo[] = [
     label: "영농기술·교육·청년농",
     business: "영농기술 지도, 귀농귀촌, 청년농, 스마트팜, 병해충 상담",
     org: "extension",
+    category: "general",
     examples: [
       "농사 기술을 배우고 싶어요",
       "귀농 상담받고 싶습니다",
@@ -110,6 +144,7 @@ export const INTENTS: IntentInfo[] = [
     label: "농업경영체·GAP·친환경 인증",
     business: "GAP·친환경인증, 원산지관리, 농업경영체 등록·변경, 직불제 확인",
     org: "naqs",
+    category: "general",
     examples: [
       "농업경영체 등록하려고요",
       "직불금 신청 확인하고 싶어요",
@@ -117,6 +152,59 @@ export const INTENTS: IntentInfo[] = [
       "GAP 인증 문의입니다",
     ],
   },
+  {
+    key: "census_target",
+    label: "농지전수조사 대상·일정 안내",
+    business: "농지 이용실태조사, 지사 농지사업",
+    org: "farmland_bank",
+    category: "census",
+    examples: [
+      "농지전수조사 대상인지 알고 싶습니다",
+      "조사가 언제 나오나요?",
+      "전수조사 안내문을 받았습니다",
+      "우리 논도 조사 대상인가요?",
+    ],
+  },
+  {
+    key: "census_visit",
+    label: "조사원 방문·현장확인 문의",
+    business: "농지 이용실태조사, 지사 농지사업",
+    org: "farmland_bank",
+    category: "census",
+    examples: [
+      "조사원이 집에 찾아왔습니다",
+      "현장조사 날짜를 바꾸고 싶어요",
+      "제가 없을 때 조사하면 되나요?",
+      "조사할 때 무엇을 준비해야 하나요?",
+    ],
+  },
+  {
+    key: "census_correction",
+    label: "조사 결과 정정·이의신청",
+    business: "농지 이용실태조사, 지사 농지사업",
+    org: "farmland_bank",
+    category: "census",
+    examples: [
+      "조사 결과가 사실과 다릅니다",
+      "이의신청을 하려고 합니다",
+      "농지 면적이 잘못 적혔어요",
+      "실제로 농사를 짓고 있는데 휴경으로 나왔습니다",
+    ],
+  },
+  {
+    key: "census_idle",
+    label: "휴경·불법 이용 관련 문의",
+    business: "훼손농지복구, 농지 이용실태조사, 지사 농지사업",
+    org: "farmland_bank",
+    category: "census",
+    examples: [
+      "휴경으로 확인됐다고 연락을 받았습니다",
+      "농지에 창고를 지었는데 문제가 되나요?",
+      "처분통지를 받았습니다",
+      "농지를 원상복구 해야 한다고 합니다",
+    ],
+  },
+
 ];
 
 // Documents required per intent (curated common docs)
@@ -129,7 +217,15 @@ export const REQUIRED_DOCS: Record<IntentKey, string[]> = {
   farm_recovery: ["신분증", "농지 등기부등본", "토지대장", "부채 증빙서류", "농업경영체 등록확인서", "경영회생 신청서"],
   farming_tech: ["신분증"],
   gap_certification: ["신분증", "농업경영체 등록증", "농지 관련 서류", "인증 신청서"],
+  census_target: ["신분증", "농지 등기부등본", "조사 안내문(받으신 경우)"],
+  census_visit: ["신분증", "농지 위치 확인 자료", "영농 사실 확인 자료(사진 등)"],
+  census_correction: ["신분증", "농지 등기부등본", "영농 사실 증빙자료", "이의신청서"],
+  census_idle: ["신분증", "농지 등기부등본", "토지대장", "받으신 통지서"],
 };
+
+export function intentsByCategory(category: CategoryKey): IntentInfo[] {
+  return INTENTS.filter((i) => i.category === category);
+}
 
 // Region list (전북 지역 우선)
 export const REGIONS = [

@@ -1,6 +1,6 @@
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
-import type { IntentKey } from "./data";
+import type { CategoryKey, IntentKey } from "./data";
 
 export interface IntentResult {
   intent: IntentKey;
@@ -12,9 +12,11 @@ export interface IntentResult {
 
 interface AppState {
   region: string | null;
+  category: CategoryKey | null;
   transcript: string;
   clarification: string;
   intent: IntentResult | null;
+  setCategory: (c: CategoryKey) => void;
   setRegion: (r: string) => void;
   setTranscript: (t: string) => void;
   appendClarification: (t: string) => void;
@@ -26,9 +28,11 @@ export const useApp = create<AppState>()(
   persist(
     (set) => ({
       region: null,
+      category: null,
       transcript: "",
       clarification: "",
       intent: null,
+      setCategory: (category) => set({ category, transcript: "", clarification: "", intent: null }),
       setRegion: (region) => set({ region }),
       setTranscript: (transcript) => set({ transcript, intent: null, clarification: "" }),
       appendClarification: (t) =>

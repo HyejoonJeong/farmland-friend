@@ -84,10 +84,12 @@ confidence가 0.7 미만이거나 두 카테고리 중 헷갈리면 needsClarifi
           parsed = {};
         }
 
-        const validKeys = INTENTS.map((i) => i.key) as string[];
+        const validKeys = pool.map((i) => i.key) as string[];
+        const fallback: IntentKey =
+          category === "census" ? "census_target" : "farmland_rent_out";
         const intent = (validKeys.includes(parsed.intent ?? "")
           ? parsed.intent
-          : "farmland_rent_out") as IntentKey;
+          : fallback) as IntentKey;
         const confidence = Math.max(0, Math.min(1, parsed.confidence ?? 0.5));
         const needsClar =
           Boolean(parsed.needsClarification) || confidence < 0.7;

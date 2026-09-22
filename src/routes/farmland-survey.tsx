@@ -237,7 +237,9 @@ function FarmlandSurveyPage() {
           <MapPin className="h-6 w-6" />
           <h2 className="text-[25px] font-black">더 궁금한 점이 있으신가요?</h2>
         </div>
-        <p className="mt-2 text-[18px] font-semibold text-foreground/75">농지 소재지를 선택하면 관할 농지은행 문의처를 알려드립니다.</p>
+        <p className="mt-2 text-[18px] font-semibold text-foreground/75">
+          농지 소재지를 선택한 뒤, 어떤 점이 궁금한지 골라주세요. 내용에 맞는 문의처를 알려드립니다.
+        </p>
         <div className="mt-4 grid grid-cols-2 gap-2">
           {REGIONS.map((item) => (
             <Button
@@ -252,11 +254,36 @@ function FarmlandSurveyPage() {
           ))}
         </div>
 
+        {region && (
+          <div className="mt-5 grid gap-3">
+            {TOPICS.map((item) => {
+              const active = topic === item.key;
+              return (
+                <button
+                  key={item.key}
+                  type="button"
+                  onClick={() => setTopic(item.key)}
+                  className={`rounded-2xl border-2 p-5 text-left transition-colors ${
+                    active ? "border-primary bg-primary/[0.06]" : "border-border bg-card"
+                  }`}
+                >
+                  <p className={`text-[20px] font-black ${active ? "text-primary" : "text-foreground"}`}>
+                    {item.title}
+                  </p>
+                  <p className="mt-1 text-[16px] font-semibold leading-relaxed text-foreground/70">
+                    {item.description}
+                  </p>
+                </button>
+              );
+            })}
+          </div>
+        )}
+
         {contact && (
           <div className="mt-5 rounded-2xl border-2 border-primary bg-primary/[0.06] p-5" aria-live="polite">
             <div className="flex items-center gap-2 text-primary">
-              <Building2 className="h-6 w-6" />
-              <p className="text-[17px] font-bold">{region} 관할 문의처</p>
+              {contact.kind === "지자체" ? <Landmark className="h-6 w-6" /> : <Building2 className="h-6 w-6" />}
+              <p className="text-[17px] font-bold">{region} 관할 {contact.kind} 문의처</p>
             </div>
             <h3 className="mt-2 text-[23px] leading-tight font-black">{contact.branch}</h3>
             <p className="mt-1 text-[17px] font-semibold text-foreground/75">{contact.duty}</p>

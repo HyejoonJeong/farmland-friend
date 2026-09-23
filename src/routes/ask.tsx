@@ -379,12 +379,18 @@ function AskPage() {
           안내는 참고용입니다. 신청 요건과 금액은 해마다 달라질 수 있어 담당자 확인이
           필요합니다.
         </p>
-        <Link
-          to="/listen"
-          className="flex min-h-16 w-full items-center justify-center gap-2 rounded-2xl border-2 border-primary bg-accent px-4 py-4 text-[20px] font-bold text-accent-foreground"
+        <button
+          type="button"
+          onClick={() => void connectToAgent()}
+          disabled={busy || connecting}
+          className="flex min-h-16 w-full items-center justify-center gap-2 rounded-2xl border-2 border-primary bg-accent px-4 py-4 text-[20px] font-bold text-accent-foreground disabled:opacity-60"
         >
+          {connecting && <Loader2 className="h-6 w-6 animate-spin" />}
           담당자 찾아 연결하기
-        </Link>
+        </button>
+        <p className="text-center text-[16px] text-muted-foreground">
+          질문하신 사업의 담당자를 바로 찾아드립니다. 지역만 선택하시면 됩니다.
+        </p>
         <a
           href={`tel:${HUMAN_SUPPORT_PHONE}`}
           className="flex min-h-16 w-full items-center justify-center gap-2 rounded-2xl bg-secondary px-4 py-4 text-[20px] font-bold text-secondary-foreground"

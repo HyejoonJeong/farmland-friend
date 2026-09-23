@@ -1,5 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { ClipboardList, Mic } from "lucide-react";
+import { ClipboardList, Landmark, Mic } from "lucide-react";
 import { PageShell } from "@/components/PageShell";
 import { SpeakButton } from "@/components/SpeakButton";
 import krcLogo from "@/assets/krc-logo.png";
@@ -91,6 +91,23 @@ function Home() {
               </span>
             </span>
           </Link>
+
+          <a
+            href="https://www.fbo.or.kr/contents/Contents.do?menuId=0500100030"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="flex min-h-20 w-full items-center gap-4 rounded-2xl border-2 border-primary/30 bg-secondary px-5 py-4 text-left text-secondary-foreground shadow-sm transition active:scale-[0.98]"
+          >
+            <span className="grid h-12 w-12 shrink-0 place-items-center rounded-xl bg-primary text-primary-foreground">
+              <Landmark className="h-7 w-7" />
+            </span>
+            <span>
+              <strong className="block text-[21px] leading-tight">농지은행 사업 안내</strong>
+              <span className="mt-1 block text-[16px] font-semibold text-muted-foreground">
+                농지은행 포털에서 사업 알아보기
+              </span>
+            </span>
+          </a>
 
           <div className="flex items-center justify-center gap-3">
             <SpeakButton text={WELCOME} label="안내 듣기" />

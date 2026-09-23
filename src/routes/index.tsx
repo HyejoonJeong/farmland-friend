@@ -71,10 +71,24 @@ function Home() {
         <div className="w-full space-y-4">
           <Link
             to="/listen"
-            className="btn-huge block w-full bg-primary text-center text-primary-foreground shadow-lg active:scale-[0.98]"
-            style={{ minHeight: 88, fontSize: 28 }}
+            className="btn-huge flex w-full flex-col items-center justify-center bg-primary text-center text-primary-foreground shadow-lg active:scale-[0.98]"
+            style={{ minHeight: 92, fontSize: 26 }}
           >
-            시작하기
+            민원 담당자 찾기
+            <span className="mt-1 text-[16px] font-semibold opacity-90">
+              말씀하시면 담당 부서로 안내
+            </span>
+          </Link>
+
+          <Link
+            to="/voice"
+            className="btn-huge flex w-full flex-col items-center justify-center border-2 border-primary bg-accent text-center text-accent-foreground shadow-lg active:scale-[0.98]"
+            style={{ minHeight: 92, fontSize: 26 }}
+          >
+            의견 남기기
+            <span className="mt-1 text-[16px] font-semibold opacity-90">
+              농지정책·농지은행에 바라는 말씀
+            </span>
           </Link>
 
           <Link

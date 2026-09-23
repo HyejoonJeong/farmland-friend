@@ -1,5 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { ClipboardList, Landmark, MessageCircleQuestion, Mic } from "lucide-react";
+import { ClipboardList, Landmark, Mic } from "lucide-react";
 import { PageShell } from "@/components/PageShell";
 import { SpeakButton } from "@/components/SpeakButton";
 import krcLogo from "@/assets/krc-logo.png";
@@ -70,13 +70,13 @@ function Home() {
 
         <div className="w-full space-y-4">
           <Link
-            to="/listen"
+            to="/ask"
             className="btn-huge flex w-full flex-col items-center justify-center bg-primary text-center text-primary-foreground shadow-lg active:scale-[0.98]"
             style={{ minHeight: 92, fontSize: 26 }}
           >
-            민원 담당자 찾기
+            궁금한 점 물어보기
             <span className="mt-1 text-[16px] font-semibold opacity-90">
-              말씀하시면 담당 부서로 안내
+              답변 듣고 담당자까지 바로 연결
             </span>
           </Link>
 
@@ -102,21 +102,6 @@ function Home() {
               <strong className="block text-[21px] leading-tight">2026년도 농지전수조사</strong>
               <span className="mt-1 block text-[16px] font-semibold text-muted-foreground">
                 조사 내용과 궁금증 알아보기
-              </span>
-            </span>
-          </Link>
-
-          <Link
-            to="/ask"
-            className="flex min-h-20 w-full items-center gap-4 rounded-2xl border-2 border-primary/30 bg-secondary px-5 py-4 text-left text-secondary-foreground shadow-sm transition active:scale-[0.98]"
-          >
-            <span className="grid h-12 w-12 shrink-0 place-items-center rounded-xl bg-primary text-primary-foreground">
-              <MessageCircleQuestion className="h-7 w-7" />
-            </span>
-            <span>
-              <strong className="block text-[21px] leading-tight">농지은행 사업 질문하기</strong>
-              <span className="mt-1 block text-[16px] font-semibold text-muted-foreground">
-                농지연금·임대·구입 궁금증 물어보기
               </span>
             </span>
           </Link>

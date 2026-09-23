@@ -58,6 +58,14 @@ export const getUsageLogs = createServerFn({ method: "POST" })
       .limit(500);
     if (error) throw new Error(error.message);
 
+    const { data: voiceRows, error: voiceError } = await supabaseAdmin
+      .from("farmer_voices")
+      .select("id, created_at, content, age_group, farming_years, gender, region, source")
+      .order("created_at", { ascending: false })
+      .limit(500);
+    if (voiceError) throw new Error(voiceError.message);
+    const voices = (voiceRows ?? []) as unknown as VoiceRow[];
+
     const logs = (rows ?? []) as unknown as UsageLogRow[];
     const startOfToday = new Date();
     startOfToday.setHours(0, 0, 0, 0);

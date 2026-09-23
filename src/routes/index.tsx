@@ -1,5 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { ClipboardList, Landmark, MessageCircleQuestion, Mic } from "lucide-react";
+import { ClipboardList, Landmark, Mic } from "lucide-react";
 import { PageShell } from "@/components/PageShell";
 import { SpeakButton } from "@/components/SpeakButton";
 import krcLogo from "@/assets/krc-logo.png";

@@ -18,11 +18,13 @@ import { Route as IntentRouteImport } from './routes/intent'
 import { Route as HelpRouteImport } from './routes/help'
 import { Route as FarmlandSurveyRouteImport } from './routes/farmland-survey'
 import { Route as ClarifyRouteImport } from './routes/clarify'
+import { Route as AskRouteImport } from './routes/ask'
 import { Route as AdminRouteImport } from './routes/admin'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as ApiTtsRouteImport } from './routes/api/tts'
 import { Route as ApiSttRouteImport } from './routes/api/stt'
 import { Route as ApiIntentRouteImport } from './routes/api/intent'
+import { Route as ApiAskRouteImport } from './routes/api/ask'
 
 const VoiceRoute = VoiceRouteImport.update({
   id: '/voice',
@@ -69,6 +71,11 @@ const ClarifyRoute = ClarifyRouteImport.update({
   path: '/clarify',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AskRoute = AskRouteImport.update({
+  id: '/ask',
+  path: '/ask',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AdminRoute = AdminRouteImport.update({
   id: '/admin',
   path: '/admin',
@@ -94,10 +101,16 @@ const ApiIntentRoute = ApiIntentRouteImport.update({
   path: '/api/intent',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiAskRoute = ApiAskRouteImport.update({
+  id: '/api/ask',
+  path: '/api/ask',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/admin': typeof AdminRoute
+  '/ask': typeof AskRoute
   '/clarify': typeof ClarifyRoute
   '/farmland-survey': typeof FarmlandSurveyRoute
   '/help': typeof HelpRoute
@@ -107,6 +120,7 @@ export interface FileRoutesByFullPath {
   '/result': typeof ResultRoute
   '/situation': typeof SituationRoute
   '/voice': typeof VoiceRoute
+  '/api/ask': typeof ApiAskRoute
   '/api/intent': typeof ApiIntentRoute
   '/api/stt': typeof ApiSttRoute
   '/api/tts': typeof ApiTtsRoute
@@ -114,6 +128,7 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/admin': typeof AdminRoute
+  '/ask': typeof AskRoute
   '/clarify': typeof ClarifyRoute
   '/farmland-survey': typeof FarmlandSurveyRoute
   '/help': typeof HelpRoute
@@ -123,6 +138,7 @@ export interface FileRoutesByTo {
   '/result': typeof ResultRoute
   '/situation': typeof SituationRoute
   '/voice': typeof VoiceRoute
+  '/api/ask': typeof ApiAskRoute
   '/api/intent': typeof ApiIntentRoute
   '/api/stt': typeof ApiSttRoute
   '/api/tts': typeof ApiTtsRoute
@@ -131,6 +147,7 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/admin': typeof AdminRoute
+  '/ask': typeof AskRoute
   '/clarify': typeof ClarifyRoute
   '/farmland-survey': typeof FarmlandSurveyRoute
   '/help': typeof HelpRoute
@@ -140,6 +157,7 @@ export interface FileRoutesById {
   '/result': typeof ResultRoute
   '/situation': typeof SituationRoute
   '/voice': typeof VoiceRoute
+  '/api/ask': typeof ApiAskRoute
   '/api/intent': typeof ApiIntentRoute
   '/api/stt': typeof ApiSttRoute
   '/api/tts': typeof ApiTtsRoute
@@ -149,6 +167,7 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/admin'
+    | '/ask'
     | '/clarify'
     | '/farmland-survey'
     | '/help'
@@ -158,6 +177,7 @@ export interface FileRouteTypes {
     | '/result'
     | '/situation'
     | '/voice'
+    | '/api/ask'
     | '/api/intent'
     | '/api/stt'
     | '/api/tts'
@@ -165,6 +185,7 @@ export interface FileRouteTypes {
   to:
     | '/'
     | '/admin'
+    | '/ask'
     | '/clarify'
     | '/farmland-survey'
     | '/help'
@@ -174,6 +195,7 @@ export interface FileRouteTypes {
     | '/result'
     | '/situation'
     | '/voice'
+    | '/api/ask'
     | '/api/intent'
     | '/api/stt'
     | '/api/tts'
@@ -181,6 +203,7 @@ export interface FileRouteTypes {
     | '__root__'
     | '/'
     | '/admin'
+    | '/ask'
     | '/clarify'
     | '/farmland-survey'
     | '/help'
@@ -190,6 +213,7 @@ export interface FileRouteTypes {
     | '/result'
     | '/situation'
     | '/voice'
+    | '/api/ask'
     | '/api/intent'
     | '/api/stt'
     | '/api/tts'
@@ -198,6 +222,7 @@ export interface FileRouteTypes {
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AdminRoute: typeof AdminRoute
+  AskRoute: typeof AskRoute
   ClarifyRoute: typeof ClarifyRoute
   FarmlandSurveyRoute: typeof FarmlandSurveyRoute
   HelpRoute: typeof HelpRoute
@@ -207,6 +232,7 @@ export interface RootRouteChildren {
   ResultRoute: typeof ResultRoute
   SituationRoute: typeof SituationRoute
   VoiceRoute: typeof VoiceRoute
+  ApiAskRoute: typeof ApiAskRoute
   ApiIntentRoute: typeof ApiIntentRoute
   ApiSttRoute: typeof ApiSttRoute
   ApiTtsRoute: typeof ApiTtsRoute
@@ -277,6 +303,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ClarifyRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/ask': {
+      id: '/ask'
+      path: '/ask'
+      fullPath: '/ask'
+      preLoaderRoute: typeof AskRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/admin': {
       id: '/admin'
       path: '/admin'
@@ -312,12 +345,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiIntentRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/ask': {
+      id: '/api/ask'
+      path: '/api/ask'
+      fullPath: '/api/ask'
+      preLoaderRoute: typeof ApiAskRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AdminRoute: AdminRoute,
+  AskRoute: AskRoute,
   ClarifyRoute: ClarifyRoute,
   FarmlandSurveyRoute: FarmlandSurveyRoute,
   HelpRoute: HelpRoute,
@@ -327,6 +368,7 @@ const rootRouteChildren: RootRouteChildren = {
   ResultRoute: ResultRoute,
   SituationRoute: SituationRoute,
   VoiceRoute: VoiceRoute,
+  ApiAskRoute: ApiAskRoute,
   ApiIntentRoute: ApiIntentRoute,
   ApiSttRoute: ApiSttRoute,
   ApiTtsRoute: ApiTtsRoute,

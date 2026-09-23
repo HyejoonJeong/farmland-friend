@@ -61,6 +61,10 @@ function AskPage() {
   const [level, setLevel] = useState(0);
   const [typed, setTyped] = useState("");
   const [showText, setShowText] = useState(false);
+  const [connecting, setConnecting] = useState(false);
+  const nav = useNavigate();
+  const setTranscript = useApp((s) => s.setTranscript);
+  const setIntent = useApp((s) => s.setIntent);
 
   const recRef = useRef<Recorder | null>(null);
   const startedAt = useRef(0);

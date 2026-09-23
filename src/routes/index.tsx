@@ -106,21 +106,6 @@ function Home() {
             </span>
           </Link>
 
-          <Link
-            to="/ask"
-            className="flex min-h-20 w-full items-center gap-4 rounded-2xl border-2 border-primary/30 bg-secondary px-5 py-4 text-left text-secondary-foreground shadow-sm transition active:scale-[0.98]"
-          >
-            <span className="grid h-12 w-12 shrink-0 place-items-center rounded-xl bg-primary text-primary-foreground">
-              <MessageCircleQuestion className="h-7 w-7" />
-            </span>
-            <span>
-              <strong className="block text-[21px] leading-tight">농지은행 사업 질문하기</strong>
-              <span className="mt-1 block text-[16px] font-semibold text-muted-foreground">
-                농지연금·임대·구입 궁금증 물어보기
-              </span>
-            </span>
-          </Link>
-
           <a
             href="https://www.fbo.or.kr/contents/Contents.do?menuId=0500100030"
             target="_blank"

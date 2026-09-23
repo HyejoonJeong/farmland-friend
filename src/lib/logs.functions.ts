@@ -25,12 +25,28 @@ export interface UsageStats {
   byRegion: { label: string; count: number }[];
 }
 
+export interface VoiceRow {
+  id: string;
+  created_at: string;
+  content: string;
+  age_group: string | null;
+  farming_years: string | null;
+  gender: string | null;
+  region: string | null;
+  source: string | null;
+}
+
 export const getUsageLogs = createServerFn({ method: "POST" })
   .inputValidator((input: { key: string }) => ({ key: String(input?.key ?? "") }))
   .handler(async ({ data }) => {
     const expected = process.env["ADMIN_ACCESS_KEY"];
     if (!expected || data.key !== expected) {
-      return { authorized: false as const, logs: [] as UsageLogRow[], stats: null };
+      return {
+        authorized: false as const,
+        logs: [] as UsageLogRow[],
+        voices: [] as VoiceRow[],
+        stats: null,
+      };
     }
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
     const { data: rows, error } = await supabaseAdmin
@@ -41,6 +57,14 @@ export const getUsageLogs = createServerFn({ method: "POST" })
       .order("created_at", { ascending: false })
       .limit(500);
     if (error) throw new Error(error.message);
+
+    const { data: voiceRows, error: voiceError } = await supabaseAdmin
+      .from("farmer_voices")
+      .select("id, created_at, content, age_group, farming_years, gender, region, source")
+      .order("created_at", { ascending: false })
+      .limit(500);
+    if (voiceError) throw new Error(voiceError.message);
+    const voices = (voiceRows ?? []) as unknown as VoiceRow[];
 
     const logs = (rows ?? []) as unknown as UsageLogRow[];
     const startOfToday = new Date();
@@ -72,5 +96,5 @@ export const getUsageLogs = createServerFn({ method: "POST" })
       byRegion: count((r) => r.region),
     };
 
-    return { authorized: true as const, logs, stats };
+    return { authorized: true as const, logs, voices, stats };
   });

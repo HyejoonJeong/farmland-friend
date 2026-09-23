@@ -14,6 +14,39 @@ export type Database = {
   }
   public: {
     Tables: {
+      farmer_voices: {
+        Row: {
+          age_group: string | null
+          content: string
+          created_at: string
+          farming_years: string | null
+          gender: string | null
+          id: string
+          region: string | null
+          source: string | null
+        }
+        Insert: {
+          age_group?: string | null
+          content: string
+          created_at?: string
+          farming_years?: string | null
+          gender?: string | null
+          id?: string
+          region?: string | null
+          source?: string | null
+        }
+        Update: {
+          age_group?: string | null
+          content?: string
+          created_at?: string
+          farming_years?: string | null
+          gender?: string | null
+          id?: string
+          region?: string | null
+          source?: string | null
+        }
+        Relationships: []
+      }
       usage_logs: {
         Row: {
           branch: string | null

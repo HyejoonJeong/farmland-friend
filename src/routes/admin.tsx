@@ -2,7 +2,7 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { useMutation } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { useState } from "react";
-import { getUsageLogs, type UsageLogRow } from "@/lib/logs.functions";
+import { getUsageLogs, type UsageLogRow, type VoiceRow } from "@/lib/logs.functions";
 import { BarChart3, Download, Loader2, Lock, RefreshCw } from "lucide-react";
 
 export const Route = createFileRoute("/admin")({
@@ -57,6 +57,35 @@ function toCsv(rows: UsageLogRow[]) {
       .join(","),
   );
   return "\uFEFF" + [head.join(","), ...body].join("\n");
+}
+
+function voicesToCsv(rows: VoiceRow[]) {
+  const head = ["시각", "의견 내용", "연령", "영농경력", "성별", "지역", "입력방식"];
+  const esc = (v: unknown) => `"${String(v ?? "").replace(/"/g, '""')}"`;
+  const body = rows.map((r) =>
+    [
+      new Date(r.created_at).toLocaleString("ko-KR"),
+      r.content,
+      r.age_group,
+      r.farming_years,
+      r.gender,
+      r.region,
+      r.source,
+    ]
+      .map(esc)
+      .join(","),
+  );
+  return "\uFEFF" + [head.join(","), ...body].join("\n");
+}
+
+function downloadCsv(csv: string, name: string) {
+  const blob = new Blob([csv], { type: "text/csv;charset=utf-8" });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = `${name}-${new Date().toISOString().slice(0, 10)}.csv`;
+  a.click();
+  URL.revokeObjectURL(url);
 }
 
 function AdminPage() {
@@ -122,7 +151,7 @@ function AdminPage() {
   const refetch = () => login.mutate(password);
   const isFetching = login.isPending;
 
-  const { logs, stats } = data;
+  const { logs, voices, stats } = data;
 
   const download = () => {
     const blob = new Blob([toCsv(logs)], { type: "text/csv;charset=utf-8" });
@@ -179,6 +208,57 @@ function AdminPage() {
         <Ranking title="업무별 문의" rows={stats.byIntent} total={stats.total} />
         <Ranking title="지역별 문의" rows={stats.byRegion} total={stats.total} />
       </div>
+
+      <section className="mt-8">
+        <div className="flex flex-wrap items-center justify-between gap-2">
+          <h2 className="text-[20px] font-bold">
+            농업인 Voice · 수집된 의견 ({voices.length}건)
+          </h2>
+          <button
+            type="button"
+            onClick={() => downloadCsv(voicesToCsv(voices), "malhaenong-voices")}
+            className="inline-flex items-center gap-2 rounded-xl border-2 border-border bg-card px-4 py-2 text-[15px] font-bold"
+          >
+            <Download className="h-5 w-5" />
+            의견 CSV
+          </button>
+        </div>
+        <div className="mt-3 overflow-x-auto rounded-2xl border-2 border-border">
+          <table className="w-full min-w-[800px] text-left text-[15px]">
+            <thead className="bg-secondary/60 text-[14px] font-bold">
+              <tr>
+                <th className="p-3">시각</th>
+                <th className="p-3">의견 내용</th>
+                <th className="p-3">연령</th>
+                <th className="p-3">영농경력</th>
+                <th className="p-3">성별</th>
+                <th className="p-3">지역</th>
+              </tr>
+            </thead>
+            <tbody>
+              {voices.length === 0 && (
+                <tr>
+                  <td className="p-4 text-muted-foreground" colSpan={6}>
+                    아직 남겨진 의견이 없습니다.
+                  </td>
+                </tr>
+              )}
+              {voices.map((v) => (
+                <tr key={v.id} className="border-t border-border align-top">
+                  <td className="whitespace-nowrap p-3 text-muted-foreground">
+                    {new Date(v.created_at).toLocaleString("ko-KR")}
+                  </td>
+                  <td className="p-3 font-semibold">{v.content}</td>
+                  <td className="whitespace-nowrap p-3">{v.age_group ?? "-"}</td>
+                  <td className="whitespace-nowrap p-3">{v.farming_years ?? "-"}</td>
+                  <td className="whitespace-nowrap p-3">{v.gender ?? "-"}</td>
+                  <td className="whitespace-nowrap p-3">{v.region ?? "-"}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </section>
 
       <section className="mt-8">
         <h2 className="text-[20px] font-bold">최근 기록 (최대 500건)</h2>

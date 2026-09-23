@@ -9,6 +9,7 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as VoiceRouteImport } from './routes/voice'
 import { Route as SituationRouteImport } from './routes/situation'
 import { Route as ResultRouteImport } from './routes/result'
 import { Route as RegionRouteImport } from './routes/region'
@@ -23,6 +24,11 @@ import { Route as ApiTtsRouteImport } from './routes/api/tts'
 import { Route as ApiSttRouteImport } from './routes/api/stt'
 import { Route as ApiIntentRouteImport } from './routes/api/intent'
 
+const VoiceRoute = VoiceRouteImport.update({
+  id: '/voice',
+  path: '/voice',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const SituationRoute = SituationRouteImport.update({
   id: '/situation',
   path: '/situation',
@@ -100,6 +106,7 @@ export interface FileRoutesByFullPath {
   '/region': typeof RegionRoute
   '/result': typeof ResultRoute
   '/situation': typeof SituationRoute
+  '/voice': typeof VoiceRoute
   '/api/intent': typeof ApiIntentRoute
   '/api/stt': typeof ApiSttRoute
   '/api/tts': typeof ApiTtsRoute
@@ -115,6 +122,7 @@ export interface FileRoutesByTo {
   '/region': typeof RegionRoute
   '/result': typeof ResultRoute
   '/situation': typeof SituationRoute
+  '/voice': typeof VoiceRoute
   '/api/intent': typeof ApiIntentRoute
   '/api/stt': typeof ApiSttRoute
   '/api/tts': typeof ApiTtsRoute
@@ -131,6 +139,7 @@ export interface FileRoutesById {
   '/region': typeof RegionRoute
   '/result': typeof ResultRoute
   '/situation': typeof SituationRoute
+  '/voice': typeof VoiceRoute
   '/api/intent': typeof ApiIntentRoute
   '/api/stt': typeof ApiSttRoute
   '/api/tts': typeof ApiTtsRoute
@@ -148,6 +157,7 @@ export interface FileRouteTypes {
     | '/region'
     | '/result'
     | '/situation'
+    | '/voice'
     | '/api/intent'
     | '/api/stt'
     | '/api/tts'
@@ -163,6 +173,7 @@ export interface FileRouteTypes {
     | '/region'
     | '/result'
     | '/situation'
+    | '/voice'
     | '/api/intent'
     | '/api/stt'
     | '/api/tts'
@@ -178,6 +189,7 @@ export interface FileRouteTypes {
     | '/region'
     | '/result'
     | '/situation'
+    | '/voice'
     | '/api/intent'
     | '/api/stt'
     | '/api/tts'
@@ -194,6 +206,7 @@ export interface RootRouteChildren {
   RegionRoute: typeof RegionRoute
   ResultRoute: typeof ResultRoute
   SituationRoute: typeof SituationRoute
+  VoiceRoute: typeof VoiceRoute
   ApiIntentRoute: typeof ApiIntentRoute
   ApiSttRoute: typeof ApiSttRoute
   ApiTtsRoute: typeof ApiTtsRoute
@@ -201,6 +214,13 @@ export interface RootRouteChildren {
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/voice': {
+      id: '/voice'
+      path: '/voice'
+      fullPath: '/voice'
+      preLoaderRoute: typeof VoiceRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/situation': {
       id: '/situation'
       path: '/situation'
@@ -306,6 +326,7 @@ const rootRouteChildren: RootRouteChildren = {
   RegionRoute: RegionRoute,
   ResultRoute: ResultRoute,
   SituationRoute: SituationRoute,
+  VoiceRoute: VoiceRoute,
   ApiIntentRoute: ApiIntentRoute,
   ApiSttRoute: ApiSttRoute,
   ApiTtsRoute: ApiTtsRoute,

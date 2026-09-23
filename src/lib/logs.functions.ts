@@ -96,5 +96,5 @@ export const getUsageLogs = createServerFn({ method: "POST" })
       byRegion: count((r) => r.region),
     };
 
-    return { authorized: true as const, logs, stats };
+    return { authorized: true as const, logs, voices, stats };
   });

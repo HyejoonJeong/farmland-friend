@@ -59,6 +59,35 @@ function toCsv(rows: UsageLogRow[]) {
   return "\uFEFF" + [head.join(","), ...body].join("\n");
 }
 
+function voicesToCsv(rows: VoiceRow[]) {
+  const head = ["시각", "의견 내용", "연령", "영농경력", "성별", "지역", "입력방식"];
+  const esc = (v: unknown) => `"${String(v ?? "").replace(/"/g, '""')}"`;
+  const body = rows.map((r) =>
+    [
+      new Date(r.created_at).toLocaleString("ko-KR"),
+      r.content,
+      r.age_group,
+      r.farming_years,
+      r.gender,
+      r.region,
+      r.source,
+    ]
+      .map(esc)
+      .join(","),
+  );
+  return "\uFEFF" + [head.join(","), ...body].join("\n");
+}
+
+function downloadCsv(csv: string, name: string) {
+  const blob = new Blob([csv], { type: "text/csv;charset=utf-8" });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = `${name}-${new Date().toISOString().slice(0, 10)}.csv`;
+  a.click();
+  URL.revokeObjectURL(url);
+}
+
 function AdminPage() {
   const fetchLogs = useServerFn(getUsageLogs);
   const [password, setPassword] = useState("");

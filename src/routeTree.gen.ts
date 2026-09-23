@@ -23,6 +23,7 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as ApiTtsRouteImport } from './routes/api/tts'
 import { Route as ApiSttRouteImport } from './routes/api/stt'
 import { Route as ApiIntentRouteImport } from './routes/api/intent'
+import { Route as ApiAskRouteImport } from './routes/api/ask'
 
 const VoiceRoute = VoiceRouteImport.update({
   id: '/voice',
@@ -94,6 +95,11 @@ const ApiIntentRoute = ApiIntentRouteImport.update({
   path: '/api/intent',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiAskRoute = ApiAskRouteImport.update({
+  id: '/api/ask',
+  path: '/api/ask',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -107,6 +113,7 @@ export interface FileRoutesByFullPath {
   '/result': typeof ResultRoute
   '/situation': typeof SituationRoute
   '/voice': typeof VoiceRoute
+  '/api/ask': typeof ApiAskRoute
   '/api/intent': typeof ApiIntentRoute
   '/api/stt': typeof ApiSttRoute
   '/api/tts': typeof ApiTtsRoute
@@ -123,6 +130,7 @@ export interface FileRoutesByTo {
   '/result': typeof ResultRoute
   '/situation': typeof SituationRoute
   '/voice': typeof VoiceRoute
+  '/api/ask': typeof ApiAskRoute
   '/api/intent': typeof ApiIntentRoute
   '/api/stt': typeof ApiSttRoute
   '/api/tts': typeof ApiTtsRoute
@@ -140,6 +148,7 @@ export interface FileRoutesById {
   '/result': typeof ResultRoute
   '/situation': typeof SituationRoute
   '/voice': typeof VoiceRoute
+  '/api/ask': typeof ApiAskRoute
   '/api/intent': typeof ApiIntentRoute
   '/api/stt': typeof ApiSttRoute
   '/api/tts': typeof ApiTtsRoute
@@ -158,6 +167,7 @@ export interface FileRouteTypes {
     | '/result'
     | '/situation'
     | '/voice'
+    | '/api/ask'
     | '/api/intent'
     | '/api/stt'
     | '/api/tts'
@@ -174,6 +184,7 @@ export interface FileRouteTypes {
     | '/result'
     | '/situation'
     | '/voice'
+    | '/api/ask'
     | '/api/intent'
     | '/api/stt'
     | '/api/tts'
@@ -190,6 +201,7 @@ export interface FileRouteTypes {
     | '/result'
     | '/situation'
     | '/voice'
+    | '/api/ask'
     | '/api/intent'
     | '/api/stt'
     | '/api/tts'
@@ -207,6 +219,7 @@ export interface RootRouteChildren {
   ResultRoute: typeof ResultRoute
   SituationRoute: typeof SituationRoute
   VoiceRoute: typeof VoiceRoute
+  ApiAskRoute: typeof ApiAskRoute
   ApiIntentRoute: typeof ApiIntentRoute
   ApiSttRoute: typeof ApiSttRoute
   ApiTtsRoute: typeof ApiTtsRoute
@@ -312,6 +325,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiIntentRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/ask': {
+      id: '/api/ask'
+      path: '/api/ask'
+      fullPath: '/api/ask'
+      preLoaderRoute: typeof ApiAskRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
@@ -327,6 +347,7 @@ const rootRouteChildren: RootRouteChildren = {
   ResultRoute: ResultRoute,
   SituationRoute: SituationRoute,
   VoiceRoute: VoiceRoute,
+  ApiAskRoute: ApiAskRoute,
   ApiIntentRoute: ApiIntentRoute,
   ApiSttRoute: ApiSttRoute,
   ApiTtsRoute: ApiTtsRoute,

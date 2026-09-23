@@ -1,4 +1,4 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useEffect, useRef, useState } from "react";
 import {
   ExternalLink,
@@ -13,7 +13,8 @@ import { PageShell } from "@/components/PageShell";
 import { SpeakButton } from "@/components/SpeakButton";
 import { startRecorder, type Recorder } from "@/lib/recorder";
 import { FBO_PORTAL_URL } from "@/lib/fbo-knowledge";
-import { HUMAN_SUPPORT_PHONE } from "@/lib/data";
+import { HUMAN_SUPPORT_PHONE, INTENTS, type IntentKey } from "@/lib/data";
+import { useApp } from "@/lib/store";
 
 export const Route = createFileRoute("/ask")({
   head: () => ({
@@ -60,6 +61,10 @@ function AskPage() {
   const [level, setLevel] = useState(0);
   const [typed, setTyped] = useState("");
   const [showText, setShowText] = useState(false);
+  const [connecting, setConnecting] = useState(false);
+  const nav = useNavigate();
+  const setTranscript = useApp((s) => s.setTranscript);
+  const setIntent = useApp((s) => s.setIntent);
 
   const recRef = useRef<Recorder | null>(null);
   const startedAt = useRef(0);
@@ -181,6 +186,46 @@ function AskPage() {
     }
     setTyped("");
     void ask(t);
+  };
+
+  // Q&A에서 바로 담당자 연결: 방금 질문을 사업(intent)으로 분류한 뒤
+  // 지역 선택 화면으로 이동해 바로 담당자 연락처를 안내한다.
+  const connectToAgent = async () => {
+    const lastQuestion = [...turns].reverse().find((t) => t.role === "user")?.content;
+    if (!lastQuestion) {
+      nav({ to: "/listen" });
+      return;
+    }
+    setConnecting(true);
+    setError(null);
+    try {
+      const res = await fetch("/api/intent", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ text: lastQuestion }),
+      });
+      if (!res.ok) throw new Error(await res.text());
+      const data = (await res.json()) as {
+        intent: IntentKey;
+        confidence: number;
+        summary: string;
+      };
+      const label = INTENTS.find((i) => i.key === data.intent)?.label ?? "";
+      setTranscript(lastQuestion);
+      setIntent({
+        intent: data.intent,
+        confidence: data.confidence,
+        summary: data.summary || `${label} 관련 문의`,
+        needsClarification: false,
+      });
+      nav({ to: "/region" });
+    } catch (e) {
+      console.error(e);
+      setError("담당 업무를 분류하지 못했어요. 말로 다시 설명해 주시겠어요?");
+      nav({ to: "/listen" });
+    } finally {
+      setConnecting(false);
+    }
   };
 
   const recording = status === "recording";
@@ -334,12 +379,18 @@ function AskPage() {
           안내는 참고용입니다. 신청 요건과 금액은 해마다 달라질 수 있어 담당자 확인이
           필요합니다.
         </p>
-        <Link
-          to="/listen"
-          className="flex min-h-16 w-full items-center justify-center gap-2 rounded-2xl border-2 border-primary bg-accent px-4 py-4 text-[20px] font-bold text-accent-foreground"
+        <button
+          type="button"
+          onClick={() => void connectToAgent()}
+          disabled={busy || connecting}
+          className="flex min-h-16 w-full items-center justify-center gap-2 rounded-2xl border-2 border-primary bg-accent px-4 py-4 text-[20px] font-bold text-accent-foreground disabled:opacity-60"
         >
+          {connecting && <Loader2 className="h-6 w-6 animate-spin" />}
           담당자 찾아 연결하기
-        </Link>
+        </button>
+        <p className="text-center text-[16px] text-muted-foreground">
+          질문하신 사업의 담당자를 바로 찾아드립니다. 지역만 선택하시면 됩니다.
+        </p>
         <a
           href={`tel:${HUMAN_SUPPORT_PHONE}`}
           className="flex min-h-16 w-full items-center justify-center gap-2 rounded-2xl bg-secondary px-4 py-4 text-[20px] font-bold text-secondary-foreground"

@@ -122,7 +122,7 @@ function AdminPage() {
   const refetch = () => login.mutate(password);
   const isFetching = login.isPending;
 
-  const { logs, stats } = data;
+  const { logs, voices, stats } = data;
 
   const download = () => {
     const blob = new Blob([toCsv(logs)], { type: "text/csv;charset=utf-8" });

@@ -70,13 +70,13 @@ function Home() {
 
         <div className="w-full space-y-4">
           <Link
-            to="/listen"
+            to="/ask"
             className="btn-huge flex w-full flex-col items-center justify-center bg-primary text-center text-primary-foreground shadow-lg active:scale-[0.98]"
             style={{ minHeight: 92, fontSize: 26 }}
           >
-            민원 담당자 찾기
+            궁금한 점 물어보기
             <span className="mt-1 text-[16px] font-semibold opacity-90">
-              말씀하시면 담당 부서로 안내
+              답변 듣고 담당자까지 바로 연결
             </span>
           </Link>
 

@@ -188,6 +188,46 @@ function AskPage() {
     void ask(t);
   };
 
+  // Q&A에서 바로 담당자 연결: 방금 질문을 사업(intent)으로 분류한 뒤
+  // 지역 선택 화면으로 이동해 바로 담당자 연락처를 안내한다.
+  const connectToAgent = async () => {
+    const lastQuestion = [...turns].reverse().find((t) => t.role === "user")?.content;
+    if (!lastQuestion) {
+      nav({ to: "/listen" });
+      return;
+    }
+    setConnecting(true);
+    setError(null);
+    try {
+      const res = await fetch("/api/intent", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ text: lastQuestion }),
+      });
+      if (!res.ok) throw new Error(await res.text());
+      const data = (await res.json()) as {
+        intent: IntentKey;
+        confidence: number;
+        summary: string;
+      };
+      const label = INTENTS.find((i) => i.key === data.intent)?.label ?? "";
+      setTranscript(lastQuestion);
+      setIntent({
+        intent: data.intent,
+        confidence: data.confidence,
+        summary: data.summary || `${label} 관련 문의`,
+        needsClarification: false,
+      });
+      nav({ to: "/region" });
+    } catch (e) {
+      console.error(e);
+      setError("담당 업무를 분류하지 못했어요. 말로 다시 설명해 주시겠어요?");
+      nav({ to: "/listen" });
+    } finally {
+      setConnecting(false);
+    }
+  };
+
   const recording = status === "recording";
   const busy = status === "processing" || status === "thinking";
 

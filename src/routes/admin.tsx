@@ -2,7 +2,7 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { useMutation } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { useState } from "react";
-import { getUsageLogs, type UsageLogRow } from "@/lib/logs.functions";
+import { getUsageLogs, type UsageLogRow, type VoiceRow } from "@/lib/logs.functions";
 import { BarChart3, Download, Loader2, Lock, RefreshCw } from "lucide-react";
 
 export const Route = createFileRoute("/admin")({

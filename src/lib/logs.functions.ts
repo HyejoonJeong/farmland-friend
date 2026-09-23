@@ -25,12 +25,28 @@ export interface UsageStats {
   byRegion: { label: string; count: number }[];
 }
 
+export interface VoiceRow {
+  id: string;
+  created_at: string;
+  content: string;
+  age_group: string | null;
+  farming_years: string | null;
+  gender: string | null;
+  region: string | null;
+  source: string | null;
+}
+
 export const getUsageLogs = createServerFn({ method: "POST" })
   .inputValidator((input: { key: string }) => ({ key: String(input?.key ?? "") }))
   .handler(async ({ data }) => {
     const expected = process.env["ADMIN_ACCESS_KEY"];
     if (!expected || data.key !== expected) {
-      return { authorized: false as const, logs: [] as UsageLogRow[], stats: null };
+      return {
+        authorized: false as const,
+        logs: [] as UsageLogRow[],
+        voices: [] as VoiceRow[],
+        stats: null,
+      };
     }
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
     const { data: rows, error } = await supabaseAdmin

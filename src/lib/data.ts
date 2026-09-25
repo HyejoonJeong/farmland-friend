@@ -340,6 +340,17 @@ export function matchContact(intent: IntentKey, region: string): ContactMatch {
     };
   }
 
+  if (info.org === "municipal") {
+    const office =
+      MUNICIPAL_OFFICES.find((o) => o.region === region) ?? MUNICIPAL_FALLBACK;
+    return {
+      orgName: office.name,
+      department: "농지이용실태조사 담당 (농업정책과)",
+      phone: office.phone,
+      duty: info.business,
+    };
+  }
+
   if (info.org === "extension") {
     const office =
       EXTENSION_OFFICES.find((o) => o.region === region) ??

@@ -8,13 +8,14 @@ export type IntentKey =
   | "farmland_sell"
   | "farm_recovery"
   | "farming_tech"
-  | "gap_certification";
+  | "gap_certification"
+  | "farmland_survey";
 
 export interface IntentInfo {
   key: IntentKey;
   label: string;
   business: string;
-  org: "farmland_bank" | "extension" | "naqs";
+  org: "farmland_bank" | "extension" | "naqs" | "municipal";
   examples: string[];
 }
 

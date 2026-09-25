@@ -118,6 +118,19 @@ export const INTENTS: IntentInfo[] = [
       "GAP 인증 문의입니다",
     ],
   },
+  {
+    key: "farmland_survey",
+    label: "농지전수조사 문의",
+    business: "농지이용실태조사",
+    org: "municipal",
+    examples: [
+      "농지전수조사가 뭔가요?",
+      "전수조사는 언제 어떻게 하나요?",
+      "우리 집 농지도 조사 대상인가요?",
+      "조사받으면 처분되나요?",
+      "농지이용실태조사 문의합니다",
+    ],
+  },
 ];
 
 // Documents required per intent (curated common docs)
@@ -130,6 +143,7 @@ export const REQUIRED_DOCS: Record<IntentKey, string[]> = {
   farm_recovery: ["신분증", "농지 등기부등본", "토지대장", "부채 증빙서류", "농업경영체 등록확인서", "경영회생 신청서"],
   farming_tech: ["신분증"],
   gap_certification: ["신분증", "농업경영체 등록증", "농지 관련 서류", "인증 신청서"],
+  farmland_survey: ["신분증", "농지 등기부등본 (해당 시)", "토지대장 (해당 시)"],
 };
 
 // Region list (전북 지역 우선)

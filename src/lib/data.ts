@@ -8,13 +8,14 @@ export type IntentKey =
   | "farmland_sell"
   | "farm_recovery"
   | "farming_tech"
-  | "gap_certification";
+  | "gap_certification"
+  | "farmland_survey";
 
 export interface IntentInfo {
   key: IntentKey;
   label: string;
   business: string;
-  org: "farmland_bank" | "extension" | "naqs";
+  org: "farmland_bank" | "extension" | "naqs" | "municipal";
   examples: string[];
 }
 
@@ -117,6 +118,19 @@ export const INTENTS: IntentInfo[] = [
       "GAP 인증 문의입니다",
     ],
   },
+  {
+    key: "farmland_survey",
+    label: "농지전수조사 문의",
+    business: "농지이용실태조사",
+    org: "municipal",
+    examples: [
+      "농지전수조사가 뭔가요?",
+      "전수조사는 언제 어떻게 하나요?",
+      "우리 집 농지도 조사 대상인가요?",
+      "조사받으면 처분되나요?",
+      "농지이용실태조사 문의합니다",
+    ],
+  },
 ];
 
 // Documents required per intent (curated common docs)
@@ -129,6 +143,7 @@ export const REQUIRED_DOCS: Record<IntentKey, string[]> = {
   farm_recovery: ["신분증", "농지 등기부등본", "토지대장", "부채 증빙서류", "농업경영체 등록확인서", "경영회생 신청서"],
   farming_tech: ["신분증"],
   gap_certification: ["신분증", "농업경영체 등록증", "농지 관련 서류", "인증 신청서"],
+  farmland_survey: ["신분증", "농지 등기부등본 (해당 시)", "토지대장 (해당 시)"],
 };
 
 // Region list (전북 지역 우선)
@@ -321,6 +336,17 @@ export function matchContact(intent: IntentKey, region: string): ContactMatch {
       orgName: `한국농어촌공사 ${pick.branch}지사 (농지은행)`,
       department: pick.duty,
       phone: pick.phone,
+      duty: info.business,
+    };
+  }
+
+  if (info.org === "municipal") {
+    const office =
+      MUNICIPAL_OFFICES.find((o) => o.region === region) ?? MUNICIPAL_FALLBACK;
+    return {
+      orgName: office.name,
+      department: "농지이용실태조사 담당 (농업정책과)",
+      phone: office.phone,
       duty: info.business,
     };
   }

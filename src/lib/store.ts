@@ -36,6 +36,16 @@ export const useApp = create<AppState>()(
       setIntent: (intent) => set({ intent }),
       reset: () => set({ transcript: "", clarification: "", intent: null }),
     }),
-    { name: "nongji-app" },
+    {
+      name: "nongji-app",
+      version: 2,
+      migrate: (persisted, version) => {
+        if (version < 2) {
+          const state = persisted as Partial<AppState>;
+          return { ...state, intent: null, transcript: "", clarification: "" };
+        }
+        return persisted as AppState;
+      },
+    },
   ),
 );

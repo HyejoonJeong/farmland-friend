@@ -59,8 +59,12 @@ function ResultPage() {
 
 
   if (!intent || !region || !contact) return null;
-  const info = INTENTS.find((i) => i.key === intent.intent)!;
-  const docs = REQUIRED_DOCS[intent.intent];
+  const info = INTENTS.find((i) => i.key === intent.intent);
+  if (!info) {
+    nav({ to: "/" });
+    return null;
+  }
+  const docs = REQUIRED_DOCS[intent.intent] ?? ["신분증", "해당 농지 관련 서류"];
 
   const speak = `${region} 지역, ${info.label} 담당은 ${contact.orgName}, ${contact.department} 입니다. 대표 전화는 ${contact.phone.replace(/-/g, " ")} 입니다. 아래 큰 전화 버튼을 누르시면 바로 연결됩니다. 방문하실 때는 ${docs.join(", ")}를 준비해 주세요.`;
 

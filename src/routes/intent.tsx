@@ -25,7 +25,11 @@ function IntentPage() {
   }, [intent, nav]);
 
   if (!intent) return null;
-  const info = INTENTS.find((i) => i.key === intent.intent)!;
+  const info = INTENTS.find((i) => i.key === intent.intent);
+  if (!info) {
+    nav({ to: "/listen" });
+    return null;
+  }
 
   const speak = `${intent.summary} 이 내용은 ${info.label} 관련 업무로 보입니다. 맞으시면 아래 초록색 버튼을 눌러 주세요.`;
   const conf = Math.round(intent.confidence * 100);

@@ -22,12 +22,11 @@ import {
 } from "@/components/ui/accordion";
 import { Button } from "@/components/ui/button";
 import {
-  FARMLAND_BANK,
   HUMAN_SUPPORT_PHONE,
+  matchContact,
   MUNICIPAL_FALLBACK,
   MUNICIPAL_OFFICES,
   REGIONS,
-  REGION_TO_FB_BRANCH,
 } from "@/lib/data";
 
 export const Route = createFileRoute("/farmland-survey")({
@@ -142,15 +141,13 @@ function FarmlandSurveyPage() {
     if (region === "기타 지역") {
       return { kind: "농지은행", branch: "농지은행 대표상담", duty: "농지 관리·제도 관련 문의", phone: HUMAN_SUPPORT_PHONE };
     }
-    const branch = REGION_TO_FB_BRANCH[region];
-    if (!branch) return null;
-    const candidates = FARMLAND_BANK.filter((item) => item.branch === branch);
-    const preferred =
-      candidates.find((item) => item.duty.includes("지사 농지사업")) ??
-      candidates.find((item) => item.duty.includes("농지총괄")) ??
-      candidates[0];
-    if (!preferred) return null;
-    return { kind: "농지은행", branch: `한국농어촌공사 ${branch}지사`, duty: preferred.duty, phone: preferred.phone };
+    const bankContact = matchContact("public_reserve_purchase", region);
+    return {
+      kind: "농지은행",
+      branch: bankContact.orgName,
+      duty: "농지 관리·제도 관련 문의",
+      phone: bankContact.phone,
+    };
   }, [region, topic]);
 
   return (

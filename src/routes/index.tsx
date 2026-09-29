@@ -62,9 +62,9 @@ function Home() {
             />
           </div>
           <p className="mt-3 text-[22px] font-semibold text-foreground/80">
-            말씀만 하시면
+            농지은행 민원을 말씀하시면
             <br />
-            담당자에게 연결해 드립니다
+            담당자에게 연결해 드립니다.
           </p>
         </div>
 

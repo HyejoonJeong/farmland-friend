@@ -18,7 +18,7 @@ export const Route = createFileRoute("/api/intent")({
 
         const catalogue = INTENTS.map(
           (i) =>
-            `- ${i.key}: ${i.label} (담당업무: ${i.business}). 예: ${i.examples.slice(0, 4).join(" / ")}`,
+            `- ${i.key}: ${i.label} (정식 업무명: ${i.business}, 의미: ${i.meaning}). 예: ${i.examples.slice(0, 8).join(" / ")}`,
         ).join("\n");
 
         const system = `당신은 한국 농촌 고객님의 민원 음성 발화를 이해해 담당 업무 카테고리로 분류하는 도우미입니다.
@@ -79,9 +79,10 @@ confidence가 0.7 미만이거나 두 카테고리 중 헷갈리면 needsClarifi
         }
 
         const validKeys = INTENTS.map((i) => i.key) as string[];
-        const intent = (validKeys.includes(parsed.intent ?? "")
-          ? parsed.intent
-          : "farmland_rent_out") as IntentKey;
+        if (!validKeys.includes(parsed.intent ?? "")) {
+          return new Response("Unable to classify intent", { status: 422 });
+        }
+        const intent = parsed.intent as IntentKey;
         const confidence = Math.max(0, Math.min(1, parsed.confidence ?? 0.5));
         const needsClar =
           Boolean(parsed.needsClarification) || confidence < 0.7;

@@ -29,7 +29,7 @@ export const Route = createFileRoute("/voice")({
 });
 
 const PROMPT =
-  "농지정책이나 농지은행 사업에 대해 하고 싶은 말씀을 편하게 해 주세요. 불편한 점, 바라는 점 모두 좋습니다. 말씀이 끝나면 자동으로 정리됩니다. 이름과 전화번호는 남기지 않습니다.";
+  "농지정책이나 농지은행 사업에 대해 하고 싶은 말씀을 편하게 해 주세요. 불편한 점, 바라는 점 모두 좋습니다. 다 말씀하시면 버튼을 한 번 더 눌러 주세요. 이름과 전화번호는 남기지 않습니다.";
 
 const AGE_GROUPS = ["30대 이하", "40대", "50대", "60대", "70대", "80대 이상"];
 const CAREERS = ["5년 미만", "5~10년", "10~20년", "20~30년", "30년 이상"];
@@ -119,9 +119,7 @@ function VoicePage() {
       vadTimer.current = window.setInterval(() => {
         const now = Date.now();
         const elapsed = now - startedAt.current;
-        const silence = now - lastVoiceAt.current;
-        if (elapsed > 60000) return void stop();
-        if (spokeRef.current && silence > 2200 && elapsed > 1500) stop();
+        if (elapsed > 120000) return void stop();
       }, 200);
     } catch (e) {
       console.error(e);
@@ -305,9 +303,9 @@ function VoicePage() {
           )}
           <button
             type="button"
-            onClick={recording ? undefined : start}
+            onClick={recording ? stop : start}
             disabled={processing}
-            aria-label={recording ? "듣는 중" : "녹음 시작"}
+            aria-label={recording ? "말씀 완료" : "녹음 시작"}
             className="relative grid h-40 w-40 place-items-center rounded-full bg-primary text-primary-foreground shadow-xl transition active:scale-95"
             style={{ transform: recording ? `scale(${1 + level * 0.15})` : undefined }}
           >
@@ -322,7 +320,7 @@ function VoicePage() {
           {processing
             ? "말씀을 글로 옮기는 중..."
             : recording
-              ? "말씀이 끝나면 자동으로 정리됩니다"
+              ? "다 말씀하셨으면 버튼을 한 번 더 눌러 주세요"
               : "버튼을 눌러 말씀 시작"}
         </p>
       </div>

@@ -14,7 +14,7 @@ import { SpeakButton } from "@/components/SpeakButton";
 import { startRecorder, type Recorder } from "@/lib/recorder";
 import { FBO_PORTAL_URL } from "@/lib/fbo-knowledge";
 import { HUMAN_SUPPORT_PHONE, INTENTS, type IntentKey } from "@/lib/data";
-import { useApp } from "@/lib/store";
+import { useApp, type IntentResult } from "@/lib/store";
 
 export const Route = createFileRoute("/ask")({
   head: () => ({

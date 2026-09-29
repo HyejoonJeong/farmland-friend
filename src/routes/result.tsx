@@ -64,9 +64,15 @@ function ResultPage() {
     nav({ to: "/" });
     return null;
   }
-  const docs = REQUIRED_DOCS[intent.intent] ?? ["신분증", "해당 농지 관련 서류"];
+  const docs = REQUIRED_DOCS[intent.intent];
+  const applicationDocs = docs?.application;
+  const contractDocs = docs?.contract;
+  const spokenDocs = [
+    applicationDocs?.length ? `신청할 때는 ${applicationDocs.join(", ")}` : "신청 서류는 관할 담당자에게 문의해 주세요",
+    contractDocs?.length ? `계약할 때는 ${contractDocs.join(", ")}` : "계약 체결 서류는 관할 담당자에게 문의해 주세요",
+  ].join(". ");
 
-  const speak = `${region} 지역, ${info.label} 담당은 ${contact.orgName}, ${contact.department} 입니다. 대표 전화는 ${contact.phone.replace(/-/g, " ")} 입니다. 아래 큰 전화 버튼을 누르시면 바로 연결됩니다. 방문하실 때는 ${docs.join(", ")}를 준비해 주세요.`;
+  const speak = `${region} 지역, ${info.label} 담당은 ${contact.orgName}, ${contact.department} 입니다. 대표 전화는 ${contact.phone.replace(/-/g, " ")} 입니다. 아래 큰 전화 버튼을 누르시면 바로 연결됩니다. ${spokenDocs}.`;
 
   return (
     <PageShell back="/region" step={{ current: 5, total: 5 }}>
@@ -110,19 +116,10 @@ function ResultPage() {
           <FileText className="h-6 w-6" />
           <h2 className="text-[22px] font-bold">준비하실 서류</h2>
         </div>
-        <ul className="mt-3 space-y-2 text-[20px]">
-          {docs.map((d) => (
-            <li
-              key={d}
-              className="flex items-start gap-3 rounded-xl bg-secondary/50 p-3"
-            >
-              <span className="mt-1 h-2.5 w-2.5 rounded-full bg-primary" />
-              <span className="font-semibold">{d}</span>
-            </li>
-          ))}
-        </ul>
+        <DocumentList title="신청 시 서류" documents={applicationDocs} />
+        <DocumentList title="계약 체결 시 서류" documents={contractDocs} />
         <p className="mt-4 text-[18px] font-semibold text-foreground/70">
-          자세한 서류는 담당직원에게 문의
+          개인·법인 여부와 신청 조건에 따라 추가 서류가 필요할 수 있습니다.
         </p>
       </section>
 
@@ -142,5 +139,27 @@ function ResultPage() {
         </Link>
       </div>
     </PageShell>
+  );
+}
+
+function DocumentList({ title, documents }: { title: string; documents: string[] | null | undefined }) {
+  return (
+    <div className="mt-4">
+      <h3 className="text-[19px] font-bold">{title}</h3>
+      {documents?.length ? (
+        <ul className="mt-2 space-y-2 text-[18px]">
+          {documents.map((document) => (
+            <li key={document} className="flex items-start gap-3 rounded-xl bg-secondary/50 p-3">
+              <span className="mt-1.5 h-2.5 w-2.5 shrink-0 rounded-full bg-primary" />
+              <span className="font-semibold leading-snug">{document}</span>
+            </li>
+          ))}
+        </ul>
+      ) : (
+        <p className="mt-2 rounded-xl bg-secondary/50 p-3 text-[18px] font-bold">
+          관할 담당자에게 문의
+        </p>
+      )}
+    </div>
   );
 }

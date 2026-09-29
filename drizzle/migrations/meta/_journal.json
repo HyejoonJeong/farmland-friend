@@ -8,6 +8,13 @@
       "when": 1790143089026,
       "tag": "0000_create_farmer_voices",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1790649707321,
+      "tag": "0001_usage_logs_classification_trace",
+      "breakpoints": true
     }
   ]
 }

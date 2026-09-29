@@ -29,14 +29,19 @@ export const Route = createFileRoute("/clarify")({
 function ClarifyPage() {
   const { intent, setIntent } = useApp();
   const nav = useNavigate();
-  const [caseId, setCaseId] = useState<ClarifyCaseId | null>(intent?.caseId ?? null);
+  const [caseId, setCaseId] = useState<ClarifyCaseId | null>(null);
+  useEffect(() => {
+    if (caseId === null && intent?.caseId) setCaseId(intent.caseId);
+  }, [intent, caseId]);
   const [round, setRound] = useState(1);
   const [fallback, setFallback] = useState(false);
 
   useEffect(() => {
-    if (!intent) nav({ to: "/listen" });
-    else if (!intent.caseId) nav({ to: "/intent" });
-  }, [intent, nav]);
+    // Read the live store (the hook returns the empty server snapshot during hydration).
+    const live = useApp.getState().intent;
+    if (!live) nav({ to: "/listen" });
+    else if (!live.caseId && !fallback) nav({ to: "/intent" });
+  }, [intent, nav, fallback]);
 
   if (!intent || !caseId) return null;
   const c = CLARIFY_CASES[caseId];

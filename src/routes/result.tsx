@@ -50,6 +50,10 @@ function ResultPage() {
         department: contact.department,
         phone: contact.phone,
         source: transcript ? "app" : null,
+        category: intent.category ?? null,
+        candidates: intent.candidates ?? null,
+        classification_status: intent.status ?? "SUCCESS",
+        clarify_trail: (intent.trail ?? null) as never,
       })
       .then(({ error }) => {
         if (error) console.error("[usage_logs] insert failed", error.message);

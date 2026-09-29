@@ -5,6 +5,10 @@ export interface UsageLogRow {
   created_at: string;
   transcript: string;
   clarification: string | null;
+  category: string | null;
+  candidates: string[] | null;
+  classification_status: string | null;
+  clarify_trail: { question: string; answer: string }[] | null;
   summary: string | null;
   intent: string | null;
   intent_label: string | null;
@@ -52,7 +56,7 @@ export const getUsageLogs = createServerFn({ method: "POST" })
     const { data: rows, error } = await supabaseAdmin
       .from("usage_logs")
       .select(
-        "id, created_at, transcript, clarification, summary, intent, intent_label, confidence, region, branch, department, phone, source",
+        "id, created_at, transcript, clarification, summary, intent, intent_label, confidence, region, branch, department, phone, source, category, candidates, classification_status, clarify_trail",
       )
       .order("created_at", { ascending: false })
       .limit(500);

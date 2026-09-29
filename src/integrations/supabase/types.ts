@@ -50,7 +50,11 @@ export type Database = {
       usage_logs: {
         Row: {
           branch: string | null
+          candidates: string[] | null
+          category: string | null
           clarification: string | null
+          clarify_trail: Json | null
+          classification_status: string | null
           confidence: number | null
           created_at: string
           department: string | null
@@ -65,7 +69,11 @@ export type Database = {
         }
         Insert: {
           branch?: string | null
+          candidates?: string[] | null
+          category?: string | null
           clarification?: string | null
+          clarify_trail?: Json | null
+          classification_status?: string | null
           confidence?: number | null
           created_at?: string
           department?: string | null
@@ -80,7 +88,11 @@ export type Database = {
         }
         Update: {
           branch?: string | null
+          candidates?: string[] | null
+          category?: string | null
           clarification?: string | null
+          clarify_trail?: Json | null
+          classification_status?: string | null
           confidence?: number | null
           created_at?: string
           department?: string | null

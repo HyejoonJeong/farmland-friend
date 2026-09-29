@@ -35,7 +35,8 @@ export type IntentKey =
   | "damaged_farmland"
   | "farming_tech"
   | "gap_certification"
-  | "farmland_survey";
+  | "farmland_survey"
+  | "general_consult";
 
 export interface IntentInfo {
   key: IntentKey;
@@ -851,6 +852,14 @@ export const INTENTS: IntentInfo[] = [
       "농지이용실태조사 문의합니다",
     ],
   },
+  {
+    key: "general_consult",
+    label: "농지은행 일반 상담",
+    business: "농지은행 일반 상담",
+    meaning: "업무를 특정하기 어려운 농지은행 문의 (다른 업무가 전혀 맞지 않을 때만)",
+    org: "farmland_bank",
+    examples: ["농지은행에 문의할 게 있어요", "상담원과 이야기하고 싶어요"],
+  },
 ];
 
 export interface DocumentGuidance {
@@ -932,6 +941,7 @@ export const REQUIRED_DOCS: Record<IntentKey, DocumentGuidance> = {
   farming_tech: ASK_OFFICE,
   gap_certification: ASK_OFFICE,
   farmland_survey: ASK_OFFICE,
+  general_consult: ASK_OFFICE,
 };
 
 export const REGIONS = [

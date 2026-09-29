@@ -1,6 +1,12 @@
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
 import type { IntentKey } from "./data";
+import type { ClarifyCaseId } from "./clarify-flow";
+
+export type ConfidenceLevel = "HIGH" | "MEDIUM" | "LOW";
+export type ClassificationStatus = "SUCCESS" | "CLARIFIED" | "FALLBACK";
+
+export interface ClarifyStep { question: string; answer: string; }
 
 export interface IntentResult {
   intent: IntentKey;
@@ -8,6 +14,12 @@ export interface IntentResult {
   summary: string;
   followUp?: string;
   needsClarification: boolean;
+  category?: string;
+  candidates?: IntentKey[];
+  level?: ConfidenceLevel;
+  caseId?: ClarifyCaseId | null;
+  trail?: ClarifyStep[];
+  status?: ClassificationStatus;
 }
 
 interface AppState {
@@ -38,9 +50,9 @@ export const useApp = create<AppState>()(
     }),
     {
       name: "nongji-app",
-      version: 2,
+      version: 3,
       migrate: (persisted, version) => {
-        if (version < 2) {
+        if (version < 3) {
           const state = persisted as Partial<AppState>;
           return { ...state, intent: null, transcript: "", clarification: "" };
         }

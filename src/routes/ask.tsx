@@ -14,7 +14,7 @@ import { SpeakButton } from "@/components/SpeakButton";
 import { startRecorder, type Recorder } from "@/lib/recorder";
 import { FBO_PORTAL_URL } from "@/lib/fbo-knowledge";
 import { HUMAN_SUPPORT_PHONE, INTENTS, type IntentKey } from "@/lib/data";
-import { useApp } from "@/lib/store";
+import { useApp, type IntentResult } from "@/lib/store";
 
 export const Route = createFileRoute("/ask")({
   head: () => ({
@@ -205,20 +205,11 @@ function AskPage() {
         body: JSON.stringify({ text: lastQuestion }),
       });
       if (!res.ok) throw new Error(await res.text());
-      const data = (await res.json()) as {
-        intent: IntentKey;
-        confidence: number;
-        summary: string;
-      };
+      const data = (await res.json()) as IntentResult;
       const label = INTENTS.find((i) => i.key === data.intent)?.label ?? "";
       setTranscript(lastQuestion);
-      setIntent({
-        intent: data.intent,
-        confidence: data.confidence,
-        summary: data.summary || `${label} 관련 문의`,
-        needsClarification: false,
-      });
-      nav({ to: "/region" });
+      setIntent({ ...data, summary: data.summary || `${label} 관련 문의` });
+      nav({ to: data.needsClarification ? "/clarify" : "/region" });
     } catch (e) {
       console.error(e);
       setError("담당 업무를 분류하지 못했어요. 말로 다시 설명해 주시겠어요?");

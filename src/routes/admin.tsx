@@ -289,6 +289,17 @@ function AdminPage() {
                   </td>
                   <td className="p-3">
                     <p className="font-semibold">{r.transcript}</p>
+                    {(r.category || r.classification_status) && (
+                      <p className="mt-1 text-sm text-muted-foreground">
+                        대분류: {r.category ?? "-"} · 상태: {r.classification_status ?? "-"}
+                        {r.candidates?.length ? ` · 후보: ${r.candidates.join(", ")}` : ""}
+                      </p>
+                    )}
+                    {r.clarify_trail?.map((t, i) => (
+                      <p key={i} className="mt-1 text-sm text-muted-foreground">
+                        추가 질문 {i + 1}: {t.question} → {t.answer}
+                      </p>
+                    ))}
                     {r.clarification && (
                       <p className="mt-1 text-[14px] text-muted-foreground">
                         추가: {r.clarification}

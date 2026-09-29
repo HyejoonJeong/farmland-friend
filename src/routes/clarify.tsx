@@ -1,175 +1,124 @@
-import { createFileRoute, useNavigate } from "@tanstack/react-router";
-import { useEffect, useRef, useState } from "react";
+import { createFileRoute, useNavigate, Link } from "@tanstack/react-router";
+import { useEffect, useState } from "react";
 import { PageShell } from "@/components/PageShell";
 import { SpeakButton } from "@/components/SpeakButton";
 import { useApp } from "@/lib/store";
-import { startRecorder, type Recorder } from "@/lib/recorder";
-import { Mic, Loader2 } from "lucide-react";
+import {
+  CLARIFY_CASES,
+  FALLBACK_MESSAGE,
+  MAX_CLARIFY_ROUNDS,
+  type ClarifyCaseId,
+  type ClarifyOption,
+} from "@/lib/clarify-flow";
+import { RotateCcw } from "lucide-react";
 
 export const Route = createFileRoute("/clarify")({
   head: () => ({
     meta: [
-      { title: "확인 질문 · 농사 도우미" },
+      { title: "확인 질문 · 말해농" },
       { name: "description", content: "정확한 안내를 위해 짧은 확인 질문에 답해 주세요." },
+      { property: "og:title", content: "확인 질문 · 말해농" },
+      { property: "og:description", content: "버튼 하나로 알맞은 농지은행 업무를 찾아 드려요." },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary" },
     ],
   }),
   component: ClarifyPage,
 });
 
 function ClarifyPage() {
-  const { intent, transcript, region, appendClarification, setIntent } = useApp();
+  const { intent, setIntent } = useApp();
   const nav = useNavigate();
-  const [status, setStatus] = useState<"idle" | "recording" | "processing">("idle");
-  const [error, setError] = useState<string | null>(null);
-  const [level, setLevel] = useState(0);
-  const recRef = useRef<Recorder | null>(null);
-  const startedAt = useRef(0);
-  const lastVoiceAt = useRef(0);
-  const spokeRef = useRef(false);
-  const vadTimer = useRef<number | null>(null);
-
-  const clearVad = () => {
-    if (vadTimer.current) {
-      window.clearInterval(vadTimer.current);
-      vadTimer.current = null;
-    }
-  };
+  const [caseId, setCaseId] = useState<ClarifyCaseId | null>(null);
+  useEffect(() => {
+    if (caseId === null && intent?.caseId) setCaseId(intent.caseId);
+  }, [intent, caseId]);
+  const [round, setRound] = useState(1);
+  const [fallback, setFallback] = useState(false);
 
   useEffect(() => {
-    if (!intent) nav({ to: "/situation" });
-  }, [intent, nav]);
+    // Read the live store (the hook returns the empty server snapshot during hydration).
+    const live = useApp.getState().intent;
+    if (!live) nav({ to: "/listen" });
+    else if (!live.caseId && !fallback) nav({ to: "/intent" });
+  }, [intent, nav, fallback]);
 
-  const question =
-    intent?.followUp ??
-    "말씀 주신 내용이 조금 헷갈립니다. 조금 더 자세히 알려 주세요.";
+  if (!intent || !caseId) return null;
+  const c = CLARIFY_CASES[caseId];
 
-  const start = async () => {
-    setError(null);
-    spokeRef.current = false;
-    try {
-      const rec = await startRecorder((v) => {
-        setLevel(v);
-        if (v > 0.12) {
-          lastVoiceAt.current = Date.now();
-          if (!spokeRef.current && Date.now() - startedAt.current > 300) {
-            spokeRef.current = true;
-          }
-        }
-      });
-      recRef.current = rec;
-      startedAt.current = Date.now();
-      lastVoiceAt.current = Date.now();
-      setStatus("recording");
-      vadTimer.current = window.setInterval(() => {
-        const now = Date.now();
-        const elapsed = now - startedAt.current;
-        const silence = now - lastVoiceAt.current;
-        if (elapsed > 15000) return void stop();
-        if (spokeRef.current && silence > 1600 && elapsed > 1500) stop();
-      }, 200);
-    } catch {
-      setError("마이크를 사용할 수 없어요.");
-    }
-  };
-
-  const stop = async () => {
-    const rec = recRef.current;
-    if (!rec) return;
-    clearVad();
-    setStatus("processing");
-    const dur = Date.now() - startedAt.current;
-    const blob = await rec.stop();
-    recRef.current = null;
-    if (dur < 500) {
-      setStatus("idle");
-      setError("조금 더 길게 말씀해 주세요.");
+  const choose = (opt: ClarifyOption) => {
+    const trail = [...(intent.trail ?? []), { question: c.question, answer: opt.label }];
+    const t = opt.target;
+    if ("intent" in t) {
+      setIntent({ ...intent, intent: t.intent, trail, caseId: null, needsClarification: false, status: "CLARIFIED" });
+      nav({ to: "/intent" });
       return;
     }
-    try {
-      const form = new FormData();
-      form.append("file", blob, "clarify");
-      const s = await fetch("/api/stt", { method: "POST", body: form });
-      if (!s.ok) throw new Error();
-      const { text } = (await s.json()) as { text: string };
-      appendClarification(text);
-      const res = await fetch("/api/intent", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ text: transcript, region, clarification: text }),
-      });
-      if (!res.ok) throw new Error();
-      const data = await res.json();
-      setIntent(data);
-      nav({ to: "/intent" });
-    } catch {
-      setError("문제가 생겼어요. 다시 시도해 주세요.");
-      setStatus("idle");
+    if ("next" in t && round < MAX_CLARIFY_ROUNDS) {
+      setIntent({ ...intent, trail });
+      setCaseId(t.next);
+      setRound(round + 1);
+      return;
     }
+    setIntent({ ...intent, intent: "general_consult", trail, caseId: null, needsClarification: false, status: "FALLBACK" });
+    setFallback(true);
   };
 
-  useEffect(
-    () => () => {
-      clearVad();
-      recRef.current?.cancel();
-    },
-    [],
-  );
-
-  const recording = status === "recording";
-  const processing = status === "processing";
+  if (fallback) {
+    return (
+      <PageShell back="/listen">
+        <h1 className="mt-6 text-[30px] leading-tight font-black">{FALLBACK_MESSAGE}</h1>
+        <div className="mt-3">
+          <SpeakButton text={FALLBACK_MESSAGE} auto label="다시 듣기" />
+        </div>
+        <div className="mt-auto pt-8">
+          <Link
+            to="/region"
+            className="btn-huge flex w-full items-center justify-center bg-primary text-primary-foreground shadow-lg"
+            style={{ minHeight: 80, fontSize: 26 }}
+          >
+            담당자 연결하기
+          </Link>
+        </div>
+      </PageShell>
+    );
+  }
 
   return (
     <PageShell back="/situation" step={{ current: 2, total: 5 }}>
-      <h1 className="mt-4 text-[30px] leading-tight font-black">
-        한 가지만 더 여쭐게요
-      </h1>
-      <p className="mt-4 rounded-2xl bg-accent/25 p-5 text-[22px] font-semibold leading-relaxed">
-        {question}
+      <p className="mt-4 text-lg font-bold text-primary">
+        한 가지만 더 여쭐게요 ({round}/{MAX_CLARIFY_ROUNDS})
       </p>
+      <h1 className="mt-2 text-[30px] leading-tight font-black" aria-live="polite">
+        {c.question}
+      </h1>
       <div className="mt-3">
-        <SpeakButton text={question} auto label="질문 다시 듣기" />
+        <SpeakButton key={caseId} text={c.question} auto label="질문 다시 듣기" />
       </div>
 
-      <div className="mt-10 grid place-items-center">
-        <div className="relative grid h-44 w-44 place-items-center">
-          {recording && (
-            <span className="mic-ring absolute inset-0 rounded-full bg-primary/40" />
-          )}
+      <div className="mt-6 space-y-3">
+        {c.options.map((o) => (
           <button
+            key={o.label}
             type="button"
-            onClick={recording ? undefined : start}
-            disabled={processing}
-            className={`relative grid h-36 w-36 place-items-center rounded-full shadow-xl active:scale-95 ${
-              recording
-                ? "bg-primary text-primary-foreground"
-                : "bg-primary text-primary-foreground"
-            }`}
-            style={{
-              transform: recording ? `scale(${1 + level * 0.15})` : undefined,
-            }}
-            aria-label={recording ? "듣는 중" : "답변 녹음"}
+            onClick={() => choose(o)}
+            className="flex w-full items-center gap-4 rounded-3xl border-2 border-primary/30 bg-card p-5 text-left text-[22px] font-bold shadow-sm transition active:scale-[0.98] hover:border-primary"
+            style={{ minHeight: 84 }}
           >
-            {processing ? (
-              <Loader2 className="h-14 w-14 animate-spin" />
-            ) : (
-              <Mic className="h-14 w-14" />
-            )}
+            <span className="text-[32px]" aria-hidden>{o.emoji}</span>
+            <span>{o.label}</span>
           </button>
-        </div>
-        <p className="mt-4 text-[20px] font-bold">
-          {processing
-            ? "정리하는 중..."
-            : recording
-              ? "다 말씀하시면 자동으로 넘어갑니다"
-              : "답을 말씀해 주세요"}
-        </p>
+        ))}
       </div>
 
-      {error && (
-        <p className="mt-4 rounded-xl bg-destructive/10 p-3 text-[19px] font-semibold text-destructive">
-          {error}
-        </p>
-      )}
+      <div className="mt-auto pt-8">
+        <Link
+          to="/listen"
+          className="btn-huge flex w-full items-center justify-center gap-2 border-2 border-border bg-card text-foreground"
+        >
+          <RotateCcw className="h-6 w-6" /> 다시 말할래요
+        </Link>
+      </div>
     </PageShell>
   );
 }

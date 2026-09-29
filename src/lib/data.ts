@@ -853,24 +853,86 @@ export const INTENTS: IntentInfo[] = [
   },
 ];
 
-const DEFAULT_DOCS = ["신분증", "해당 농지 관련 서류"];
+export interface DocumentGuidance {
+  application: string[] | null;
+  contract: string[] | null;
+}
 
-export const REQUIRED_DOCS: Record<IntentKey, string[]> = Object.fromEntries(
-  INTENTS.map((intent) => [intent.key, DEFAULT_DOCS]),
-) as Record<IntentKey, string[]>;
+const ASK_OFFICE: DocumentGuidance = { application: null, contract: null };
 
-Object.assign(REQUIRED_DOCS, {
-  farmland_trade_sell: ["신분증", "농지 등기부등본", "토지대장", "매도 신청서"],
-  public_reserve_purchase: ["신분증", "농지 등기부등본", "토지대장", "매도 신청서"],
-  farmland_sale_trust: ["신분증", "농지 등기부등본", "토지대장", "매도수탁 신청서"],
-  management_recovery: ["신분증", "농지 등기부등본", "토지대장", "부채 증빙서류", "농업경영체 등록확인서", "경영회생 신청서"],
-  farmland_lease_trust_out: ["신분증", "농지 등기부등본", "토지대장", "임대수탁 신청서"],
-  farmland_pension: ["신분증", "농지 등기부등본", "주민등록등본", "가족관계증명서", "농업경영체 등록확인서"],
-  retirement_direct_payment: ["신분증", "농업경영체 등록확인서", "농지 등기부등본", "농지이양 신청서"],
-  farming_tech: ["신분증"],
-  gap_certification: ["신분증", "농업경영체 등록증", "농지 관련 서류", "인증 신청서"],
-  farmland_survey: ["신분증", "농지 등기부등본 (해당 시)", "토지대장 (해당 시)"],
-} satisfies Partial<Record<IntentKey, string[]>>);
+export const REQUIRED_DOCS: Record<IntentKey, DocumentGuidance> = {
+  farmland_trade_sell: {
+    application: ["농지매도신청서", "주민등록등본(개인) 또는 법인등기부등본(법인)", "토지대장등본", "등기부등본", "지적도", "토지이용계획확인원", "농지대장 또는 농업경영체등록확인서(농업인)", "재산세과세내역(농업인)"],
+    contract: ["신분증(개인)", "인감증명서(개인) 또는 법인인감증명서(법인)", "등기권리증", "본인통장 사본"],
+  },
+  public_reserve_purchase: {
+    application: ["농지매도신청서", "주민등록등본(개인)", "토지대장", "지적도", "토지이용계획확인원", "등기부등본", "농지대장", "농업경영체등록확인서"],
+    contract: ["신분증(개인)", "인감증명서(개인)", "등기권리증", "본인통장 사본"],
+  },
+  farmland_sale_trust: {
+    application: ["농지매도위탁신청서", "주민등록표등본 또는 초본", "토지대장등본", "등기부등본", "지적도등본", "토지이용계획확인원", "농지처분의무통지서 사본(농지처분 통지를 받은 경우)"],
+    contract: ["신분증(개인)", "인감증명서(개인) 또는 법인인감증명서(법인)", "등기권리증", "본인통장 사본"],
+  },
+  management_recovery: ASK_OFFICE,
+  orchard_trade_sell: {
+    application: ["과원매도신청서", "신분증", "주민등록등본(개인) 또는 법인등기부등본(법인)", "토지대장등본", "등기부등본", "농지대장 또는 농업경영체등록확인서(농가)", "재산세과세내역(농업인)", "과원조성 증빙서류(신규 조성 예정 과원)"],
+    contract: ["신분증 및 주민등록등본(개인)", "인감증명서(개인) 또는 법인인감증명서(법인)", "등기권리증", "본인통장 사본"],
+  },
+  long_term_lease_out: {
+    application: ["농지임대신청서", "주민등록등본", "토지대장등본", "등기부등본", "지적도", "토지이용계획확인원", "농지대장 또는 농업경영체등록확인서(농업인)"],
+    contract: ["신분증(개인)", "본인통장 사본", "보증용 인감도장 및 인감증명서 1통", "연대보증인 1인(1천만원 미만)", "임차권·근저당권 설정 또는 이행지급보증서(1천만원 이상)"],
+  },
+  farmland_lease_trust_out: {
+    application: ["농지임대(사용대)위탁신청서", "주민등록표등본(재외국민·외국인은 여권 사본)", "등기부등본", "부동산종합증명서", "개인(신용)정보 조회·수집·이용·제공 동의서", "농업인확인서 또는 농업경영체등록확인서(수탁수수료 감면 신청 시)"],
+    contract: ["신분증 사본", "본인통장 사본"],
+  },
+  orchard_lease_out: {
+    application: ["과원장기임대신청서", "신분증", "주민등록등본(개인) 또는 법인등기부등본(법인)", "토지대장등본", "등기부등본", "지적도", "토지이용계획확인원", "농지대장 또는 농업경영체등록확인서(농업인)"],
+    contract: ["신분증 및 주민등록등본(개인)", "인감증명서(개인) 또는 법인인감증명서(법인)", "등기권리증", "본인통장 사본"],
+  },
+  farmland_trade_buy: {
+    application: ["주민등록등본 또는 초본", "신분증 사본", "가족관계증명서", "농지대장 또는 농업경영체등록확인서 등 경영면적 확인서류", "국세·지방세 완납증명서", "소득금액증명서(배우자 포함)", "영농교육·인증 등 심사 확인서류", "법인등기부등본·경영계획서·전년도 재무상태표(농업법인)"],
+    contract: null,
+  },
+  lease_then_sale: {
+    application: ["주민등록등본 또는 초본", "신분증 사본", "가족관계증명서", "농지대장", "농업경영체등록확인서", "지방세 세목별 미과세 증명서(취득세)", "지방세 완납증명서", "소득금액증명원(배우자 포함)", "교육·자격·인증 등 선택 증빙서류"],
+    contract: null,
+  },
+  orchard_trade_buy: {
+    application: ["과원매입신청서", "신분증(농업인)", "농업경영체등록확인서 등 경영면적 확인서류", "국세·지방세 완납증명서", "금융거래확인서", "소득금액증명서(배우자 포함·농업인)", "개인(신용)정보 조회·수집·이용·제공 동의서", "신규과원 조성계획서 및 증빙서류(해당 시)", "법인등기부등본·경영계획서(농업법인)"],
+    contract: ["주민등록등본 및 인감증명서(농업인·근저당권 설정등기)", "법인인감증명서(농업법인·근저당권 설정등기)"],
+  },
+  reserve_farmland_lease: {
+    application: ["주민등록등본 또는 초본", "신분증 사본", "가족관계증명서", "농지대장 또는 농업경영체등록확인서", "국세·지방세 완납증명서", "소득금액증명서(배우자 포함)", "영농교육·인증 등 심사 확인서류"],
+    contract: null,
+  },
+  long_term_lease_in: {
+    application: ["주민등록등본 또는 초본", "신분증 사본", "가족관계증명서", "농지대장 또는 농업경영체등록확인서 등 경영면적 확인서류", "국세·지방세 완납증명서", "소득금액증명서(배우자 포함)", "영농교육·인증 등 심사 확인서류", "법인등기부등본·경영계획서·전년도 재무상태표(농업법인)"],
+    contract: null,
+  },
+  farmland_lease_trust_in: {
+    application: ["농지임차(사용차)신청서", "신분증 사본", "주민등록표등본 또는 초본", "농지대장·농업인확인서·농업경영체등록증 중 1가지(농업인)", "개인(신용)정보 조회·수집·이용·제공 동의서", "영농능력·경영주·보험·인증·소득 등 선택 증빙서류"],
+    contract: null,
+  },
+  orchard_lease_in: {
+    application: ["과원장기임차신청서", "신분증(농업인)", "농업경영체등록확인서 등 경영면적 확인서류", "국세·지방세 완납증명서", "금융거래확인서", "소득금액증명서(배우자 포함·농업인)", "개인정보 제공·활용 동의서", "법인등기부등본·경영계획서(농업법인)"],
+    contract: ["주민등록등본 및 인감증명서(농업인·근저당권 설정등기)", "법인인감증명서(농업법인·근저당권 설정등기)"],
+  },
+  reserve_smartfarm: ASK_OFFICE,
+  land_exchange: {
+    application: ["농지원부 1통", "등기부등본 필지별 1통", "토지대장(공시지가 기재) 필지별 1통"],
+    contract: ["주민등록등본 1통", "인감도장", "본인 통장 1통", "보증용 인감도장 및 인감증명서 1통", "보증인 1명(1천만원 미만)", "임차권 또는 근저당권 설정 및 등기권리증(1천만원 이상)"],
+  },
+  retirement_direct_payment: {
+    application: ["농업경영체", "등기부등본", "부동산종합증명서", "지방세 세목별 과세증명서"],
+    contract: null,
+  },
+  farmland_pension: ASK_OFFICE,
+  damaged_farmland: ASK_OFFICE,
+  farming_tech: ASK_OFFICE,
+  gap_certification: ASK_OFFICE,
+  farmland_survey: ASK_OFFICE,
+};
 
 export const REGIONS = [
   "전주시", "군산시", "익산시", "정읍시", "김제시", "남원시", "완주군",

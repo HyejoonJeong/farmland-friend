@@ -3,6 +3,7 @@ import { PageShell } from "@/components/PageShell";
 import { SpeakButton } from "@/components/SpeakButton";
 import {
   EXTENSION_OFFICES,
+  FARMLAND_BRANCH_LABELS,
   FARMLAND_BANK,
   HUMAN_SUPPORT_PHONE,
   NAQS_OFFICES,
@@ -24,7 +25,8 @@ export const Route = createFileRoute("/help")({
 function HelpPage() {
   const region = useApp((s) => s.region);
   const branch = region ? REGION_TO_FB_BRANCH[region] : null;
-  const fb = branch ? FARMLAND_BANK.filter((c) => c.branch === branch) : [];
+  const branchLabel = branch ? FARMLAND_BRANCH_LABELS[branch] : null;
+  const fb = branchLabel ? FARMLAND_BANK.filter((c) => c.branch === branchLabel) : [];
   const ext = region ? EXTENSION_OFFICES.filter((o) => o.region === region) : [];
   const naqs = region
     ? NAQS_OFFICES.filter((o) => o.region.includes(region.replace(/[시군]$/, "")))

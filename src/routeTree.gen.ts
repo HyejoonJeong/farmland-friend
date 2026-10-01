@@ -9,71 +9,26 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
-import { Route as IndexRouteImport } from './routes/index'
-import { Route as AdminRouteImport } from './routes/admin'
-import { Route as AskRouteImport } from './routes/ask'
-import { Route as ClarifyRouteImport } from './routes/clarify'
-import { Route as FarmlandSurveyRouteImport } from './routes/farmland-survey'
-import { Route as HelpRouteImport } from './routes/help'
-import { Route as IntentRouteImport } from './routes/intent'
-import { Route as ListenRouteImport } from './routes/listen'
-import { Route as RegionRouteImport } from './routes/region'
-import { Route as ResultRouteImport } from './routes/result'
-import { Route as SituationRouteImport } from './routes/situation'
 import { Route as VoiceRouteImport } from './routes/voice'
-import { Route as ApiAskRouteImport } from './routes/api/ask'
-import { Route as ApiIntentRouteImport } from './routes/api/intent'
-import { Route as ApiSttRouteImport } from './routes/api/stt'
+import { Route as SituationRouteImport } from './routes/situation'
+import { Route as ResultRouteImport } from './routes/result'
+import { Route as RegionRouteImport } from './routes/region'
+import { Route as ListenRouteImport } from './routes/listen'
+import { Route as IntentRouteImport } from './routes/intent'
+import { Route as HelpRouteImport } from './routes/help'
+import { Route as FarmlandSurveyRouteImport } from './routes/farmland-survey'
+import { Route as ClarifyRouteImport } from './routes/clarify'
+import { Route as AskRouteImport } from './routes/ask'
+import { Route as AdminRouteImport } from './routes/admin'
+import { Route as IndexRouteImport } from './routes/index'
 import { Route as ApiTtsRouteImport } from './routes/api/tts'
+import { Route as ApiSttRouteImport } from './routes/api/stt'
+import { Route as ApiIntentRouteImport } from './routes/api/intent'
+import { Route as ApiAskRouteImport } from './routes/api/ask'
 
-const IndexRoute = IndexRouteImport.update({
-  id: '/',
-  path: '/',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const AdminRoute = AdminRouteImport.update({
-  id: '/admin',
-  path: '/admin',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const AskRoute = AskRouteImport.update({
-  id: '/ask',
-  path: '/ask',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ClarifyRoute = ClarifyRouteImport.update({
-  id: '/clarify',
-  path: '/clarify',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const FarmlandSurveyRoute = FarmlandSurveyRouteImport.update({
-  id: '/farmland-survey',
-  path: '/farmland-survey',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const HelpRoute = HelpRouteImport.update({
-  id: '/help',
-  path: '/help',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const IntentRoute = IntentRouteImport.update({
-  id: '/intent',
-  path: '/intent',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ListenRoute = ListenRouteImport.update({
-  id: '/listen',
-  path: '/listen',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const RegionRoute = RegionRouteImport.update({
-  id: '/region',
-  path: '/region',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ResultRoute = ResultRouteImport.update({
-  id: '/result',
-  path: '/result',
+const VoiceRoute = VoiceRouteImport.update({
+  id: '/voice',
+  path: '/voice',
   getParentRoute: () => rootRouteImport,
 } as any)
 const SituationRoute = SituationRouteImport.update({
@@ -81,19 +36,59 @@ const SituationRoute = SituationRouteImport.update({
   path: '/situation',
   getParentRoute: () => rootRouteImport,
 } as any)
-const VoiceRoute = VoiceRouteImport.update({
-  id: '/voice',
-  path: '/voice',
+const ResultRoute = ResultRouteImport.update({
+  id: '/result',
+  path: '/result',
   getParentRoute: () => rootRouteImport,
 } as any)
-const ApiAskRoute = ApiAskRouteImport.update({
-  id: '/api/ask',
-  path: '/api/ask',
+const RegionRoute = RegionRouteImport.update({
+  id: '/region',
+  path: '/region',
   getParentRoute: () => rootRouteImport,
 } as any)
-const ApiIntentRoute = ApiIntentRouteImport.update({
-  id: '/api/intent',
-  path: '/api/intent',
+const ListenRoute = ListenRouteImport.update({
+  id: '/listen',
+  path: '/listen',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const IntentRoute = IntentRouteImport.update({
+  id: '/intent',
+  path: '/intent',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const HelpRoute = HelpRouteImport.update({
+  id: '/help',
+  path: '/help',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const FarmlandSurveyRoute = FarmlandSurveyRouteImport.update({
+  id: '/farmland-survey',
+  path: '/farmland-survey',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ClarifyRoute = ClarifyRouteImport.update({
+  id: '/clarify',
+  path: '/clarify',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AskRoute = AskRouteImport.update({
+  id: '/ask',
+  path: '/ask',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AdminRoute = AdminRouteImport.update({
+  id: '/admin',
+  path: '/admin',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const IndexRoute = IndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiTtsRoute = ApiTtsRouteImport.update({
+  id: '/api/tts',
+  path: '/api/tts',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ApiSttRoute = ApiSttRouteImport.update({
@@ -101,9 +96,14 @@ const ApiSttRoute = ApiSttRouteImport.update({
   path: '/api/stt',
   getParentRoute: () => rootRouteImport,
 } as any)
-const ApiTtsRoute = ApiTtsRouteImport.update({
-  id: '/api/tts',
-  path: '/api/tts',
+const ApiIntentRoute = ApiIntentRouteImport.update({
+  id: '/api/intent',
+  path: '/api/intent',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiAskRoute = ApiAskRouteImport.update({
+  id: '/api/ask',
+  path: '/api/ask',
   getParentRoute: () => rootRouteImport,
 } as any)
 
@@ -240,74 +240,11 @@ export interface RootRouteChildren {
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
-    '/': {
-      id: '/'
-      path: '/'
-      fullPath: '/'
-      preLoaderRoute: typeof IndexRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/admin': {
-      id: '/admin'
-      path: '/admin'
-      fullPath: '/admin'
-      preLoaderRoute: typeof AdminRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/ask': {
-      id: '/ask'
-      path: '/ask'
-      fullPath: '/ask'
-      preLoaderRoute: typeof AskRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/clarify': {
-      id: '/clarify'
-      path: '/clarify'
-      fullPath: '/clarify'
-      preLoaderRoute: typeof ClarifyRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/farmland-survey': {
-      id: '/farmland-survey'
-      path: '/farmland-survey'
-      fullPath: '/farmland-survey'
-      preLoaderRoute: typeof FarmlandSurveyRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/help': {
-      id: '/help'
-      path: '/help'
-      fullPath: '/help'
-      preLoaderRoute: typeof HelpRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/intent': {
-      id: '/intent'
-      path: '/intent'
-      fullPath: '/intent'
-      preLoaderRoute: typeof IntentRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/listen': {
-      id: '/listen'
-      path: '/listen'
-      fullPath: '/listen'
-      preLoaderRoute: typeof ListenRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/region': {
-      id: '/region'
-      path: '/region'
-      fullPath: '/region'
-      preLoaderRoute: typeof RegionRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/result': {
-      id: '/result'
-      path: '/result'
-      fullPath: '/result'
-      preLoaderRoute: typeof ResultRouteImport
+    '/voice': {
+      id: '/voice'
+      path: '/voice'
+      fullPath: '/voice'
+      preLoaderRoute: typeof VoiceRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/situation': {
@@ -317,25 +254,81 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof SituationRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/voice': {
-      id: '/voice'
-      path: '/voice'
-      fullPath: '/voice'
-      preLoaderRoute: typeof VoiceRouteImport
+    '/result': {
+      id: '/result'
+      path: '/result'
+      fullPath: '/result'
+      preLoaderRoute: typeof ResultRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/api/ask': {
-      id: '/api/ask'
-      path: '/api/ask'
-      fullPath: '/api/ask'
-      preLoaderRoute: typeof ApiAskRouteImport
+    '/region': {
+      id: '/region'
+      path: '/region'
+      fullPath: '/region'
+      preLoaderRoute: typeof RegionRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/api/intent': {
-      id: '/api/intent'
-      path: '/api/intent'
-      fullPath: '/api/intent'
-      preLoaderRoute: typeof ApiIntentRouteImport
+    '/listen': {
+      id: '/listen'
+      path: '/listen'
+      fullPath: '/listen'
+      preLoaderRoute: typeof ListenRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/intent': {
+      id: '/intent'
+      path: '/intent'
+      fullPath: '/intent'
+      preLoaderRoute: typeof IntentRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/help': {
+      id: '/help'
+      path: '/help'
+      fullPath: '/help'
+      preLoaderRoute: typeof HelpRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/farmland-survey': {
+      id: '/farmland-survey'
+      path: '/farmland-survey'
+      fullPath: '/farmland-survey'
+      preLoaderRoute: typeof FarmlandSurveyRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/clarify': {
+      id: '/clarify'
+      path: '/clarify'
+      fullPath: '/clarify'
+      preLoaderRoute: typeof ClarifyRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/ask': {
+      id: '/ask'
+      path: '/ask'
+      fullPath: '/ask'
+      preLoaderRoute: typeof AskRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/admin': {
+      id: '/admin'
+      path: '/admin'
+      fullPath: '/admin'
+      preLoaderRoute: typeof AdminRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/': {
+      id: '/'
+      path: '/'
+      fullPath: '/'
+      preLoaderRoute: typeof IndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/tts': {
+      id: '/api/tts'
+      path: '/api/tts'
+      fullPath: '/api/tts'
+      preLoaderRoute: typeof ApiTtsRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/api/stt': {
@@ -345,11 +338,18 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiSttRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/api/tts': {
-      id: '/api/tts'
-      path: '/api/tts'
-      fullPath: '/api/tts'
-      preLoaderRoute: typeof ApiTtsRouteImport
+    '/api/intent': {
+      id: '/api/intent'
+      path: '/api/intent'
+      fullPath: '/api/intent'
+      preLoaderRoute: typeof ApiIntentRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/ask': {
+      id: '/api/ask'
+      path: '/api/ask'
+      fullPath: '/api/ask'
+      preLoaderRoute: typeof ApiAskRouteImport
       parentRoute: typeof rootRouteImport
     }
   }

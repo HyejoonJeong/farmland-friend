@@ -399,7 +399,6 @@ function AskPage() {
           <ExternalLink className="h-5 w-5" /> 농지은행 포털에서 자세히 보기
         </a>
       </div>
-      <div ref={bottomRef} />
     </PageShell>
   );
 }

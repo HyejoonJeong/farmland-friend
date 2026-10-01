@@ -38,7 +38,7 @@ export const Route = createFileRoute("/ask")({
 });
 
 const PROMPT =
-  "농지은행 사업에 대해 궁금한 점을 편하게 말씀해 주세요. 농지연금, 농지 임대, 농지 구입, 경영회생 같은 내용을 쉬운 말로 알려드립니다.";
+  "농지은행 사업에 대해 궁금한 점을 편하게 말씀해 주세요. 농지연금, 농지 임대, 농지 구입, 경영회생 같은 내용을 쉬운 말로 알려드립니다. 다 말씀하시면 버튼을 한 번 더 눌러 주세요.";
 
 const SUGGESTIONS = [
   "농지연금은 누가 받을 수 있나요?",
@@ -167,9 +167,7 @@ function AskPage() {
       vadTimer.current = window.setInterval(() => {
         const now = Date.now();
         const elapsed = now - startedAt.current;
-        const silence = now - lastVoiceAt.current;
-        if (elapsed > 30000) return void stop();
-        if (spokeRef.current && silence > 1800 && elapsed > 1500) stop();
+        if (elapsed > 60000) return void stop();
       }, 200);
     } catch (e) {
       console.error(e);
@@ -308,9 +306,9 @@ function AskPage() {
           )}
           <button
             type="button"
-            onClick={recording ? undefined : start}
+            onClick={recording ? stop : start}
             disabled={busy}
-            aria-label={recording ? "듣는 중" : "질문 말하기"}
+            aria-label={recording ? "말씀 완료" : "질문 말하기"}
             className="relative grid h-32 w-32 place-items-center rounded-full bg-primary text-primary-foreground shadow-xl transition active:scale-95 disabled:opacity-60"
             style={{ transform: recording ? `scale(${1 + level * 0.15})` : undefined }}
           >
@@ -325,7 +323,7 @@ function AskPage() {
           {status === "processing"
             ? "말씀을 글로 옮기는 중..."
             : recording
-              ? "말씀이 끝나면 자동으로 답해드려요"
+              ? "다 말씀하셨으면 버튼을 한 번 더 눌러 주세요"
               : "버튼을 눌러 질문하기"}
         </p>
       </div>

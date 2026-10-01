@@ -71,7 +71,7 @@ function AskPage() {
   const lastVoiceAt = useRef(0);
   const spokeRef = useRef(false);
   const vadTimer = useRef<number | null>(null);
-  const bottomRef = useRef<HTMLDivElement | null>(null);
+  const lastTurnRef = useRef<HTMLDivElement | null>(null);
 
   const clearVad = () => {
     if (vadTimer.current) {
@@ -88,8 +88,11 @@ function AskPage() {
     [],
   );
 
+  // 새 질문/답변이 추가되면 그 말풍선으로 자동 스크롤해 바로 보이게 한다.
   useEffect(() => {
-    bottomRef.current?.scrollIntoView({ behavior: "smooth", block: "end" });
+    if (turns.length > 0) {
+      lastTurnRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+    }
   }, [turns, status]);
 
   const ask = async (question: string) => {
@@ -262,10 +265,11 @@ function AskPage() {
           {turns.map((t, i) => (
             <div
               key={i}
+              ref={i === turns.length - 1 ? lastTurnRef : undefined}
               className={
                 t.role === "user"
-                  ? "ml-auto max-w-[92%] rounded-2xl bg-primary px-4 py-3 text-[19px] leading-relaxed font-semibold text-primary-foreground"
-                  : "max-w-full rounded-2xl border-2 border-primary/25 bg-card px-4 py-4 text-[20px] leading-relaxed whitespace-pre-line"
+                  ? "ml-auto max-w-[92%] scroll-mt-24 rounded-2xl bg-primary px-4 py-3 text-[19px] leading-relaxed font-semibold text-primary-foreground"
+                  : "max-w-full scroll-mt-24 rounded-2xl border-2 border-primary/25 bg-card px-4 py-4 text-[20px] leading-relaxed whitespace-pre-line"
               }
             >
               {t.content}

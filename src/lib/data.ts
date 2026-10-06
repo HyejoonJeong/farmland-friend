@@ -1008,6 +1008,18 @@ export function matchContact(intent: IntentKey, region: string): ContactMatch {
   const info = INTENTS.find((item) => item.key === intent);
   if (!info) return { orgName: "농지은행", department: "상담 담당", phone: HUMAN_SUPPORT_PHONE, duty: "농지은행 상담" };
   if (info.org === "farmland_bank") {
+    // 임실군의 임대수탁 업무는 전주완주임실지사가 아닌 임실지부가 담당한다.
+    if (
+      region === "임실군" &&
+      (intent === "farmland_lease_trust_out" || intent === "farmland_lease_trust_in")
+    ) {
+      return {
+        orgName: "한국농어촌공사 전주완주임실지사 임실지부 (농지은행)",
+        department: info.label,
+        phone: "063-270-0587",
+        duty: info.meaning,
+      };
+    }
     const branchKey = REGION_TO_FB_BRANCH[region];
     const directPhone = branchKey ? info.contacts?.[branchKey] : undefined;
     const branchName = branchKey ? FARMLAND_BRANCH_LABELS[branchKey] : "대표";

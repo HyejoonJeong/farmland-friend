@@ -20,10 +20,12 @@ import { Route as ListenRouteImport } from './routes/listen'
 import { Route as RegionRouteImport } from './routes/region'
 import { Route as ResultRouteImport } from './routes/result'
 import { Route as SituationRouteImport } from './routes/situation'
+import { Route as SurveyConsultRouteImport } from './routes/survey-consult'
 import { Route as VoiceRouteImport } from './routes/voice'
 import { Route as ApiAskRouteImport } from './routes/api/ask'
 import { Route as ApiIntentRouteImport } from './routes/api/intent'
 import { Route as ApiSttRouteImport } from './routes/api/stt'
+import { Route as ApiSurveyAskRouteImport } from './routes/api/survey-ask'
 import { Route as ApiTtsRouteImport } from './routes/api/tts'
 
 const IndexRoute = IndexRouteImport.update({
@@ -81,6 +83,11 @@ const SituationRoute = SituationRouteImport.update({
   path: '/situation',
   getParentRoute: () => rootRouteImport,
 } as any)
+const SurveyConsultRoute = SurveyConsultRouteImport.update({
+  id: '/survey-consult',
+  path: '/survey-consult',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const VoiceRoute = VoiceRouteImport.update({
   id: '/voice',
   path: '/voice',
@@ -101,6 +108,11 @@ const ApiSttRoute = ApiSttRouteImport.update({
   path: '/api/stt',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiSurveyAskRoute = ApiSurveyAskRouteImport.update({
+  id: '/api/survey-ask',
+  path: '/api/survey-ask',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ApiTtsRoute = ApiTtsRouteImport.update({
   id: '/api/tts',
   path: '/api/tts',
@@ -119,10 +131,12 @@ export interface FileRoutesByFullPath {
   '/region': typeof RegionRoute
   '/result': typeof ResultRoute
   '/situation': typeof SituationRoute
+  '/survey-consult': typeof SurveyConsultRoute
   '/voice': typeof VoiceRoute
   '/api/ask': typeof ApiAskRoute
   '/api/intent': typeof ApiIntentRoute
   '/api/stt': typeof ApiSttRoute
+  '/api/survey-ask': typeof ApiSurveyAskRoute
   '/api/tts': typeof ApiTtsRoute
 }
 export interface FileRoutesByTo {
@@ -137,10 +151,12 @@ export interface FileRoutesByTo {
   '/region': typeof RegionRoute
   '/result': typeof ResultRoute
   '/situation': typeof SituationRoute
+  '/survey-consult': typeof SurveyConsultRoute
   '/voice': typeof VoiceRoute
   '/api/ask': typeof ApiAskRoute
   '/api/intent': typeof ApiIntentRoute
   '/api/stt': typeof ApiSttRoute
+  '/api/survey-ask': typeof ApiSurveyAskRoute
   '/api/tts': typeof ApiTtsRoute
 }
 export interface FileRoutesById {
@@ -156,10 +172,12 @@ export interface FileRoutesById {
   '/region': typeof RegionRoute
   '/result': typeof ResultRoute
   '/situation': typeof SituationRoute
+  '/survey-consult': typeof SurveyConsultRoute
   '/voice': typeof VoiceRoute
   '/api/ask': typeof ApiAskRoute
   '/api/intent': typeof ApiIntentRoute
   '/api/stt': typeof ApiSttRoute
+  '/api/survey-ask': typeof ApiSurveyAskRoute
   '/api/tts': typeof ApiTtsRoute
 }
 export interface FileRouteTypes {
@@ -176,10 +194,12 @@ export interface FileRouteTypes {
     | '/region'
     | '/result'
     | '/situation'
+    | '/survey-consult'
     | '/voice'
     | '/api/ask'
     | '/api/intent'
     | '/api/stt'
+    | '/api/survey-ask'
     | '/api/tts'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -194,10 +214,12 @@ export interface FileRouteTypes {
     | '/region'
     | '/result'
     | '/situation'
+    | '/survey-consult'
     | '/voice'
     | '/api/ask'
     | '/api/intent'
     | '/api/stt'
+    | '/api/survey-ask'
     | '/api/tts'
   id:
     | '__root__'
@@ -212,10 +234,12 @@ export interface FileRouteTypes {
     | '/region'
     | '/result'
     | '/situation'
+    | '/survey-consult'
     | '/voice'
     | '/api/ask'
     | '/api/intent'
     | '/api/stt'
+    | '/api/survey-ask'
     | '/api/tts'
   fileRoutesById: FileRoutesById
 }
@@ -231,10 +255,12 @@ export interface RootRouteChildren {
   RegionRoute: typeof RegionRoute
   ResultRoute: typeof ResultRoute
   SituationRoute: typeof SituationRoute
+  SurveyConsultRoute: typeof SurveyConsultRoute
   VoiceRoute: typeof VoiceRoute
   ApiAskRoute: typeof ApiAskRoute
   ApiIntentRoute: typeof ApiIntentRoute
   ApiSttRoute: typeof ApiSttRoute
+  ApiSurveyAskRoute: typeof ApiSurveyAskRoute
   ApiTtsRoute: typeof ApiTtsRoute
 }
 
@@ -317,6 +343,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof SituationRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/survey-consult': {
+      id: '/survey-consult'
+      path: '/survey-consult'
+      fullPath: '/survey-consult'
+      preLoaderRoute: typeof SurveyConsultRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/voice': {
       id: '/voice'
       path: '/voice'
@@ -345,6 +378,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiSttRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/survey-ask': {
+      id: '/api/survey-ask'
+      path: '/api/survey-ask'
+      fullPath: '/api/survey-ask'
+      preLoaderRoute: typeof ApiSurveyAskRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/tts': {
       id: '/api/tts'
       path: '/api/tts'
@@ -367,10 +407,12 @@ const rootRouteChildren: RootRouteChildren = {
   RegionRoute: RegionRoute,
   ResultRoute: ResultRoute,
   SituationRoute: SituationRoute,
+  SurveyConsultRoute: SurveyConsultRoute,
   VoiceRoute: VoiceRoute,
   ApiAskRoute: ApiAskRoute,
   ApiIntentRoute: ApiIntentRoute,
   ApiSttRoute: ApiSttRoute,
+  ApiSurveyAskRoute: ApiSurveyAskRoute,
   ApiTtsRoute: ApiTtsRoute,
 }
 export const routeTree = rootRouteImport

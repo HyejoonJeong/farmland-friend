@@ -1,4 +1,4 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { useMemo, useRef, useState } from "react";
 import {
   Building2,
@@ -8,6 +8,7 @@ import {
   Database,
   Landmark,
   MapPin,
+  Mic,
   Phone,
   Sprout,
   Users,
@@ -167,6 +168,21 @@ function FarmlandSurveyPage() {
         </div>
       </section>
 
+      <Link
+        to="/survey-consult"
+        className="mt-6 flex items-center gap-4 rounded-3xl bg-primary p-5 text-primary-foreground shadow-lg transition active:scale-[0.98]"
+      >
+        <span className="grid h-16 w-16 shrink-0 place-items-center rounded-full bg-primary-foreground/15">
+          <Mic className="h-9 w-9" />
+        </span>
+        <span>
+          <span className="block text-[23px] font-black">말로 상담하기</span>
+          <span className="mt-1 block text-[17px] font-semibold opacity-90">
+            전수조사 상담센터 매뉴얼로 바로 답해드려요
+          </span>
+        </span>
+      </Link>
+
       <section className="mt-7">
         <h2 className="text-[25px] font-black">많이 궁금해하시는 내용</h2>
         <Accordion type="single" collapsible className="mt-3 space-y-3">
@@ -237,7 +253,7 @@ function FarmlandSurveyPage() {
         </p>
       </section>
 
-      <section ref={askRef} className="mt-8 scroll-mt-4 pb-8">
+      <section id="contact" ref={askRef} className="mt-8 scroll-mt-4 pb-8">
         <div className="flex items-center gap-2 text-primary">
           <MapPin className="h-6 w-6" />
           <h2 className="text-[25px] font-black">더 궁금한 점이 있으신가요?</h2>

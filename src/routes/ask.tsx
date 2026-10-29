@@ -11,6 +11,7 @@ import {
 } from "lucide-react";
 import { PageShell } from "@/components/PageShell";
 import { SpeakButton } from "@/components/SpeakButton";
+import { BusinessAnswer, businessAnswerSpeech } from "@/components/BusinessAnswer";
 import { startRecorder, type Recorder } from "@/lib/recorder";
 import { FBO_PORTAL_URL } from "@/lib/fbo-knowledge";
 import { HUMAN_SUPPORT_PHONE, INTENTS, type IntentKey } from "@/lib/data";
@@ -269,13 +270,13 @@ function AskPage() {
               className={
                 t.role === "user"
                   ? "ml-auto max-w-[92%] scroll-mt-24 rounded-2xl bg-primary px-4 py-3 text-[19px] leading-relaxed font-semibold text-primary-foreground"
-                  : "max-w-full scroll-mt-24 rounded-2xl border-2 border-primary/25 bg-card px-4 py-4 text-[20px] leading-relaxed whitespace-pre-line"
+                  : "max-w-full scroll-mt-24 rounded-2xl border-2 border-primary/25 bg-card px-4 py-4 text-[20px] leading-relaxed"
               }
             >
-              {t.content}
+              {t.role === "assistant" ? <BusinessAnswer text={t.content} /> : t.content}
               {t.role === "assistant" && (
                 <div className="mt-3">
-                  <SpeakButton text={t.content} label="답변 듣기" />
+                  <SpeakButton text={businessAnswerSpeech(t.content)} label="답변 듣기" />
                 </div>
               )}
             </div>

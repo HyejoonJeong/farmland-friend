@@ -1,1 +1,8 @@
-project_id = "kelgjjyyjqogrlqjcokc"
+project_id = "ertujxbknytbyuqgvcuy"
+
+[functions.malhaenong-api]
+enabled = true
+# The app supports anonymous public callers. The function validates apikey,
+# applies an origin allowlist and durable limits, and separately authenticates admin requests.
+verify_jwt = false
+entrypoint = "./functions/malhaenong-api/index.ts"

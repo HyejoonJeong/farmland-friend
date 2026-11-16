@@ -9,7 +9,12 @@
     "build:dev": "vite build --mode development",
     "preview": "vite preview",
     "lint": "eslint .",
-    "format": "prettier --write ."
+    "format": "prettier --write .",
+    "edge:sync": "node scripts/sync-edge-knowledge.mjs",
+    "edge:check": "deno check --config supabase/functions/malhaenong-api/deno.json supabase/functions/malhaenong-api/index.ts",
+    "test:backend": "deno test --config supabase/functions/malhaenong-api/deno.json tests/backend.test.ts",
+    "test:schema": "node --test tests/schema.test.mjs",
+    "prebuild": "node scripts/sync-edge-knowledge.mjs --check"
   },
   "dependencies": {
     "@hookform/resolvers": "^5.2.2",
@@ -87,6 +92,7 @@
     "prettier": "^3.7.3",
     "typescript": "^5.8.3",
     "typescript-eslint": "^8.56.1",
-    "vite": "^8.0.16"
+    "vite": "^8.0.16",
+    "@electric-sql/pglite": "0.5.16"
   }
 }

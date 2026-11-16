@@ -1,3 +1,4 @@
+import { backendFetch } from "@/lib/backend-fetch";
 import { createFileRoute, useNavigate, Link } from "@tanstack/react-router";
 import { useEffect, useRef, useState } from "react";
 import { Mic, Loader2, Send, Keyboard } from "lucide-react";
@@ -95,7 +96,7 @@ function ListenPage() {
     const form = new FormData();
     form.append("file", blob, "recording");
     try {
-      const res = await fetch("/api/stt", { method: "POST", body: form });
+      const res = await backendFetch("/api/stt", { method: "POST", body: form });
       if (!res.ok) throw new Error(await res.text());
       const data = (await res.json()) as { text: string };
       const text = (data.text ?? "").trim();

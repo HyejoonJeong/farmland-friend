@@ -1,3 +1,4 @@
+import { backendFetch } from "@/lib/backend-fetch";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useRef, useState } from "react";
 import { CheckCircle2, Keyboard, Loader2, Megaphone, Mic, Send } from "lucide-react";
@@ -5,7 +6,7 @@ import { PageShell } from "@/components/PageShell";
 import { SpeakButton } from "@/components/SpeakButton";
 import { startRecorder, type Recorder } from "@/lib/recorder";
 import { REGIONS } from "@/lib/data";
-import { supabase } from "@/integrations/supabase/client";
+import { supabase } from "@/lib/backend-db";
 
 export const Route = createFileRoute("/voice")({
   head: () => ({
@@ -79,7 +80,7 @@ function VoicePage() {
     const form = new FormData();
     form.append("file", blob, "recording");
     try {
-      const res = await fetch("/api/stt", { method: "POST", body: form });
+      const res = await backendFetch("/api/stt", { method: "POST", body: form });
       if (!res.ok) throw new Error(await res.text());
       const data = (await res.json()) as { text: string };
       const t = (data.text ?? "").trim();

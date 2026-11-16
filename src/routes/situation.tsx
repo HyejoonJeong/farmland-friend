@@ -1,3 +1,4 @@
+import { backendFetch } from "@/lib/backend-fetch";
 import { createFileRoute, useNavigate, Link } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { PageShell } from "@/components/PageShell";
@@ -29,7 +30,7 @@ function SituationPage() {
     setLoading(true);
     setError(null);
     try {
-      const res = await fetch("/api/intent", {
+      const res = await backendFetch("/api/intent", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ text: transcript, region }),

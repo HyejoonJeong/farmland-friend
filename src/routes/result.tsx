@@ -4,7 +4,7 @@ import { PageShell } from "@/components/PageShell";
 import { SpeakButton } from "@/components/SpeakButton";
 import { useApp } from "@/lib/store";
 import { INTENTS, REQUIRED_DOCS, matchContact } from "@/lib/data";
-import { supabase } from "@/integrations/supabase/client";
+import { supabase } from "@/lib/backend-db";
 import { Phone, FileText, Building2, Home } from "lucide-react";
 
 export const Route = createFileRoute("/result")({

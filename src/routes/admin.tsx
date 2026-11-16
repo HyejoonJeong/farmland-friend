@@ -1,3 +1,4 @@
+import { backendFetch, backendConfig } from "@/lib/backend-fetch";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useMutation } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
@@ -94,7 +95,14 @@ function AdminPage() {
   const [denied, setDenied] = useState(false);
 
   const login = useMutation({
-    mutationFn: (key: string) => fetchLogs({ data: { key } }),
+    mutationFn: async (key: string): Promise<Awaited<ReturnType<typeof getUsageLogs>>> => {
+      if (backendConfig.provider !== 'supabase') return fetchLogs({ data: { key } });
+      const response = await backendFetch('/api/admin-logs', {
+        method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ key }),
+      });
+      if (!response.ok) throw new Error('운영 데이터를 불러오지 못했습니다.');
+      return response.json();
+    },
     onSuccess: (res) => setDenied(!res.authorized),
   });
 

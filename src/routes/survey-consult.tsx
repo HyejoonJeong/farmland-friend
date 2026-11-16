@@ -1,3 +1,4 @@
+import { backendFetch } from "@/lib/backend-fetch";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useRef, useState } from "react";
 import {
@@ -97,7 +98,7 @@ function SurveyConsultPage() {
     setStatus("thinking");
     setError(null);
     try {
-      const res = await fetch("/api/survey-ask", {
+      const res = await backendFetch("/api/survey-ask", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ question, history }),
@@ -129,7 +130,7 @@ function SurveyConsultPage() {
     const form = new FormData();
     form.append("file", blob, "recording");
     try {
-      const res = await fetch("/api/stt", { method: "POST", body: form });
+      const res = await backendFetch("/api/stt", { method: "POST", body: form });
       if (!res.ok) throw new Error(await res.text());
       const data = (await res.json()) as { text: string };
       const t = (data.text ?? "").trim();

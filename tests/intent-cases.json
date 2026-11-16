@@ -1,0 +1,12 @@
+[
+  { "text": "농지연금 신청하려고요", "intent": "farmland_pension", "level": "HIGH" },
+  { "text": "빚 때문에 땅을 팔아야 하는데 농사는 계속 짓고 싶어요", "intent": "management_recovery", "level": "HIGH" },
+  { "text": "청년농인데 먼저 빌렸다가 나중에 사고 싶어요", "intent": "lease_then_sale", "level": "HIGH" },
+  { "text": "농지 전수조사 안내가 왔어요", "intent": "farmland_survey", "level": "HIGH" },
+  { "text": "농지를 팔고 싶어요", "needsClarification": true },
+  { "text": "농지를 빌려주고 싶어요", "needsClarification": true },
+  { "text": "청년농인데 땅이 필요해요", "needsClarification": true },
+  { "text": "과수원이 필요해요", "needsClarification": true },
+  { "text": "농사를 못 짓게 됐어요", "needsClarification": true },
+  { "text": "빚 때문에 농지가 걱정이에요", "needsClarification": true }
+]

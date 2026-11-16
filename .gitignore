@@ -15,6 +15,9 @@ dist-ssr
 .tanstack/**
 .nitro
 *.local
+supabase/.env
+supabase/.env.*
+!supabase/.env.example
 
 # Wrangler / Cloudflare
 .wrangler/

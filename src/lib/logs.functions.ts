@@ -40,65 +40,9 @@ export interface VoiceRow {
   source: string | null;
 }
 
+// Legacy server function is retired; the current admin UI calls Supabase directly.
 export const getUsageLogs = createServerFn({ method: "POST" })
   .inputValidator((input: { key: string }) => ({ key: String(input?.key ?? "") }))
-  .handler(async ({ data }) => {
-    const expected = process.env["ADMIN_ACCESS_KEY"];
-    if (!expected || data.key !== expected) {
-      return {
-        authorized: false as const,
-        logs: [] as UsageLogRow[],
-        voices: [] as VoiceRow[],
-        stats: null,
-      };
-    }
-    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-    const { data: rows, error } = await supabaseAdmin
-      .from("usage_logs")
-      .select(
-        "id, created_at, transcript, clarification, summary, intent, intent_label, confidence, region, branch, department, phone, source, category, candidates, classification_status, clarify_trail",
-      )
-      .order("created_at", { ascending: false })
-      .limit(500);
-    if (error) throw new Error(error.message);
-
-    const { data: voiceRows, error: voiceError } = await supabaseAdmin
-      .from("farmer_voices")
-      .select("id, created_at, content, age_group, farming_years, gender, region, source")
-      .order("created_at", { ascending: false })
-      .limit(500);
-    if (voiceError) throw new Error(voiceError.message);
-    const voices = (voiceRows ?? []) as unknown as VoiceRow[];
-
-    const logs = (rows ?? []) as unknown as UsageLogRow[];
-    const startOfToday = new Date();
-    startOfToday.setHours(0, 0, 0, 0);
-
-    const count = (pick: (r: UsageLogRow) => string | null) => {
-      const map = new Map<string, number>();
-      for (const r of logs) {
-        const k = pick(r) || "미상";
-        map.set(k, (map.get(k) ?? 0) + 1);
-      }
-      return [...map.entries()]
-        .map(([label, c]) => ({ label, count: c }))
-        .sort((a, b) => b.count - a.count);
-    };
-
-    const confidences = logs
-      .map((r) => (typeof r.confidence === "number" ? r.confidence : Number(r.confidence)))
-      .filter((n) => Number.isFinite(n)) as number[];
-
-    const stats: UsageStats = {
-      total: logs.length,
-      today: logs.filter((r) => new Date(r.created_at) >= startOfToday).length,
-      lowConfidence: confidences.filter((c) => c < 0.7).length,
-      avgConfidence: confidences.length
-        ? confidences.reduce((a, b) => a + b, 0) / confidences.length
-        : null,
-      byIntent: count((r) => r.intent_label),
-      byRegion: count((r) => r.region),
-    };
-
-    return { authorized: true as const, logs, voices, stats };
-  });
+  .handler(async (): Promise<{
+    authorized: boolean; logs: UsageLogRow[]; voices: VoiceRow[]; stats: UsageStats | null;
+  }> => ({ authorized: false, logs: [], voices: [], stats: null }));

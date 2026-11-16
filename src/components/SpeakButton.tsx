@@ -1,8 +1,15 @@
 import { useEffect, useRef, useState } from "react";
 import { Volume2, Square } from "lucide-react";
+import { speechBlob } from "@/lib/speech-cache";
 
 // Only one utterance may play at a time across the whole app.
 let currentAudio: HTMLAudioElement | null = null;
+const audioUrls = new WeakMap<HTMLAudioElement, string>();
+
+function releaseAudio(audio: HTMLAudioElement) {
+  const url = audioUrls.get(audio);
+  if (url) { URL.revokeObjectURL(url); audioUrls.delete(audio); }
+}
 
 function stopCurrentAudio() {
   if (currentAudio) {
@@ -10,6 +17,7 @@ function stopCurrentAudio() {
       currentAudio.pause();
       currentAudio.currentTime = 0;
       currentAudio.src = "";
+      releaseAudio(currentAudio);
     } catch {
       /* noop */
     }
@@ -40,6 +48,7 @@ export function SpeakButton({
       else {
         audioRef.current.pause();
         audioRef.current.src = "";
+        releaseAudio(audioRef.current);
       }
       audioRef.current = null;
     }
@@ -53,27 +62,23 @@ export function SpeakButton({
       return;
     }
     if (!text.trim()) return;
+    if (loading) return;
     stopCurrentAudio();
     const controller = new AbortController();
     abortRef.current = controller;
     setLoading(true);
     try {
-      const res = await fetch("/api/tts", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ text }),
-        signal: controller.signal,
-      });
-      if (!res.ok) throw new Error(await res.text());
-      const blob = await res.blob();
+      const blob = await speechBlob(text, controller.signal);
       if (controller.signal.aborted || !aliveRef.current) return;
       const url = URL.createObjectURL(blob);
       const audio = new Audio(url);
+      audioUrls.set(audio, url);
       audioRef.current = audio;
       stopCurrentAudio();
       currentAudio = audio;
       audio.onended = () => {
         if (currentAudio === audio) currentAudio = null;
+        releaseAudio(audio);
         setPlaying(false);
       };
       audio.onpause = () => setPlaying(false);
@@ -107,6 +112,7 @@ export function SpeakButton({
         else {
           audioRef.current.pause();
           audioRef.current.src = "";
+          releaseAudio(audioRef.current);
         }
         audioRef.current = null;
       }
@@ -117,6 +123,7 @@ export function SpeakButton({
     <button
       type="button"
       onClick={play}
+      disabled={loading}
       className="inline-flex items-center gap-2 rounded-full bg-secondary px-5 py-3 text-lg font-semibold text-secondary-foreground shadow-sm active:scale-95"
       aria-label={playing ? "듣기 중지" : "음성으로 듣기"}
     >

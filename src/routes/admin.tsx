@@ -1,3 +1,4 @@
+import { AnswerReviews } from '@/components/AnswerReviews';
 import { backendFetch, backendConfig } from "@/lib/backend-fetch";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useMutation } from "@tanstack/react-query";
@@ -197,6 +198,8 @@ function AdminPage() {
           </button>
         </div>
       </header>
+
+      <AnswerReviews adminKey={password} />
 
       <section className="mt-6 grid grid-cols-2 gap-3 md:grid-cols-4">
         <Stat label="누적 상담" value={`${stats.total}건`} />

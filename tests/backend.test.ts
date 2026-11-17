@@ -50,7 +50,11 @@ Deno.test('oversized bodies are rejected even without a Content-Length header', 
 
 Deno.test('common consult API isolates knowledge and rejects injected history roles', async () => {
   const calls: any[] = [];
-  await withFetch(async (_url, init) => { calls.push(JSON.parse(String(init?.body))); return response('## 농지연금\n- 안내입니다.'); }, async () => {
+  await withFetch(async (_url, init) => {
+    if (String(_url).includes('/rest/v1/')) return Response.json([]);
+    calls.push(JSON.parse(String(init?.body)));
+    return response(JSON.stringify({intent: 'farmland_pension', answer: '## 농지연금\n- 안내입니다.', reference_ids: []}));
+  }, async () => {
     for (const domain of ['farmland', 'survey']) {
       const result = await handler(request('consult', { domain, question: '안내해 주세요' }));
       assert.equal(result.status, 200); assert.equal((await result.json()).answer, '## 농지연금\n- 안내입니다.');

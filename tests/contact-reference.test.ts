@@ -31,8 +31,13 @@ Deno.test('updated institutional keywords are supplied to the AI without changin
  const prompt=intentPrompt({region:'익산시'});
  for(const [sheetIndex,rowIndex,column,key]of [[1,1,3,'farming_tech'],[2,1,4,'gap_certification']] as const){
   const expected=sheets[sheetIndex].values[rowIndex][column].split(',').map((s:string)=>s.trim());
-  const item=INTENTS.find(i=>i.key===key);assert.deepEqual(item?.keywords,expected);
-  for(const keyword of expected)assert.ok(prompt.includes(keyword),keyword);
+  const item=INTENTS.find(i=>i.key===key);
+  // Application routing was corrected by the user: registration/certification remains NAQS,
+  // payment applications now belong to municipal 읍·면·동 offices.
+  const moved=['공익직불금 신청','기본형 직불금 문의','소농직불금 자격','면적직불금 문의','전략작물직불금 문의','직불금 신청 기간','직불금 지급 확인','직불금 대상 확인'];
+  const retained=key==='gap_certification'?expected.filter((s:string)=>!moved.includes(s)):expected;
+  assert.deepEqual(item?.keywords,retained);
+  for(const keyword of retained)assert.ok(prompt.includes(keyword),keyword);
  }
- assert.equal(INTENTS.length,24);
+ assert.equal(INTENTS.length,25);
 });

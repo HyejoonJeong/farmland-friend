@@ -9,8 +9,8 @@ const req=(route:string,body:object)=>new Request('https://example.supabase.co/f
 const example={id:'11111111-1111-1111-1111-111111111111',intent:'farmland_pension',category:'농지연금',question:'농지연금 서류',answer:'담당 지사 확인',source_reference:'검토자료'};
 const generation=(ids:string[]=[])=>Response.json({status:'completed',output:[{content:[{type:'output_text',text:JSON.stringify({intent:'farmland_pension',answer:'## 농지연금\n- 담당 지사에 확인해 주세요.',reference_ids:ids})}]}]});
 async function mocked(mock:typeof fetch,run:()=>Promise<void>){const previous=globalThis.fetch;globalThis.fetch=mock;try{await run();}finally{globalThis.fetch=previous;}}
-Deno.test('all 24 intents have one allowed category, with institutional categories and pension separated',()=>{
- assert.equal(CATEGORIES.length,15); assert.equal(Object.keys(INTENT_META).length,24);
+Deno.test('all intents have one allowed category, with institutional categories and pension separated',()=>{
+ assert.equal(CATEGORIES.length,15); assert.equal(Object.keys(INTENT_META).length,INTENTS.length);
  for(const i of INTENTS)assert.ok(CATEGORIES.includes(INTENT_META[i.key].category));
  assert.notEqual(INTENT_META.farmland_pension.category,INTENT_META.retirement_direct_payment.category);
 });

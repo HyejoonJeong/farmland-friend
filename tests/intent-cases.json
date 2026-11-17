@@ -8,5 +8,11 @@
   { "text": "청년농인데 땅이 필요해요", "needsClarification": true },
   { "text": "과수원이 필요해요", "needsClarification": true },
   { "text": "농사를 못 짓게 됐어요", "needsClarification": true },
-  { "text": "빚 때문에 농지가 걱정이에요", "needsClarification": true }
+  { "text": "빚 때문에 농지가 걱정이에요", "needsClarification": true },
+  { "text": "직불금 신청은 어디서 하나요?", "intent": "direct_payment_application", "level": "HIGH" },
+  { "text": "소농직불금 신청 서류가 궁금해요", "intent": "direct_payment_application", "level": "HIGH" },
+  { "text": "농지이양 은퇴직불금 문의하려고요", "intent": "retirement_direct_payment", "level": "HIGH" },
+  { "text": "농지로 매월 돈을 받고 싶은데 연금과 은퇴 지원 중 어떤 것인지 모르겠어요", "needsClarification": true },
+  { "text": "농지를 5년 넘게 빌리고 싶은데 어느 사업인지는 모르겠어요", "needsClarification": true },
+  { "text": "스마트팜 토마토 병해충 재배기술 교육이 필요해요", "intent": "farming_tech", "level": "HIGH" }
 ]

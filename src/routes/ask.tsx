@@ -1,4 +1,5 @@
 import { backendFetch } from "@/lib/backend-fetch";
+import { clearFeedback, keepFeedbackDomain, rememberFeedback, type FeedbackReceipt } from "@/lib/answer-feedback";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useEffect, useRef, useState } from "react";
 import {
@@ -55,6 +56,9 @@ interface Turn {
 }
 
 function AskPage() {
+  const pageActive = useRef(false);
+  const questionSequence = useRef(0);
+  useEffect(() => { pageActive.current = true; keepFeedbackDomain('farmland'); return () => { pageActive.current = false; }; }, []);
   const [turns, setTurns] = useState<Turn[]>([]);
   const [status, setStatus] = useState<"idle" | "recording" | "processing" | "thinking">(
     "idle",
@@ -98,6 +102,8 @@ function AskPage() {
   }, [turns, status]);
 
   const ask = async (question: string) => {
+    const currentRequest = ++questionSequence.current;
+    clearFeedback();
     const history = turns.slice(-6);
     setTurns((t) => [...t, { role: "user", content: question }]);
     setStatus("thinking");
@@ -109,13 +115,16 @@ function AskPage() {
         body: JSON.stringify({ question, history }),
       });
       if (!res.ok) throw new Error(await res.text());
-      const data = (await res.json()) as { answer: string };
+      const data = (await res.json()) as { answer: string; feedback?: FeedbackReceipt };
+      if (!pageActive.current || currentRequest !== questionSequence.current) return;
+      rememberFeedback(data.feedback, 'farmland', question, data.answer);
       setTurns((t) => [...t, { role: "assistant", content: data.answer }]);
     } catch (e) {
+      if (!pageActive.current || currentRequest !== questionSequence.current) return;
       console.error(e);
       setError("답변을 가져오지 못했어요. 잠시 후 다시 물어봐 주세요.");
     } finally {
-      setStatus("idle");
+      if (pageActive.current && currentRequest === questionSequence.current) setStatus("idle");
     }
   };
 

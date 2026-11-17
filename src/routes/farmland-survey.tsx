@@ -1,5 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
+import { keepFeedbackDomain } from "@/lib/answer-feedback";
 import {
   Building2,
   Check,
@@ -117,6 +118,7 @@ const TOPICS = [
 ];
 
 function FarmlandSurveyPage() {
+  useEffect(() => { keepFeedbackDomain('survey'); }, []);
   const [region, setRegion] = useState<string | null>(null);
   const [topic, setTopic] = useState<"survey" | "bank" | null>(null);
   const [step, setStep] = useState<"region" | "topic" | "contact">("region");

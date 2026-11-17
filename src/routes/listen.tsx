@@ -1,4 +1,5 @@
 import { backendFetch } from "@/lib/backend-fetch";
+import { clearFeedback } from "@/lib/answer-feedback";
 import { createFileRoute, useNavigate, Link } from "@tanstack/react-router";
 import { useEffect, useRef, useState } from "react";
 import { Mic, Loader2, Send, Keyboard } from "lucide-react";
@@ -106,6 +107,7 @@ function ListenPage() {
         return;
       }
       setLive(text);
+      clearFeedback();
       setTranscript(text);
       setTimeout(() => nav({ to: "/situation" }), 400);
     } catch (e) {
@@ -129,6 +131,7 @@ function ListenPage() {
       setError("조금 더 자세히 적어 주세요.");
       return;
     }
+    clearFeedback();
     setTranscript(t);
     nav({ to: "/situation" });
   };

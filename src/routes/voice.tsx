@@ -1,4 +1,5 @@
 import { backendFetch } from "@/lib/backend-fetch";
+import { clearFeedback } from "@/lib/answer-feedback";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useRef, useState } from "react";
 import { CheckCircle2, Keyboard, Loader2, Megaphone, Mic, Send } from "lucide-react";
@@ -37,6 +38,7 @@ const CAREERS = ["5년 미만", "5~10년", "10~20년", "20~30년", "30년 이상
 const GENDERS = ["남성", "여성", "밝히지 않음"];
 
 function VoicePage() {
+  useEffect(() => { clearFeedback(); }, []);
   const [step, setStep] = useState<"speak" | "profile" | "done">("speak");
   const [text, setText] = useState("");
   const [source, setSource] = useState<"voice" | "text">("voice");

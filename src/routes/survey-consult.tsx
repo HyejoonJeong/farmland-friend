@@ -1,17 +1,9 @@
-import { backendFetch } from "@/lib/backend-fetch";
-import {
-  clearFeedback,
-  keepFeedbackDomain,
-  rememberFeedback,
-  type FeedbackReceipt,
-} from "@/lib/answer-feedback";
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { useEffect, useRef, useState, type ReactNode } from "react";
+import { type ReactNode } from "react";
 import { MapPin, Loader2, MessageCircleQuestion, Mic, Phone, Send } from "lucide-react";
-import { useChatScroll } from "@/components/useChatScroll";
+import { useConsultation } from "@/components/useConsultation";
 import { PageShell } from "@/components/PageShell";
 import { SpeakButton } from "@/components/SpeakButton";
-import { startRecorder, type Recorder } from "@/lib/recorder";
 import { HUMAN_SUPPORT_PHONE } from "@/lib/data";
 
 const SURVEY_CENTER_PHONE = "1811-8852";
@@ -48,11 +40,6 @@ const SUGGESTIONS = [
   "양성화 특례기간은 꼭 신청해야 하나요?",
 ];
 
-interface Turn {
-  role: "user" | "assistant";
-  content: string;
-}
-
 function SurveyConsultPage() {
   return <SurveyConversation />;
 }
@@ -64,145 +51,21 @@ export function SurveyConversation({
   guide?: ReactNode;
   onContact?: () => void;
 }) {
-  const pageActive = useRef(false);
-  const questionSequence = useRef(0);
-  useEffect(() => {
-    pageActive.current = true;
-    keepFeedbackDomain("survey");
-    return () => {
-      pageActive.current = false;
-    };
-  }, []);
-  const [turns, setTurns] = useState<Turn[]>([]);
-  const [status, setStatus] = useState<"idle" | "recording" | "processing" | "thinking">("idle");
-  const [error, setError] = useState<string | null>(null);
-  const [level, setLevel] = useState(0);
-  const [typed, setTyped] = useState("");
-
-  const recRef = useRef<Recorder | null>(null);
-  const startedAt = useRef(0);
-  const lastVoiceAt = useRef(0);
-  const spokeRef = useRef(false);
-  const vadTimer = useRef<number | null>(null);
-  const chat = useChatScroll(turns, status);
-
-  const clearVad = () => {
-    if (vadTimer.current) {
-      window.clearInterval(vadTimer.current);
-      vadTimer.current = null;
-    }
-  };
-
-  useEffect(
-    () => () => {
-      clearVad();
-      recRef.current?.cancel();
-    },
-    [],
-  );
-
-  const ask = async (question: string) => {
-    const currentRequest = ++questionSequence.current;
-    chat.followLatest();
-    clearFeedback();
-    const history = turns.slice(-6);
-    setTurns((t) => [...t, { role: "user", content: question }]);
-    setStatus("thinking");
-    setError(null);
-    try {
-      const res = await backendFetch("/api/survey-ask", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ question, history }),
-      });
-      if (!res.ok) throw new Error(await res.text());
-      const data = (await res.json()) as { answer: string; feedback?: FeedbackReceipt };
-      if (!pageActive.current || currentRequest !== questionSequence.current) return;
-      rememberFeedback(data.feedback, "survey", question, data.answer);
-      setTurns((t) => [...t, { role: "assistant", content: data.answer }]);
-    } catch (e) {
-      if (!pageActive.current || currentRequest !== questionSequence.current) return;
-      console.error(e);
-      setError("답변을 가져오지 못했어요. 잠시 후 다시 물어봐 주세요.");
-    } finally {
-      if (pageActive.current && currentRequest === questionSequence.current) setStatus("idle");
-    }
-  };
-
-  const stop = async () => {
-    const rec = recRef.current;
-    if (!rec) return;
-    clearVad();
-    setStatus("processing");
-    const dur = Date.now() - startedAt.current;
-    const blob = await rec.stop();
-    recRef.current = null;
-    if (dur < 800 || blob.size < 2048) {
-      setError("녹음이 너무 짧아요. 한 번 더 말씀해 주세요.");
-      setStatus("idle");
-      return;
-    }
-    const form = new FormData();
-    form.append("file", blob, "recording");
-    try {
-      const res = await backendFetch("/api/stt", { method: "POST", body: form });
-      if (!res.ok) throw new Error(await res.text());
-      const data = (await res.json()) as { text: string };
-      const t = (data.text ?? "").trim();
-      if (!t) {
-        setError("소리를 알아듣지 못했어요. 조금 더 크게 다시 말씀해 주세요.");
-        setStatus("idle");
-        return;
-      }
-      await ask(t);
-    } catch (e) {
-      console.error(e);
-      setError("연결에 문제가 있어요. 잠시 후 다시 시도해 주세요.");
-      setStatus("idle");
-    }
-  };
-
-  const start = async () => {
-    setError(null);
-    spokeRef.current = false;
-    try {
-      const rec = await startRecorder((v) => {
-        setLevel(v);
-        if (v > 0.12) {
-          lastVoiceAt.current = Date.now();
-          if (!spokeRef.current && Date.now() - startedAt.current > 300) {
-            spokeRef.current = true;
-          }
-        }
-      });
-      recRef.current = rec;
-      startedAt.current = Date.now();
-      lastVoiceAt.current = Date.now();
-      setStatus("recording");
-      vadTimer.current = window.setInterval(() => {
-        const now = Date.now();
-        const elapsed = now - startedAt.current;
-        if (elapsed > 60000) return void stop();
-      }, 200);
-    } catch (e) {
-      console.error(e);
-      setError("마이크를 사용할 수 없어요. 마이크 권한을 허용해 주세요.");
-      setStatus("idle");
-    }
-  };
-
-  const submitTyped = () => {
-    const t = typed.trim();
-    if (t.length < 3) {
-      setError("궁금한 점을 조금 더 적어 주세요.");
-      return;
-    }
-    setTyped("");
-    void ask(t);
-  };
-
-  const recording = status === "recording";
-  const busy = status === "processing" || status === "thinking";
+  const {
+    turns,
+    status,
+    error,
+    level,
+    typed,
+    setTyped,
+    chat,
+    ask,
+    submitTyped,
+    start,
+    stop,
+    recording,
+    busy,
+  } = useConsultation("survey");
 
   const composer = (
     <div className="standalone-composer">

@@ -1,23 +1,16 @@
 import { backendFetch } from "@/lib/backend-fetch";
-import {
-  clearFeedback,
-  keepFeedbackDomain,
-  rememberFeedback,
-  type FeedbackReceipt,
-} from "@/lib/answer-feedback";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useEffect, useRef, useState, type ReactNode } from "react";
 import { ExternalLink, Loader2, MessageCircleQuestion, Mic, Phone, Send } from "lucide-react";
-import { useChatScroll } from "@/components/useChatScroll";
+import { useConsultation } from "@/components/useConsultation";
 import { PageShell } from "@/components/PageShell";
 import { SpeakButton } from "@/components/SpeakButton";
 import { BusinessAnswer, businessAnswerSpeech } from "@/components/BusinessAnswer";
-import { startRecorder, type Recorder } from "@/lib/recorder";
 import { FBO_PORTAL_URL } from "@/lib/fbo-knowledge";
-import { HUMAN_SUPPORT_PHONE, INTENTS, type IntentKey } from "@/lib/data";
+import { HUMAN_SUPPORT_PHONE, INTENTS } from "@/lib/data";
 import { useApp, type IntentResult } from "@/lib/store";
-import greenMascot from "@/assets/mascot-green-3d.png";
-import yellowMascot from "@/assets/mascot-yellow-3d.png";
+import greenMascot from "@/assets/mascot-green-3d.webp";
+import yellowMascot from "@/assets/mascot-yellow-3d.webp";
 
 export const Route = createFileRoute("/ask")({
   head: () => ({
@@ -50,11 +43,6 @@ const SUGGESTIONS = [
   "빚이 많은데 농지로 도움받을 방법 있나요?",
 ];
 
-interface Turn {
-  role: "user" | "assistant";
-  content: string;
-}
-
 function AskPage() {
   return <QuestionConversation />;
 }
@@ -66,181 +54,67 @@ export function QuestionConversation({
   embedded?: boolean;
   intro?: ReactNode;
 }) {
-  const pageActive = useRef(false);
-  const questionSequence = useRef(0);
-  useEffect(() => {
-    pageActive.current = true;
-    keepFeedbackDomain("farmland");
-    return () => {
-      pageActive.current = false;
-    };
-  }, []);
-  const [turns, setTurns] = useState<Turn[]>([]);
-  const [status, setStatus] = useState<"idle" | "recording" | "processing" | "thinking">("idle");
-  const [error, setError] = useState<string | null>(null);
-  const [level, setLevel] = useState(0);
-  const [typed, setTyped] = useState("");
+  const {
+    turns,
+    status,
+    error,
+    setError,
+    level,
+    typed,
+    setTyped,
+    chat,
+    ask,
+    submitTyped,
+    start,
+    stop,
+    recording,
+    busy,
+  } = useConsultation("farmland", !embedded);
 
   const [connecting, setConnecting] = useState(false);
+  const connection = useRef<AbortController | null>(null);
+  useEffect(() => () => connection.current?.abort(), []);
   const nav = useNavigate();
   const setTranscript = useApp((s) => s.setTranscript);
   const setIntent = useApp((s) => s.setIntent);
 
-  const recRef = useRef<Recorder | null>(null);
-  const startedAt = useRef(0);
-  const lastVoiceAt = useRef(0);
-  const spokeRef = useRef(false);
-  const vadTimer = useRef<number | null>(null);
-  const chat = useChatScroll(turns, status);
-
-  const clearVad = () => {
-    if (vadTimer.current) {
-      window.clearInterval(vadTimer.current);
-      vadTimer.current = null;
-    }
-  };
-
-  useEffect(
-    () => () => {
-      clearVad();
-      recRef.current?.cancel();
-    },
-    [],
-  );
-
-  const ask = async (question: string) => {
-    const currentRequest = ++questionSequence.current;
-    chat.followLatest();
-    clearFeedback();
-    const history = turns.slice(-6);
-    setTurns((t) => [...t, { role: "user", content: question }]);
-    setStatus("thinking");
-    setError(null);
-    try {
-      const res = await backendFetch("/api/ask", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ question, history }),
-      });
-      if (!res.ok) throw new Error(await res.text());
-      const data = (await res.json()) as { answer: string; feedback?: FeedbackReceipt };
-      if (!pageActive.current || currentRequest !== questionSequence.current) return;
-      rememberFeedback(data.feedback, "farmland", question, data.answer);
-      setTurns((t) => [...t, { role: "assistant", content: data.answer }]);
-    } catch (e) {
-      if (!pageActive.current || currentRequest !== questionSequence.current) return;
-      console.error(e);
-      setError("답변을 가져오지 못했어요. 잠시 후 다시 물어봐 주세요.");
-    } finally {
-      if (pageActive.current && currentRequest === questionSequence.current) setStatus("idle");
-    }
-  };
-
-  const stop = async () => {
-    const rec = recRef.current;
-    if (!rec) return;
-    clearVad();
-    setStatus("processing");
-    const dur = Date.now() - startedAt.current;
-    const blob = await rec.stop();
-    recRef.current = null;
-    if (dur < 800 || blob.size < 2048) {
-      setError("녹음이 너무 짧아요. 한 번 더 말씀해 주세요.");
-      setStatus("idle");
-      return;
-    }
-    const form = new FormData();
-    form.append("file", blob, "recording");
-    try {
-      const res = await backendFetch("/api/stt", { method: "POST", body: form });
-      if (!res.ok) throw new Error(await res.text());
-      const data = (await res.json()) as { text: string };
-      const t = (data.text ?? "").trim();
-      if (!t) {
-        setError("소리를 알아듣지 못했어요. 조금 더 크게 다시 말씀해 주세요.");
-        setStatus("idle");
-        return;
-      }
-      await ask(t);
-    } catch (e) {
-      console.error(e);
-      setError("연결에 문제가 있어요. 잠시 후 다시 시도해 주세요.");
-      setStatus("idle");
-    }
-  };
-
-  const start = async () => {
-    setError(null);
-    spokeRef.current = false;
-    try {
-      const rec = await startRecorder((v) => {
-        setLevel(v);
-        if (v > 0.12) {
-          lastVoiceAt.current = Date.now();
-          if (!spokeRef.current && Date.now() - startedAt.current > 300) {
-            spokeRef.current = true;
-          }
-        }
-      });
-      recRef.current = rec;
-      startedAt.current = Date.now();
-      lastVoiceAt.current = Date.now();
-      setStatus("recording");
-      vadTimer.current = window.setInterval(() => {
-        const now = Date.now();
-        const elapsed = now - startedAt.current;
-        if (elapsed > 60000) return void stop();
-      }, 200);
-    } catch (e) {
-      console.error(e);
-      setError("마이크를 사용할 수 없어요. 마이크 권한을 허용해 주세요.");
-      setStatus("idle");
-    }
-  };
-
-  const submitTyped = () => {
-    const t = typed.trim();
-    if (t.length < 3) {
-      setError("궁금한 점을 조금 더 적어 주세요.");
-      return;
-    }
-    setTyped("");
-    void ask(t);
-  };
-
   // Q&A에서 바로 담당자 연결: 방금 질문을 사업(intent)으로 분류한 뒤
   // 지역 선택 화면으로 이동해 바로 담당자 연락처를 안내한다.
   const connectToAgent = async () => {
+    if (connection.current) return;
     const lastQuestion = [...turns].reverse().find((t) => t.role === "user")?.content;
     if (!lastQuestion) {
       nav({ to: "/listen" });
       return;
     }
+    const controller = new AbortController();
+    connection.current = controller;
     setConnecting(true);
     setError(null);
     try {
       const res = await backendFetch("/api/intent", {
+        signal: controller.signal,
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ text: lastQuestion }),
       });
       if (!res.ok) throw new Error(await res.text());
       const data = (await res.json()) as IntentResult;
+      if (controller.signal.aborted) return;
       const label = INTENTS.find((i) => i.key === data.intent)?.label ?? "";
       setTranscript(lastQuestion);
       setIntent({ ...data, summary: data.summary || `${label} 관련 문의` });
       nav({ to: data.needsClarification ? "/clarify" : "/region" });
     } catch (e) {
+      if (controller.signal.aborted) return;
       console.error(e);
       setError("담당 업무를 분류하지 못했어요. 말로 다시 설명해 주시겠어요?");
       nav({ to: "/listen" });
     } finally {
-      setConnecting(false);
+      if (connection.current === controller) connection.current = null;
+      if (!controller.signal.aborted) setConnecting(false);
     }
   };
-
-  const recording = status === "recording";
-  const busy = status === "processing" || status === "thinking";
 
   const homeComposer = (
     <div className="home-conversation">

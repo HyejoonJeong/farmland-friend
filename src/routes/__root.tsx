@@ -83,10 +83,6 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
         rel: "stylesheet",
         href: pastelCss,
       },
-      {
-        rel: "stylesheet",
-        href: "https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable.min.css",
-      },
       { rel: "icon", type: "image/x-icon", href: "/favicon.ico?v=2" },
       { rel: "icon", type: "image/png", sizes: "512x512", href: "/favicon.png?v=2" },
       { rel: "apple-touch-icon", sizes: "180x180", href: "/apple-touch-icon.png?v=2" },

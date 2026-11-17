@@ -36,7 +36,7 @@ ${SURVEY_MANUAL}`;
 export function intentPrompt(body: { region?: string }) {
         const catalogue = INTENTS.map((i) => {
           const m = INTENT_META[i.key];
-          return `- ${i.key} [${m?.category ?? "기타"}]: ${i.business} — ${i.meaning}. 예: ${i.examples.slice(0, 6).join(" / ")}`;
+          return `- ${i.key} [${m?.category ?? "기타"}]: ${i.business} — ${i.meaning}. 예: ${i.examples.slice(0, 6).join(" / ")}${i.keywords?.length ? ` 업무 키워드: ${i.keywords.join(", ")}` : ""}`;
         }).join("\n");
         const cases = CLARIFY_CASE_IDS.map(
           (id) => `- ${id}: "${CLARIFY_CASES[id].question}" 선택지: ${CLARIFY_CASES[id].options.map((o) => o.label).join(" / ")}`,

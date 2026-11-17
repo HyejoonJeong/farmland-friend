@@ -14,23 +14,23 @@ Deno.test('all 24 intents have one allowed category, with institutional categori
  for(const i of INTENTS)assert.ok(CATEGORIES.includes(INTENT_META[i.key].category));
  assert.notEqual(INTENT_META.farmland_pension.category,INTENT_META.retirement_direct_payment.category);
 });
-Deno.test('consultation retrieves approved references, preserves history, calls AI once and persists pending draft',async()=>{
+Deno.test('consultation retrieves satisfaction references, preserves history, calls AI once and issues a scoped receipt',async()=>{
  const calls:{url:string;body:any}[]=[];
  await mocked(async(url,init)=>{
   const body=JSON.parse(String(init?.body));calls.push({url:String(url),body});
-  if(String(url).endsWith('/rpc/search_approved_answers')) {assert.equal(body.current_version,KNOWLEDGE_VERSION);assert.match(body.search_text,/그럼 서류.*농지연금/);return Response.json([example]);}
+  if(String(url).endsWith('/rpc/search_satisfied_answers')) {assert.equal(body.current_version,KNOWLEDGE_VERSION);assert.match(body.search_text,/그럼 서류.*농지연금/);return Response.json([example]);}
   if(String(url).includes('api.openai.com')) {assert.equal(body.store,false);assert.ok(body.text.format.schema);assert.equal(body.input.at(-1).content,'그럼 서류는요?');assert.equal(body.input.at(-2).role,'assistant');return generation([example.id]);}
   assert.equal(body.status,'pending');assert.equal(body.category,'농지연금');assert.deepEqual(body.reference_ids,[example.id]);return new Response(null,{status:201});
  },async()=>{
   const res=await handler(req('consult',{domain:'farmland',question:'그럼 서류는요?',history:[{role:'user',content:'농지연금 문의'},{role:'assistant',content:'앞선 답변'}]}));
-  assert.equal(res.status,200);assert.equal((await res.json()).category,'농지연금');assert.equal(calls.length,3);
+  assert.equal(res.status,200);const result=await res.json();assert.equal(result.category,'농지연금');assert.match(result.feedback.answerId,/^[a-f0-9-]{36}$/);assert.match(result.feedback.token,/^\d{10}\.[a-f0-9]{64}$/);assert.equal(calls.length,3);
  });
 });
 Deno.test('unknown reference ids cannot be accepted or saved',async()=>{
- await mocked(async(url)=>{if(String(url).endsWith('/rpc/search_approved_answers'))return Response.json([]);if(String(url).includes('api.openai.com'))return generation([example.id]);throw new Error('Must not persist invalid citation');},async()=>{assert.equal((await handler(req('consult',{domain:'farmland',question:'연금 문의'}))).status,502);});
+ await mocked(async(url)=>{if(String(url).endsWith('/rpc/search_satisfied_answers'))return Response.json([]);if(String(url).includes('api.openai.com'))return generation([example.id]);throw new Error('Must not persist invalid citation');},async()=>{assert.equal((await handler(req('consult',{domain:'farmland',question:'연금 문의'}))).status,502);});
 });
 Deno.test('failed persistence never reports an answered consultation as successful',async()=>{
- await mocked(async(url)=>String(url).endsWith('/rpc/search_approved_answers')?Response.json([]):String(url).includes('api.openai.com')?generation():new Response(null,{status:503}),async()=>{assert.equal((await handler(req('consult',{domain:'farmland',question:'연금 문의'}))).status,503);});
+ await mocked(async(url)=>String(url).endsWith('/rpc/search_satisfied_answers')?Response.json([]):String(url).includes('api.openai.com')?generation():new Response(null,{status:503}),async()=>{assert.equal((await handler(req('consult',{domain:'farmland',question:'연금 문의'}))).status,503);});
 });
 Deno.test('review endpoints reject unauthorized access, unreviewed approval and private identifiers',async()=>{
  const base={key:'admin',action:'update',id:example.id,revision:1,status:'approved',intent:'farmland_pension',question:'연금 안내',answer:'안내',source_reference:'현행 자료',reviewer:'검토 담당',valid_until:new Date(Date.now()+86400000).toISOString()};
@@ -48,4 +48,16 @@ Deno.test('review updates use optimistic revisions and server-owned approval met
  },async()=>{
   const res=await handler(req('admin-reviews',{key:'admin',action:'update',id:example.id,revision:3,status:'approved',intent:'farmland_pension',category:'잘못된값',question:'연금 안내',answer:'담당자 안내',source_reference:'현행 문서',reviewer:'담당자',privacy_checked:true,valid_until:new Date(Date.now()+86400000).toISOString()}));assert.equal(res.status,409);
  });
+});
+
+Deno.test('legacy administrator edits invalidate source excerpts instead of reviving old feedback',async()=>{
+ const base={key:'admin',action:'update',id:example.id,revision:3,intent:'farmland_pension',question:'연금 안내',answer:'현행 안내',source_reference:'현행 문서',reviewer:'담당자',privacy_checked:true,valid_until:new Date(Date.now()+86400000).toISOString()};
+ await mocked(async(_url,init)=>{
+  const patch=JSON.parse(String(init?.body));
+  assert.equal(patch.reuse_question,'');assert.equal(patch.reuse_answer,'');assert.equal(patch.reuse_valid_until,null);
+  assert.equal(patch.feedback_satisfaction,undefined);assert.equal(patch.feedback_reuse_consent,undefined);
+  return Response.json([{...patch,id:example.id,revision:4}]);
+ },async()=>{for(const status of ['pending','approved','rejected','retired']){
+  assert.equal((await handler(req('admin-reviews',{...base,status,reuse_answer:'untrusted injected excerpt',reuse_question:'untrusted',reuse_valid_until:'2999-01-01'}))).status,200);
+ }});
 });

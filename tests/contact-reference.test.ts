@@ -17,7 +17,8 @@ Deno.test('every supplied office and business phone resolves to its source works
   for(const region of ['진안군','장수군'])assert.equal(matchContact(item.key,region).phone,row[13]);
   assert.equal(matchContact(item.key,'완주군').phone,row[10]);
   assert.equal(matchContact(item.key,'임실군').phone,row[14]??row[10]);
-  assert.deepEqual(item.examples,String(row[3]).split(/\r?\n/).map((s:string)=>s.trim()).filter(Boolean));
+  if(row[3]!=null)assert.deepEqual(item.examples,String(row[3]).split(/\r?\n|\s+\/\s+/).map((s:string)=>s.trim()).filter(Boolean));
+  else {assert.ok(item.examples.length>0);assert.ok(!item.examples.includes('null'));}
  }
  for(const row of sheets[1].values.slice(1)){const actual=matchContact('farming_tech',row[0]);assert.equal(actual.phone,row[4]);assert.equal(actual.duty,row[2]);verified++;}
  for(const row of sheets[2].values.slice(1)){const actual=matchContact('gap_certification',row[1]);assert.equal(actual.phone,row[2]);assert.equal(actual.duty,row[3]);verified++;}

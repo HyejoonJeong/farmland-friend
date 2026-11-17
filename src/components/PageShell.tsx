@@ -68,7 +68,7 @@ export function PageShell({
           <SiteNavigation />
         </div>
       </header>
-      <main className="flex flex-1 flex-col px-5 pb-6"><AnswerFeedback />{children}</main>
+      <main className="flex flex-1 flex-col px-5 pb-6">{children}<AnswerFeedback /></main>
       <footer className="site-footer">
         <img src={krcLogo} alt="KRC 한국농어촌공사" width={180} />
       </footer>

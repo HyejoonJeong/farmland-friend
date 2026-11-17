@@ -50,7 +50,8 @@ export const INTENT_META: Record<IntentKey, IntentMeta> = {
   farmland_pension: { category: "농지연금", displayName: "농지연금", description: "농지를 담보로 매달 연금을 받는 제도입니다." },
   damaged_farmland: { category: "훼손농지", displayName: "훼손농지 문의", description: "훼손농지 사업과 담당자 문의입니다." },
   farming_tech: { category: "영농기술·재배·농기계", displayName: "영농기술·재배·농기계", description: "재배, 토양, 병해충, 농기계와 영농교육 문의입니다." },
-  gap_certification: { category: "농업경영체·직불제·인증", displayName: "경영체·직불제·인증", description: "경영체 등록, 공익직불, 인증, 품질·안전·원산지 문의입니다." },
+  direct_payment_application: { category: "농업경영체·직불제·인증", displayName: "직불금 신청 · 읍·면·동 문의", description: "직불금 신청은 농어촌공사가 아닌 관할 읍·면·동 행정복지센터에 문의해 주세요." },
+  gap_certification: { category: "농업경영체·직불제·인증", displayName: "경영체·인증", description: "경영체 등록, 인증, 품질·안전·원산지 문의입니다." },
   farmland_survey: { category: "농지 전수조사", displayName: "농지 전수조사", description: "전수조사 대상, 방법, 일정과 후속조치 문의입니다." },
   general_consult: { category: "기타 / 분류 불확실", displayName: "농지은행 일반 상담", description: "정확한 안내를 위해 농지은행 담당자가 직접 상담해 드립니다." },
 };
@@ -65,51 +66,175 @@ export interface ClarifyCase { question: string; options: ClarifyOption[]; }
 
 export type ClarifyCaseId =
   | "sell" | "lease_out" | "lease_out_term" | "find_land" | "lease_in"
-  | "orchard" | "orchard_owner" | "cant_farm" | "debt" | "general";
+  | "orchard" | "orchard_owner" | "cant_farm" | "debt" | "general"
+  | "sell_bank" | "income" | "smartfarm" | "direct_payment";
 
 export const CLARIFY_CASES: Record<ClarifyCaseId, ClarifyCase> = {
   sell: {
-    question: "농지를 어떤 방식으로 처분하고 싶으신가요?",
-    options: [
-      { emoji: "🏦", label: "농지은행에 팔고 싶어요", target: { intent: "farmland_trade_sell" } },
-      { emoji: "🤝", label: "팔 사람을 찾아줬으면 좋겠어요", target: { intent: "farmland_sale_trust" } },
-      { emoji: "👴", label: "은퇴하면서 농지를 넘기고 싶어요", target: { intent: "retirement_direct_payment" } },
-      { emoji: "💸", label: "빚 때문에 농지를 처분해야 해요", target: { intent: "management_recovery" } },
-    ],
-  },
+  "question": "농지를 어떻게 처분하거나 활용하고 싶으신가요?",
+  "options": [
+    {
+      "emoji": "🌱",
+      "label": "농지은행을 통해 농지를 팔고 싶어요",
+      "target": {
+        "next": "sell_bank"
+      }
+    },
+    {
+      "emoji": "🌱",
+      "label": "농지은행이 대신 살 사람을 찾아줬으면 해요",
+      "target": {
+        "intent": "farmland_sale_trust"
+      }
+    },
+    {
+      "emoji": "🌱",
+      "label": "은퇴 지원금이나 연금이 궁금해요",
+      "target": {
+        "next": "income"
+      }
+    },
+    {
+      "emoji": "🌱",
+      "label": "빚을 갚으면서 농사를 계속할 방법이 필요해요",
+      "target": {
+        "next": "debt"
+      }
+    },
+    {
+      "emoji": "🌱",
+      "label": "아직 잘 모르겠어요",
+      "target": {
+        "fallback": true
+      }
+    }
+  ]
+},
   lease_out: {
-    question: "어떤 도움이 필요하신가요?",
-    options: [
-      { emoji: "📅", label: "농지를 장기간 빌려주고 싶어요", target: { intent: "long_term_lease_out" } },
-      { emoji: "🏦", label: "농지은행에 맡겨 임차인을 찾고 싶어요", target: { intent: "farmland_lease_trust_out" } },
-      { emoji: "❓", label: "잘 모르겠어요", target: { next: "lease_out_term" } },
-    ],
-  },
+  "question": "내 농지를 빌려줄 때 어떤 도움을 원하시나요?",
+  "options": [
+    {
+      "emoji": "🌱",
+      "label": "농지은행이 임차인을 찾아 관리해 주길 원해요",
+      "target": {
+        "intent": "farmland_lease_trust_out"
+      }
+    },
+    {
+      "emoji": "🌱",
+      "label": "장기임대차 지원사업을 통해 빌려주고 싶어요",
+      "target": {
+        "intent": "long_term_lease_out"
+      }
+    },
+    {
+      "emoji": "🌱",
+      "label": "오래 빌려주고 싶은데 방식은 모르겠어요",
+      "target": {
+        "next": "lease_out_term"
+      }
+    }
+  ]
+},
   lease_out_term: {
-    question: "얼마나 오래 빌려주실 생각이세요?",
-    options: [
-      { emoji: "📅", label: "5년 이상 오래 빌려줄래요", target: { intent: "long_term_lease_out" } },
-      { emoji: "🏦", label: "기간은 상관없이 맡기고 싶어요", target: { intent: "farmland_lease_trust_out" } },
-      { emoji: "❓", label: "아직 잘 모르겠어요", target: { fallback: true } },
-    ],
-  },
+  "question": "기간 외에 원하시는 계약·관리 방식이 있나요?",
+  "options": [
+    {
+      "emoji": "🌱",
+      "label": "농지은행에 임대를 맡기고 임차인을 소개받고 싶어요",
+      "target": {
+        "intent": "farmland_lease_trust_out"
+      }
+    },
+    {
+      "emoji": "🌱",
+      "label": "장기임대차 지원사업을 문의하고 있어요",
+      "target": {
+        "intent": "long_term_lease_out"
+      }
+    },
+    {
+      "emoji": "🌱",
+      "label": "계약·관리 방식은 아직 모르겠어요",
+      "target": {
+        "fallback": true
+      }
+    }
+  ]
+},
   find_land: {
-    question: "어떤 방식으로 농지를 구하고 싶으신가요?",
-    options: [
-      { emoji: "🌱", label: "농지를 사고 싶어요", target: { intent: "farmland_trade_buy" } },
-      { emoji: "🚜", label: "농지를 빌리고 싶어요", target: { next: "lease_in" } },
-      { emoji: "🌾", label: "먼저 빌리고 나중에 사고 싶어요", target: { intent: "lease_then_sale" } },
-    ],
-  },
+  "question": "농지를 소유하려는지, 빌려 쓰려는지 알려 주세요.",
+  "options": [
+    {
+      "emoji": "🌱",
+      "label": "바로 농지를 구입하고 싶어요",
+      "target": {
+        "intent": "farmland_trade_buy"
+      }
+    },
+    {
+      "emoji": "🌱",
+      "label": "농지를 빌려 농사짓고 싶어요",
+      "target": {
+        "next": "lease_in"
+      }
+    },
+    {
+      "emoji": "🌱",
+      "label": "먼저 빌린 뒤 그 농지를 구입하고 싶어요",
+      "target": {
+        "intent": "lease_then_sale"
+      }
+    },
+    {
+      "emoji": "🌱",
+      "label": "스마트팜 시설이나 재배기술이 궁금해요",
+      "target": {
+        "next": "smartfarm"
+      }
+    },
+    {
+      "emoji": "🌱",
+      "label": "아직 정하지 못했어요",
+      "target": {
+        "fallback": true
+      }
+    }
+  ]
+},
   lease_in: {
-    question: "어떤 농지를 빌리고 싶으신가요?",
-    options: [
-      { emoji: "🏦", label: "농지은행이 가진 농지를 빌리고 싶어요", target: { intent: "reserve_farmland_lease" } },
-      { emoji: "📅", label: "5년 이상 오래 빌리고 싶어요", target: { intent: "long_term_lease_in" } },
-      { emoji: "🤝", label: "농지은행에 맡겨진 농지를 빌리고 싶어요", target: { intent: "farmland_lease_trust_in" } },
-      { emoji: "❓", label: "잘 모르겠어요", target: { fallback: true } },
-    ],
-  },
+  "question": "빌리려는 농지가 어떤 방식으로 공급되는지 아시나요?",
+  "options": [
+    {
+      "emoji": "🌱",
+      "label": "농지은행이 사서 보유한 비축농지를 빌리고 싶어요",
+      "target": {
+        "intent": "reserve_farmland_lease"
+      }
+    },
+    {
+      "emoji": "🌱",
+      "label": "농가의 농지를 장기임대차 지원으로 빌리고 싶어요",
+      "target": {
+        "intent": "long_term_lease_in"
+      }
+    },
+    {
+      "emoji": "🌱",
+      "label": "소유자가 농지은행에 임대를 맡긴 농지를 빌리고 싶어요",
+      "target": {
+        "intent": "farmland_lease_trust_in"
+      }
+    },
+    {
+      "emoji": "🌱",
+      "label": "농지의 공급 방식은 잘 모르겠어요",
+      "target": {
+        "fallback": true
+      }
+    }
+  ]
+},
   orchard: {
     question: "과수원을 어떻게 이용하고 싶으신가요?",
     options: [
@@ -130,26 +255,139 @@ export const CLARIFY_CASES: Record<ClarifyCaseId, ClarifyCase> = {
     options: [
       { emoji: "💰", label: "팔고 싶어요", target: { next: "sell" } },
       { emoji: "📅", label: "빌려주고 싶어요", target: { next: "lease_out" } },
-      { emoji: "👴", label: "은퇴 관련 지원을 받고 싶어요", target: { intent: "retirement_direct_payment" } },
+      { emoji: "👴", label: "은퇴 지원금이나 농지연금이 궁금해요", target: { next: "income" } },
       { emoji: "❓", label: "아직 잘 모르겠어요", target: { fallback: true } },
     ],
   },
   debt: {
-    question: "농지를 처분한 뒤에도 해당 농지에서 계속 농사를 짓고 싶으신가요?",
-    options: [
-      { emoji: "🌾", label: "네, 계속 농사짓고 싶어요", target: { intent: "management_recovery" } },
-      { emoji: "💰", label: "아니요, 농지를 처분하고 싶어요", target: { next: "sell" } },
-    ],
-  },
+  "question": "빚 문제와 관련해, 농지를 판 뒤에도 그 농지에서 농사를 계속하고 싶으신가요?",
+  "options": [
+    {
+      "emoji": "🌱",
+      "label": "네, 다시 빌려 농사짓고 나중에 되살 방법이 궁금해요",
+      "target": {
+        "intent": "management_recovery"
+      }
+    },
+    {
+      "emoji": "🌱",
+      "label": "아니요, 농지를 파는 방법이 궁금해요",
+      "target": {
+        "next": "sell"
+      }
+    },
+    {
+      "emoji": "🌱",
+      "label": "농지를 팔지 않고 담보로 연금을 받고 싶어요",
+      "target": {
+        "intent": "farmland_pension"
+      }
+    },
+    {
+      "emoji": "🌱",
+      "label": "아직 잘 모르겠어요",
+      "target": {
+        "fallback": true
+      }
+    }
+  ]
+},
   general: {
     question: "어떤 일로 도움이 필요하신가요?",
     options: [
       { emoji: "💰", label: "농지를 팔고 싶어요", target: { next: "sell" } },
       { emoji: "📅", label: "농지를 빌려주고 싶어요", target: { next: "lease_out" } },
       { emoji: "🌱", label: "농사지을 땅을 구하고 싶어요", target: { next: "find_land" } },
+      { emoji: "👴", label: "농지연금·은퇴 지원이 궁금해요", target: { next: "income" } },
+      { emoji: "🏛", label: "직불금 신청·경영체 등록·인증이 궁금해요", target: { next: "direct_payment" } },
+      { emoji: "🌿", label: "스마트팜 시설·재배기술이 궁금해요", target: { next: "smartfarm" } },
       { emoji: "❓", label: "잘 모르겠어요", target: { fallback: true } },
     ],
   },
+  sell_bank: {
+  "question": "농지은행을 통한 매도 중 어떤 방식이 궁금하신가요?",
+  "options": [
+    {
+      "emoji": "🌱",
+      "label": "농지은행이 사서 공공임대용으로 보유하는 방식이요",
+      "target": {
+        "intent": "public_reserve_purchase"
+      }
+    },
+    {
+      "emoji": "🌱",
+      "label": "다른 농업인이 구입하도록 매매를 지원하는 방식이요",
+      "target": {
+        "intent": "farmland_trade_sell"
+      }
+    },
+    {
+      "emoji": "🌱",
+      "label": "두 방식의 차이를 잘 모르겠어요",
+      "target": {
+        "fallback": true
+      }
+    }
+  ]
+},
+  income: {
+  "question": "농지를 계속 소유하며 연금을 받고 싶으신가요, 넘기고 은퇴하려는 건가요?",
+  "options": [
+    {
+      "emoji": "🌱",
+      "label": "농지는 소유하고 담보로 매월 연금을 받고 싶어요",
+      "target": {
+        "intent": "farmland_pension"
+      }
+    },
+    {
+      "emoji": "🌱",
+      "label": "농지를 넘기고 은퇴하는 지원금이 궁금해요",
+      "target": {
+        "intent": "retirement_direct_payment"
+      }
+    },
+    {
+      "emoji": "🌱",
+      "label": "둘의 차이가 궁금하거나 아직 정하지 못했어요",
+      "target": {
+        "fallback": true
+      }
+    }
+  ]
+},
+  smartfarm: {
+  "question": "스마트팜 시설을 빌리려는 건가요, 재배기술·교육이 필요한 건가요?",
+  "options": [
+    {
+      "emoji": "🌱",
+      "label": "농지은행의 비축농지 스마트팜 시설을 빌리고 싶어요",
+      "target": {
+        "intent": "reserve_smartfarm"
+      }
+    },
+    {
+      "emoji": "🌱",
+      "label": "재배기술·시설 운영 교육이나 영농상담이 필요해요",
+      "target": {
+        "intent": "farming_tech"
+      }
+    },
+    {
+      "emoji": "🌱",
+      "label": "다른 시설 지원이거나 아직 잘 모르겠어요",
+      "target": {
+        "fallback": true
+      }
+    }
+  ]
+},
+  direct_payment: { question: "어떤 직불금 또는 행정 업무인지 알려 주세요.", options: [
+    { emoji: "🏛", label: "공익·소농·면적·전략작물 직불금 신청이요", target: { intent: "direct_payment_application" } },
+    { emoji: "👴", label: "농지를 넘기고 은퇴하는 지원금이요", target: { intent: "retirement_direct_payment" } },
+    { emoji: "📋", label: "농업경영체 등록·인증 문의예요", target: { intent: "gap_certification" } },
+    { emoji: "❓", label: "어떤 제도인지 잘 모르겠어요", target: { fallback: true } },
+  ] },
 };
 
 export const CLARIFY_CASE_IDS = Object.keys(CLARIFY_CASES) as ClarifyCaseId[];
@@ -162,9 +400,22 @@ export const CATEGORY_DEFAULT_CASE: Partial<Record<Category, ClarifyCaseId>> = {
   "농지 빌리기": "lease_in",
   "과원 관련": "orchard",
   "농업경영 위기·부채": "debt",
-  "고령농 은퇴·농지이양": "cant_farm",
+  "고령농 은퇴·농지이양": "income",
+  "농지연금": "income",
+  "스마트팜": "smartfarm",
   "기타 / 분류 불확실": "general",
 };
 
 export const MAX_CLARIFY_ROUNDS = 2;
 export const FALLBACK_MESSAGE = "정확한 안내를 위해 농지은행 담당자에게 연결해드릴게요.";
+
+/** Classification boundaries, not eligibility decisions or verified accuracy scores. */
+export const BUSINESS_DISTINCTIONS = [
+  { businesses: ['farmland_pension','retirement_direct_payment'], distinction: '소유권 유지·담보 연금인지 농지이양·은퇴 지원인지 구분. 고령·매월 지급만으로 판단하지 않음.', clarify: 'income' },
+  { businesses: ['farmland_trade_sell','public_reserve_purchase','farmland_sale_trust','management_recovery'], distinction: '매매지원/공공임대용 매입/매도수탁/경영회생을 구분. 단순 매도·부채 언급만으로 경영회생을 확정하지 않음.', clarify: 'sell' },
+  { businesses: ['long_term_lease_out','farmland_lease_trust_out'], distinction: '장기임대차 지원인지 임차인 소개·임대관리 위탁인지 확인. 5년 이상이라는 기간만으로 확정하지 않음.', clarify: 'lease_out' },
+  { businesses: ['reserve_farmland_lease','long_term_lease_in','farmland_lease_trust_in','lease_then_sale'], distinction: '농지은행 소유 비축농지/농가 농지 장기임대차/소유자 임대수탁/임차 후 매입 목적을 구분. 청년·장기 임차만으로 결정하지 않음.', clarify: 'find_land' },
+  { businesses: ['orchard_trade_sell','orchard_trade_buy','orchard_lease_out','orchard_lease_in'], distinction: '소유자의 매도·임대인지 이용자의 매입·임차인지 확인.', clarify: 'orchard' },
+  { businesses: ['reserve_smartfarm','farming_tech'], distinction: '농지은행 비축농지 스마트팜 임대인지 재배기술·교육 문의인지 확인. 스마트팜이라는 단어만으로 시설 임대를 확정하지 않음.', clarify: 'smartfarm' },
+  { businesses: ['retirement_direct_payment','direct_payment_application','gap_certification'], distinction: '농지이양·은퇴 직불인지 공익직불·경영체 등록인지 확인. 직불금이라는 단어만으로 분류하지 않음.', clarify: 'direct_payment' },
+] as const;

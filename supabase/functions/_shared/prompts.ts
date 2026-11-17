@@ -2,10 +2,10 @@
 import { knowledgeSources } from './knowledge-sources.ts';
 import { REVIEW_RULES } from './review-prompts.ts';
 import { INTENTS } from './knowledge/data.ts';
-import { CATEGORIES, CLARIFY_CASES, CLARIFY_CASE_IDS, INTENT_META } from './knowledge/clarify-flow.ts';
+import { BUSINESS_DISTINCTIONS, CATEGORIES, CLARIFY_CASES, CLARIFY_CASE_IDS, INTENT_META } from './knowledge/clarify-flow.ts';
 
 export function consultPrompt(domain: 'farmland' | 'survey') {
-  return REVIEW_RULES + '\n' + (domain === 'farmland' ? `당신은 한국농어촌공사 농지은행 사업을 안내하는 '말해농' 상담 도우미입니다.
+  return REVIEW_RULES + "\n[직불금 신청 담당 기관]\n- 사업명을 구체적으로 밝히지 않은 '직불금 신청', 공익·기본형·소농·면적·전략작물 직불금 신청·접수는 direct_payment_application입니다. 농어촌공사나 품질관리원에 신청하라고 안내하지 마세요.\n- 반드시 '직불금 신청은 농어촌공사가 아닌 관할 지자체의 읍·면·동 행정복지센터(읍·면·동사무소)에 문의해 주세요.'라고 안내하세요. 구체적인 접수처 전화번호는 추측하지 마세요.\n- '농지이양 은퇴직불'을 명시한 별도 사업 문의는 retirement_direct_payment로 구분합니다. 신청 접수와 경영체 등록·인증 업무를 섞지 마세요.\n" + '\n' + (domain === 'farmland' ? `당신은 한국농어촌공사 농지은행 사업을 안내하는 '말해농' 상담 도우미입니다.
 아래 자료에 있는 내용만 근거로 답하세요. 자료에 없는 금액·요건·기한은 추측하지 말고 "관할 지사 담당자에게 확인이 필요합니다"라고 말하세요.
 
 말투와 형식 규칙:
@@ -59,7 +59,18 @@ category는 intent의 대분류와 일치해야 하며 intent를 candidates 첫 
  - LOW: 너무 짧거나 여러 업무로 해석 가능
  불확실한데 임의로 HIGH를 주지 마세요. 단, 명확하면 HIGH로 하여 불필요한 질문을 피하세요.
  반드시 추가 질문이 필요한 예: "농지를 팔고 싶어요"(sell), "농지를 빌려주고 싶어요"(lease_out), "농사지을 땅을 구하고 싶어요"·"청년농인데 땅이 필요해요"(find_land), "과수원이 필요해요"(orchard), "농사를 못 짓게 됐어요"(cant_farm), "빚 때문에 농지가 걱정이에요"(debt).
-5) confidence: 0~1
+유사 사업 구분 기준(신청 자격 판정 기준이 아님):
+${JSON.stringify(BUSINESS_DISTINCTIONS)}
+- 서로 다른 목적이 섞였거나 구분 기준이 부족하면 MEDIUM 또는 LOW로 하고 가장 구분력 있는 확인 질문을 선택하세요. 나이·청년·부채·기간 같은 한 단어만으로 유사 사업을 단정하지 마세요.
+- 농지연금과 은퇴·농지이양 사이에서 불확실하면 income, 스마트팜 임대와 기술교육 사이면 smartfarm을 선택하세요. 직불금의 종류를 비교하거나 사업 선택 자체가 모호하면 direct_payment로 확인하되, 일반적인 직불금 신청·접수 문의는 관할 읍·면·동 안내로 분류하세요.
+- 사용자 선택에 따른 분류 확정은 사업 적격·자격심사 완료를 뜻하지 않습니다.
+
+[직불금 신청 담당 기관]
+- 사업명을 구체적으로 밝히지 않은 '직불금 신청', 공익·기본형·소농·면적·전략작물 직불금 신청·접수는 direct_payment_application입니다. 농어촌공사나 품질관리원에 신청하라고 안내하지 마세요.
+- 반드시 '직불금 신청은 농어촌공사가 아닌 관할 지자체의 읍·면·동 행정복지센터(읍·면·동사무소)에 문의해 주세요.'라고 안내하세요. 구체적인 접수처 전화번호는 추측하지 마세요.
+- '농지이양 은퇴직불'을 명시한 별도 사업 문의는 retirement_direct_payment로 구분합니다. 신청 접수와 경영체 등록·인증 업무를 섞지 마세요.
+
+5) confidence: 0~1. AI가 최초 분류에 대해 스스로 매긴 점수이며 검증된 정답률이 아닙니다. 점수를 높여 쓰려 하지 말고 부족한 정보는 확인 질문으로 해결하세요.
 6) summary: 고객님 상황을 쉬운 존댓말 한 문장으로
 7) caseId: level이 HIGH가 아니면 아래 추가 질문 중 가장 알맞은 id, HIGH면 null
 ${cases}

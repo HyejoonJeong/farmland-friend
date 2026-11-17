@@ -40,6 +40,7 @@ export function normalizeIntent(value: unknown, text: string, clarification: str
     (CLARIFY_CASE_IDS as readonly unknown[]).includes(item.caseId) ? item.caseId as ClarifyCaseId : CATEGORY_DEFAULT_CASE[category] ?? 'general';
   return {
     intent, category, candidates: [intent, ...new Set((item.candidates as IntentKey[]).filter(key => key !== intent))].slice(0, 5), confidence: item.confidence,
+    status: level === 'HIGH' && !clarification ? 'AI_DIRECT' : 'NEEDS_CLARIFICATION',
     summary: item.summary || text, level, caseId, needsClarification: level !== 'HIGH' && !clarification,
   };
 }
@@ -118,7 +119,9 @@ export async function consult(request: Request, env: Env): Promise<Response> {
       !Array.isArray(value.reference_ids) || value.reference_ids.length > 3 || !value.reference_ids.every(id => examples.some(e => e.id === id && e.intent === value.intent))) {
     throw new ApiError(502, '답변 내용을 확인하지 못했습니다. 다시 질문해 주세요.');
   }
-  const answer = value.answer.trim();
+  const answer = value.intent === 'direct_payment_application'
+    ? '직불금 신청은 농어촌공사가 아닌 관할 지자체의 읍·면·동 행정복지센터(읍·면·동사무소)에 문의해 주세요. 신청 기간과 서류, 정확한 접수처는 해당 지자체에서 확인해 주세요.'
+    : value.answer.trim();
   const intent = value.intent as IntentKey;
   const category = INTENT_META[intent].category;
   // Only exact current public-source excerpts can cross sessions; never original user text.

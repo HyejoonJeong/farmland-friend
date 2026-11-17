@@ -2,6 +2,8 @@ import type { ReactNode } from "react";
 import { Link } from "@tanstack/react-router";
 import { HelpCircle, ChevronLeft } from "lucide-react";
 import { HUMAN_SUPPORT_PHONE } from "@/lib/data";
+import { AnswerFeedback } from "./AnswerFeedback";
+import { noteContactAttempt } from "@/lib/answer-feedback";
 
 export function PageShell({
   children,
@@ -13,7 +15,10 @@ export function PageShell({
   step?: { current: number; total: number };
 }) {
   return (
-    <div className="mx-auto flex min-h-dvh w-full max-w-md flex-col bg-background text-foreground">
+    <div className="mx-auto flex min-h-dvh w-full max-w-md flex-col bg-background text-foreground" onClickCapture={event => {
+      const target = event.target;
+      if (target instanceof Element && target.closest('a[href^="tel:"]')) noteContactAttempt();
+    }}>
       <header className="sticky top-0 z-10 flex items-center justify-between bg-background/95 px-4 py-3 backdrop-blur">
         {back !== null && back !== undefined ? (
           <Link
@@ -41,7 +46,7 @@ export function PageShell({
           도움
         </a>
       </header>
-      <main className="flex flex-1 flex-col px-5 pb-6">{children}</main>
+      <main className="flex flex-1 flex-col px-5 pb-6"><AnswerFeedback />{children}</main>
     </div>
   );
 }

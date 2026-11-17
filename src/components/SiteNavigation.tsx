@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Link } from "@tanstack/react-router";
 import * as Dialog from "@radix-ui/react-dialog";
-import { ArrowRight, ArrowUpRight, Menu, X } from "lucide-react";
+import { ArrowRight, ArrowUpRight, LockKeyhole, Menu, X } from "lucide-react";
 import { SITE_MENUS } from "@/lib/site-navigation";
 import { HUMAN_SUPPORT_PHONE } from "@/lib/data";
 
@@ -89,6 +89,16 @@ export function SiteNavigation() {
               <ArrowRight size={21} aria-hidden="true" />
             </a>
           </nav>
+          <div className="mt-auto flex shrink-0 justify-end pt-6">
+            <Link
+              to="/admin"
+              onClick={() => setOpen(false)}
+              className="inline-flex min-h-11 items-center gap-1.5 px-2 text-[13px] font-medium text-muted-foreground hover:text-primary"
+            >
+              <LockKeyhole size={14} aria-hidden="true" />
+              관리자 페이지
+            </Link>
+          </div>
         </Dialog.Content>
       </Dialog.Portal>
     </Dialog.Root>

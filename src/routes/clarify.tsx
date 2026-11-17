@@ -5,6 +5,7 @@ import { SpeakButton } from "@/components/SpeakButton";
 import { useApp } from "@/lib/store";
 import {
   CLARIFY_CASES,
+  INTENT_META,
   FALLBACK_MESSAGE,
   MAX_CLARIFY_ROUNDS,
   type ClarifyCaseId,
@@ -50,7 +51,7 @@ function ClarifyPage() {
     const trail = [...(intent.trail ?? []), { question: c.question, answer: opt.label }];
     const t = opt.target;
     if ("intent" in t) {
-      setIntent({ ...intent, intent: t.intent, trail, caseId: null, needsClarification: false, status: "CLARIFIED" });
+      setIntent({ ...intent, intent: t.intent, category: INTENT_META[t.intent].category, trail, caseId: null, needsClarification: false, status: "CLARIFIED" });
       nav({ to: "/intent" });
       return;
     }
@@ -60,7 +61,7 @@ function ClarifyPage() {
       setRound(round + 1);
       return;
     }
-    setIntent({ ...intent, intent: "general_consult", trail, caseId: null, needsClarification: false, status: "FALLBACK" });
+    setIntent({ ...intent, intent: "general_consult", category: INTENT_META.general_consult.category, trail, caseId: null, needsClarification: false, status: "FALLBACK" });
     setFallback(true);
   };
 

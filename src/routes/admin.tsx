@@ -1,3 +1,4 @@
+import { CLASSIFICATION_PATHS, classificationPath, classificationMetrics } from "@/lib/classification-metrics";
 import { AnswerReviews } from "@/components/AnswerReviews";
 import { backendFetch, backendConfig } from "@/lib/backend-fetch";
 import { createFileRoute, Link } from "@tanstack/react-router";
@@ -34,8 +35,9 @@ function toCsv(rows: UsageLogRow[]) {
     "발화",
     "추가답변",
     "요약",
-    "분류업무",
-    "확신도",
+    "최종 안내 업무",
+    "분류 경로",
+    "최초 AI 분류 확신도(자기평가)",
     "지역",
     "지사",
     "담당부서",
@@ -50,6 +52,7 @@ function toCsv(rows: UsageLogRow[]) {
       r.clarification,
       r.summary,
       r.intent_label,
+      CLASSIFICATION_PATHS[classificationPath(r)],
       r.confidence,
       r.region,
       r.branch,
@@ -164,6 +167,7 @@ function AdminPage() {
   const isFetching = login.isPending;
 
   const { logs, voices, stats } = data;
+  const paths = classificationMetrics(logs);
 
   const download = () => {
     const blob = new Blob([toCsv(logs)], { type: "text/csv;charset=utf-8" });
@@ -204,15 +208,19 @@ function AdminPage() {
       </header>
 
       <section className="mt-6 grid grid-cols-2 gap-3 md:grid-cols-4">
-        <Stat label="누적 상담" value={`${stats.total}건`} />
+        <Stat label="조회된 연결 기록(최대 500건)" value={`${stats.total}건`} />
         <Stat label="오늘" value={`${stats.today}건`} />
         <Stat
-          label="평균 확신도"
+          label="평균 최초 AI 확신도(자기평가)"
           value={stats.avgConfidence === null ? "-" : `${Math.round(stats.avgConfidence * 100)}%`}
         />
-        <Stat label="확신도 낮음(70% 미만)" value={`${stats.lowConfidence}건`} />
+        <Stat label="최초 AI 점수 70% 미만" value={`${stats.lowConfidence}건`} />
       </section>
 
+      <section className="mt-4 grid grid-cols-2 gap-3 md:grid-cols-4" aria-label="업무 분류 경로별 현황">
+        {Object.entries(CLASSIFICATION_PATHS).map(([key,label]) => <Stat key={key} label={label} value={`${paths[key as keyof typeof paths]}건`} />)}
+      </section>
+      <p className="mt-3 text-sm text-muted-foreground">최근 연결 기록 최대 500건 기준입니다. 확신도는 AI 최초 분류의 자기평가이며 답변 정확도·통화 성공률이 아닙니다. 추가 질문으로 업무를 정해도 점수를 올리지 않습니다. ‘확정’은 이용자가 선택한 안내 업무를 뜻하며 신청 자격이나 담당자 검증을 의미하지 않습니다. 과거 SUCCESS 기록은 경로를 추정하지 않고 별도로 표시합니다.</p>
       <AnswerReviews adminKey={password} />
       <div className="mt-6 grid gap-4 md:grid-cols-2">
         <Ranking title="업무별 문의" rows={stats.byIntent} total={stats.total} />
@@ -276,8 +284,9 @@ function AdminPage() {
               <tr>
                 <th className="p-3">시각</th>
                 <th className="p-3">말씀한 내용</th>
-                <th className="p-3">AI 분류</th>
-                <th className="p-3">확신도</th>
+                <th className="p-3">최종 안내 업무</th>
+                <th className="p-3">분류 경로</th>
+                <th className="p-3">최초 AI 확신도(자기평가)</th>
                 <th className="p-3">지역</th>
                 <th className="p-3">연결된 담당</th>
               </tr>
@@ -285,7 +294,7 @@ function AdminPage() {
             <tbody>
               {logs.length === 0 && (
                 <tr>
-                  <td className="p-4 text-muted-foreground" colSpan={6}>
+                  <td className="p-4 text-muted-foreground" colSpan={7}>
                     아직 쌓인 기록이 없습니다.
                   </td>
                 </tr>
@@ -299,8 +308,8 @@ function AdminPage() {
                     <p className="font-semibold">{r.transcript}</p>
                     {(r.category || r.classification_status) && (
                       <p className="mt-1 text-sm text-muted-foreground">
-                        대분류: {r.category ?? "-"} · 상태: {r.classification_status ?? "-"}
-                        {r.candidates?.length ? ` · 후보: ${r.candidates.join(", ")}` : ""}
+                        대분류: {r.category ?? "-"} · 경로 코드: {r.classification_status ?? "기록 없음"}
+                        {r.candidates?.length ? ` · 최초 AI 후보: ${r.candidates.join(", ")}` : ""}
                       </p>
                     )}
                     {r.clarify_trail?.map((t, i) => (
@@ -314,10 +323,11 @@ function AdminPage() {
                       </p>
                     )}
                     {r.summary && (
-                      <p className="mt-1 text-[14px] text-muted-foreground">요약: {r.summary}</p>
+                      <p className="mt-1 text-[14px] text-muted-foreground">최초 AI 요약: {r.summary}</p>
                     )}
                   </td>
                   <td className="p-3 font-semibold">{r.intent_label ?? "-"}</td>
+                  <td className="p-3">{CLASSIFICATION_PATHS[classificationPath(r)]}</td>
                   <td className="p-3">
                     {r.confidence === null ? "-" : `${Math.round(Number(r.confidence) * 100)}%`}
                   </td>

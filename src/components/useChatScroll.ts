@@ -1,29 +1,35 @@
-import { useLayoutEffect, useRef } from "react";
+import { useEffect, useLayoutEffect, useRef } from "react";
 import { isNearChatBottom } from "@/lib/chat-scroll";
 
 export function useChatScroll(update: unknown, status: string) {
-  const scrollRef = useRef<HTMLDivElement>(null);
   const contentRef = useRef<HTMLDivElement>(null);
   const following = useRef(false);
   const followLatest = () => {
     following.current = true;
   };
-  const onScroll = () => {
-    const el = scrollRef.current;
-    if (el) following.current = isNearChatBottom(el.scrollTop, el.clientHeight, el.scrollHeight);
-  };
+  useEffect(() => {
+    const onScroll = () => {
+      following.current = isNearChatBottom(
+        window.scrollY,
+        window.innerHeight,
+        document.documentElement.scrollHeight,
+      );
+    };
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => window.removeEventListener("scroll", onScroll);
+  }, []);
   useLayoutEffect(() => {
-    const el = scrollRef.current;
     const content = contentRef.current;
-    if (!el || !content) return;
+    if (!content) return;
     const follow = () => {
-      if (following.current) el.scrollTop = el.scrollHeight;
+      if (following.current)
+        window.scrollTo({ top: document.documentElement.scrollHeight, behavior: "instant" });
     };
     follow();
     const observer = new ResizeObserver(follow);
     observer.observe(content);
-    observer.observe(el);
+    observer.observe(document.body);
     return () => observer.disconnect();
   }, [update, status]);
-  return { scrollRef, contentRef, onScroll, followLatest };
+  return { contentRef, followLatest };
 }

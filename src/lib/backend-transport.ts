@@ -5,7 +5,7 @@ export function createBackendFetch(config: BackendConfig, request: typeof fetch 
     if (config.provider !== 'supabase') return request(path, init);
     if (!config.url || !config.key) throw new Error('Supabase 연결 설정이 필요합니다.');
     const action = path.replace(/^\/api\//, '');
-    const routes: Record<string, string> = { ask: 'consult', 'survey-ask': 'consult', intent: 'intent', stt: 'stt', tts: 'tts', 'admin-logs': 'admin-logs' };
+    const routes: Record<string, string> = { ask: 'consult', 'survey-ask': 'consult', intent: 'intent', stt: 'stt', tts: 'tts', 'admin-logs': 'admin-logs', 'admin-reviews': 'admin-reviews' };
     if (!routes[action]) throw new Error('지원하지 않는 API 경로입니다.');
     const headers = new Headers(init.headers);
     headers.set('apikey', config.key);

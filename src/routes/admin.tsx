@@ -1,4 +1,4 @@
-import { AnswerReviews } from '@/components/AnswerReviews';
+import { AnswerReviews } from "@/components/AnswerReviews";
 import { backendFetch, backendConfig } from "@/lib/backend-fetch";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useMutation } from "@tanstack/react-query";
@@ -6,6 +6,7 @@ import { useServerFn } from "@tanstack/react-start";
 import { useState } from "react";
 import { getUsageLogs, type UsageLogRow, type VoiceRow } from "@/lib/logs.functions";
 import { BarChart3, Download, Loader2, Lock, RefreshCw } from "lucide-react";
+import { BackButton } from "@/components/BackButton";
 
 export const Route = createFileRoute("/admin")({
   head: () => ({
@@ -21,6 +22,7 @@ export const Route = createFileRoute("/admin")({
   component: AdminPage,
   errorComponent: () => (
     <div className="mx-auto max-w-md p-8 text-center">
+      <BackButton />
       <p className="text-[20px] font-bold">데이터를 불러올 수 없습니다.</p>
     </div>
   ),
@@ -111,7 +113,10 @@ function AdminPage() {
 
   if (!data || !data.stats) {
     return (
-      <div className="mx-auto grid min-h-screen max-w-md place-items-center p-6">
+      <div className="relative mx-auto grid min-h-screen max-w-md place-items-center p-6">
+        <div className="absolute top-4 left-4">
+          <BackButton />
+        </div>
         <form
           onSubmit={(e) => {
             e.preventDefault();
@@ -122,9 +127,7 @@ function AdminPage() {
         >
           <Lock className="mx-auto h-12 w-12 text-primary" />
           <h1 className="mt-3 text-[24px] font-black">관리자 페이지</h1>
-          <p className="mt-2 text-[16px] text-muted-foreground">
-            비밀번호를 입력해 주세요.
-          </p>
+          <p className="mt-2 text-[16px] text-muted-foreground">비밀번호를 입력해 주세요.</p>
           <input
             type="password"
             value={password}
@@ -175,6 +178,7 @@ function AdminPage() {
   return (
     <div className="mx-auto max-w-5xl px-4 py-8">
       <header className="flex flex-wrap items-center justify-between gap-3">
+        <BackButton />
         <div className="flex items-center gap-2 text-primary">
           <BarChart3 className="h-7 w-7" />
           <h1 className="text-[26px] font-black text-foreground">말해농 운영 데이터</h1>
@@ -199,22 +203,17 @@ function AdminPage() {
         </div>
       </header>
 
-      <AnswerReviews adminKey={password} />
-
       <section className="mt-6 grid grid-cols-2 gap-3 md:grid-cols-4">
         <Stat label="누적 상담" value={`${stats.total}건`} />
         <Stat label="오늘" value={`${stats.today}건`} />
         <Stat
           label="평균 확신도"
-          value={
-            stats.avgConfidence === null
-              ? "-"
-              : `${Math.round(stats.avgConfidence * 100)}%`
-          }
+          value={stats.avgConfidence === null ? "-" : `${Math.round(stats.avgConfidence * 100)}%`}
         />
         <Stat label="확신도 낮음(70% 미만)" value={`${stats.lowConfidence}건`} />
       </section>
 
+      <AnswerReviews adminKey={password} />
       <div className="mt-6 grid gap-4 md:grid-cols-2">
         <Ranking title="업무별 문의" rows={stats.byIntent} total={stats.total} />
         <Ranking title="지역별 문의" rows={stats.byRegion} total={stats.total} />
@@ -222,9 +221,7 @@ function AdminPage() {
 
       <section className="mt-8">
         <div className="flex flex-wrap items-center justify-between gap-2">
-          <h2 className="text-[20px] font-bold">
-            농업인 Voice · 수집된 의견 ({voices.length}건)
-          </h2>
+          <h2 className="text-[20px] font-bold">농업인 Voice · 수집된 의견 ({voices.length}건)</h2>
           <button
             type="button"
             onClick={() => downloadCsv(voicesToCsv(voices), "malhaenong-voices")}
@@ -317,16 +314,12 @@ function AdminPage() {
                       </p>
                     )}
                     {r.summary && (
-                      <p className="mt-1 text-[14px] text-muted-foreground">
-                        요약: {r.summary}
-                      </p>
+                      <p className="mt-1 text-[14px] text-muted-foreground">요약: {r.summary}</p>
                     )}
                   </td>
                   <td className="p-3 font-semibold">{r.intent_label ?? "-"}</td>
                   <td className="p-3">
-                    {r.confidence === null
-                      ? "-"
-                      : `${Math.round(Number(r.confidence) * 100)}%`}
+                    {r.confidence === null ? "-" : `${Math.round(Number(r.confidence) * 100)}%`}
                   </td>
                   <td className="whitespace-nowrap p-3">{r.region ?? "-"}</td>
                   <td className="p-3">
@@ -366,9 +359,7 @@ function Ranking({
   return (
     <div className="rounded-2xl border-2 border-border bg-card p-4">
       <h2 className="text-[18px] font-bold">{title}</h2>
-      {rows.length === 0 && (
-        <p className="mt-2 text-[15px] text-muted-foreground">데이터 없음</p>
-      )}
+      {rows.length === 0 && <p className="mt-2 text-[15px] text-muted-foreground">데이터 없음</p>}
       <ul className="mt-3 space-y-2">
         {rows.slice(0, 8).map((r) => (
           <li key={r.label}>

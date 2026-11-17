@@ -8,13 +8,16 @@ import {
   lazyRouteComponent,
 } from "@tanstack/react-router";
 import type { ReactNode } from "react";
+import { BackButton } from "@/components/BackButton";
 
 import appCss from "../styles.css?url";
+import pastelCss from "../pastel-theme.css?url";
 
 function NotFoundComponent() {
   return (
     <div className="flex min-h-screen items-center justify-center bg-background px-4">
       <div className="max-w-md text-center">
+        <BackButton />
         <h1 className="text-7xl font-bold text-foreground">404</h1>
         <h2 className="mt-4 text-xl font-semibold text-foreground">Page not found</h2>
         <p className="mt-2 text-sm text-muted-foreground">
@@ -33,29 +36,52 @@ function NotFoundComponent() {
   );
 }
 
-
 export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()({
   head: () => ({
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
       { title: "Lovable App" },
-      { name: "description", content: "Gentle Guide is a voice-first AI assistant for South Korean elderly farmers, simplifying access to public services." },
+      {
+        name: "description",
+        content:
+          "Gentle Guide is a voice-first AI assistant for South Korean elderly farmers, simplifying access to public services.",
+      },
       { name: "author", content: "Lovable" },
       { property: "og:title", content: "Lovable App" },
-      { property: "og:description", content: "Gentle Guide is a voice-first AI assistant for South Korean elderly farmers, simplifying access to public services." },
+      {
+        property: "og:description",
+        content:
+          "Gentle Guide is a voice-first AI assistant for South Korean elderly farmers, simplifying access to public services.",
+      },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },
       { name: "twitter:site", content: "@Lovable" },
       { name: "twitter:title", content: "Lovable App" },
-      { name: "twitter:description", content: "Gentle Guide is a voice-first AI assistant for South Korean elderly farmers, simplifying access to public services." },
-      { property: "og:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/d841f7f0-51ef-4595-92d8-6c225e9a04f0/id-preview-79f9266b--295ae513-f336-46d2-b05c-32cecd1dafe1.lovable.app-1782888635103.png" },
-      { name: "twitter:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/d841f7f0-51ef-4595-92d8-6c225e9a04f0/id-preview-79f9266b--295ae513-f336-46d2-b05c-32cecd1dafe1.lovable.app-1782888635103.png" },
+      {
+        name: "twitter:description",
+        content:
+          "Gentle Guide is a voice-first AI assistant for South Korean elderly farmers, simplifying access to public services.",
+      },
+      {
+        property: "og:image",
+        content:
+          "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/d841f7f0-51ef-4595-92d8-6c225e9a04f0/id-preview-79f9266b--295ae513-f336-46d2-b05c-32cecd1dafe1.lovable.app-1782888635103.png",
+      },
+      {
+        name: "twitter:image",
+        content:
+          "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/d841f7f0-51ef-4595-92d8-6c225e9a04f0/id-preview-79f9266b--295ae513-f336-46d2-b05c-32cecd1dafe1.lovable.app-1782888635103.png",
+      },
     ],
     links: [
       {
         rel: "stylesheet",
         href: appCss,
+      },
+      {
+        rel: "stylesheet",
+        href: pastelCss,
       },
       {
         rel: "stylesheet",
@@ -71,7 +97,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
 
 function RootShell({ children }: { children: ReactNode }) {
   return (
-    <html lang="en">
+    <html lang="ko">
       <head>
         <HeadContent />
       </head>

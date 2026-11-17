@@ -18,6 +18,8 @@ import { startRecorder, type Recorder } from "@/lib/recorder";
 import { FBO_PORTAL_URL } from "@/lib/fbo-knowledge";
 import { HUMAN_SUPPORT_PHONE, INTENTS, type IntentKey } from "@/lib/data";
 import { useApp, type IntentResult } from "@/lib/store";
+import greenMascot from "@/assets/mascot-green-3d.png";
+import yellowMascot from "@/assets/mascot-yellow-3d.png";
 
 export const Route = createFileRoute("/ask")({
   head: () => ({
@@ -56,13 +58,15 @@ interface Turn {
 }
 
 function AskPage() {
+  return <QuestionConversation />;
+}
+
+export function QuestionConversation({ embedded = false }: { embedded?: boolean }) {
   const pageActive = useRef(false);
   const questionSequence = useRef(0);
   useEffect(() => { pageActive.current = true; keepFeedbackDomain('farmland'); return () => { pageActive.current = false; }; }, []);
   const [turns, setTurns] = useState<Turn[]>([]);
-  const [status, setStatus] = useState<"idle" | "recording" | "processing" | "thinking">(
-    "idle",
-  );
+  const [status, setStatus] = useState<"idle" | "recording" | "processing" | "thinking">("idle");
   const [error, setError] = useState<string | null>(null);
   const [level, setLevel] = useState(0);
   const [typed, setTyped] = useState("");
@@ -117,7 +121,7 @@ function AskPage() {
       if (!res.ok) throw new Error(await res.text());
       const data = (await res.json()) as { answer: string; feedback?: FeedbackReceipt };
       if (!pageActive.current || currentRequest !== questionSequence.current) return;
-      rememberFeedback(data.feedback, 'farmland', question, data.answer);
+      rememberFeedback(data.feedback, "farmland", question, data.answer);
       setTurns((t) => [...t, { role: "assistant", content: data.answer }]);
     } catch (e) {
       if (!pageActive.current || currentRequest !== questionSequence.current) return;
@@ -234,6 +238,126 @@ function AskPage() {
   const recording = status === "recording";
   const busy = status === "processing" || status === "thinking";
 
+  if (embedded) {
+    return (
+      <div className="home-conversation">
+        <div className="home-mic-stage">
+          <img
+            src={greenMascot}
+            alt="초록색 말해농 캐릭터"
+            className="home-mascot home-mascot-green"
+            width={240}
+            height={280}
+          />
+          <button
+            type="button"
+            className={`home-microphone ${recording ? "is-recording" : ""}`}
+            onClick={recording ? stop : start}
+            disabled={busy}
+            aria-label={recording ? "말씀 완료" : "질문 말하기"}
+            aria-pressed={recording}
+          >
+            {busy ? (
+              <Loader2 className="animate-spin" aria-hidden="true" />
+            ) : (
+              <Mic aria-hidden="true" />
+            )}
+          </button>
+          <img
+            src={yellowMascot}
+            alt="노란색 말해농 캐릭터"
+            className="home-mascot home-mascot-yellow"
+            width={240}
+            height={280}
+          />
+        </div>
+        {(recording || status === "processing") && (
+          <p className="home-mic-caption" role="status">
+            {recording
+              ? "듣고 있어요. 다 말씀하셨으면 마이크를 눌러 주세요."
+              : "말씀을 글로 옮기는 중이에요..."}
+          </p>
+        )}
+        <form
+          className="home-chat-form"
+          onSubmit={(event) => {
+            event.preventDefault();
+            if (!busy && !recording) submitTyped();
+          }}
+        >
+          <label htmlFor="home-question" className="sr-only">
+            궁금한 점 입력
+          </label>
+          <textarea
+            id="home-question"
+            rows={2}
+            value={typed}
+            onChange={(event) => setTyped(event.target.value)}
+            disabled={busy || recording}
+            placeholder="말해농에게 질문해보세요"
+            autoComplete="off"
+            maxLength={3000}
+            onKeyDown={(event) => {
+              if (event.key === "Enter" && !event.shiftKey && !event.nativeEvent.isComposing) {
+                event.preventDefault();
+                event.currentTarget.form?.requestSubmit();
+              }
+            }}
+          />
+          <button
+            type="submit"
+            disabled={busy || recording || typed.trim().length < 3}
+            aria-label="질문 보내기"
+          >
+            <Send aria-hidden="true" />
+          </button>
+        </form>
+        <div className="home-chat-hints">
+          <SpeakButton text={PROMPT} label="안내 듣기" />
+        </div>
+        {error && (
+          <p className="home-chat-error" role="alert">
+            {error}
+          </p>
+        )}
+        <div className="home-chat-messages" aria-live="polite" aria-busy={busy}>
+          {turns.map((turn, index) => (
+            <div
+              key={index}
+              ref={index === turns.length - 1 ? lastTurnRef : undefined}
+              className={`home-chat-bubble ${turn.role}`}
+            >
+              {turn.role === "assistant" ? (
+                <>
+                  <BusinessAnswer text={turn.content} />
+                  <SpeakButton text={businessAnswerSpeech(turn.content)} label="답변 듣기" />
+                </>
+              ) : (
+                <p>{turn.content}</p>
+              )}
+            </div>
+          ))}
+          {status === "thinking" && (
+            <p className="home-thinking" role="status">
+              <Loader2 className="animate-spin" size={20} aria-hidden="true" /> 답변을 찾고
+              있어요...
+            </p>
+          )}
+        </div>
+        {turns.some((turn) => turn.role === "assistant") && (
+          <button
+            type="button"
+            className="home-connect"
+            onClick={() => void connectToAgent()}
+            disabled={busy || connecting || recording}
+          >
+            {connecting ? "담당자를 찾고 있어요..." : "이 질문의 담당자 찾아 연결하기"}
+          </button>
+        )}
+      </div>
+    );
+  }
+
   return (
     <PageShell back="/">
       <div className="mt-2 flex items-center gap-2 text-primary">
@@ -252,9 +376,7 @@ function AskPage() {
 
       {turns.length === 0 && (
         <div className="mt-6">
-          <p className="text-[18px] font-bold text-foreground/80">
-            이렇게 물어보실 수 있어요
-          </p>
+          <p className="text-[18px] font-bold text-foreground/80">이렇게 물어보실 수 있어요</p>
           <div className="mt-3 space-y-2">
             {SUGGESTIONS.map((s) => (
               <button
@@ -327,11 +449,7 @@ function AskPage() {
             className="relative grid h-32 w-32 place-items-center rounded-full bg-primary text-primary-foreground shadow-xl transition active:scale-95 disabled:opacity-60"
             style={{ transform: recording ? `scale(${1 + level * 0.15})` : undefined }}
           >
-            {busy ? (
-              <Loader2 className="h-14 w-14 animate-spin" />
-            ) : (
-              <Mic className="h-14 w-14" />
-            )}
+            {busy ? <Loader2 className="h-14 w-14 animate-spin" /> : <Mic className="h-14 w-14" />}
           </button>
         </div>
         <p className="mt-3 text-center text-[20px] font-bold">
@@ -380,8 +498,7 @@ function AskPage() {
 
       <div className="mt-8 space-y-3 pb-6">
         <p className="text-[17px] text-muted-foreground">
-          안내는 참고용입니다. 신청 요건과 금액은 해마다 달라질 수 있어 담당자 확인이
-          필요합니다.
+          안내는 참고용입니다. 신청 요건과 금액은 해마다 달라질 수 있어 담당자 확인이 필요합니다.
         </p>
         <button
           type="button"

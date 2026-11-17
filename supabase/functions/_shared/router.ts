@@ -1,3 +1,4 @@
+import { adminReviews } from './reviews.ts';
 import { adminLogs, sameSecret } from './admin.ts';
 import { synthesize, transcribe, type ConnectSocket } from './audio.ts';
 import { classify, consult } from './text.ts';
@@ -61,7 +62,7 @@ export function makeHandler(env: Env, connect: ConnectSocket, limit: RateLimit) 
       if (request.method !== 'POST') return finish(new Response('POST 요청만 가능합니다.', { status: 405, headers: { Allow: 'POST, OPTIONS' } }));
       const segments = new URL(request.url).pathname.split('/').filter(Boolean);
       const action = segments.at(-1) ?? '';
-      if (!['intent', 'consult', 'stt', 'tts', 'admin-logs', 'health'].includes(action)) throw new ApiError(404, 'API 경로를 찾을 수 없습니다.');
+      if (!['intent', 'consult', 'stt', 'tts', 'admin-logs', 'admin-reviews', 'health'].includes(action)) throw new ApiError(404, 'API 경로를 찾을 수 없습니다.');
       if (!await validApiKey(request, env)) throw new ApiError(401, '앱 API 키가 올바르지 않습니다.');
       const length = Number(request.headers.get('content-length') ?? 0);
       if (length > (action === 'stt' ? 11 * 1024 * 1024 : 64 * 1024)) throw new ApiError(413, '요청 크기가 너무 큽니다.');
@@ -71,6 +72,7 @@ export function makeHandler(env: Env, connect: ConnectSocket, limit: RateLimit) 
       const response = action === 'consult' ? await consult(input, env) :
         action === 'intent' ? await classify(input, env) :
         action === 'stt' ? await transcribe(input, env) :
+        action === 'admin-reviews' ? await adminReviews(input, env) :
         action === 'tts' ? await synthesize(input, env, connect) : await adminLogs(input, env);
       return finish(response);
     } catch (error) {
@@ -92,7 +94,7 @@ export function createDatabaseLimiter(env: Env): RateLimit {
     const positive = (name: string, fallback: number) => { const n = Number(env(name)); return Number.isInteger(n) && n > 0 ? n : fallback; };
     const response = await fetch(`${requireEnv(env, 'SUPABASE_URL')}/rest/v1/rpc/consume_ai_request`, {
       method: 'POST', headers: { apikey: secret, Authorization: `Bearer ${secret}`, 'Content-Type': 'application/json' },
-      body: JSON.stringify({ client_hash: fingerprint, per_minute: action === 'admin-logs' ? 10 : positive('API_REQUESTS_PER_MINUTE', 30), per_day: positive('API_REQUESTS_PER_DAY', 10000) }),
+      body: JSON.stringify({ client_hash: fingerprint, per_minute: action.startsWith('admin-') ? 10 : positive('API_REQUESTS_PER_MINUTE', 30), per_day: positive('API_REQUESTS_PER_DAY', 10000) }),
       signal: AbortSignal.any([request.signal, AbortSignal.timeout(10_000)]),
     });
     if (!response.ok) { await response.body?.cancel(); throw new ApiError(503, '요청 한도 설정을 확인해 주세요.'); }

@@ -4,7 +4,7 @@ import type { IntentKey } from "./data";
 import type { ClarifyCaseId } from "./clarify-flow";
 
 export type ConfidenceLevel = "HIGH" | "MEDIUM" | "LOW";
-export type ClassificationStatus = "SUCCESS" | "CLARIFIED" | "FALLBACK";
+export type ClassificationStatus = "SUCCESS" | "AI_DIRECT" | "NEEDS_CLARIFICATION" | "CLARIFIED" | "FALLBACK" | "LEGACY";
 
 export interface ClarifyStep { question: string; answer: string; }
 

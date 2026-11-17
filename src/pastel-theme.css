@@ -1,4 +1,36 @@
 /* Blue and white interface. Green is reserved for the requested contact shortcut. */
+.mic-listening {
+  position: relative;
+  isolation: isolate;
+  overflow: visible;
+}
+.home-microphone.mic-listening.is-recording {
+  animation: none;
+}
+.mic-listening[data-recording="true"]::before,
+.mic-listening[data-recording="true"]::after {
+  content: "";
+  position: absolute;
+  inset: -4px;
+  border: 2px solid var(--primary);
+  border-radius: 50%;
+  pointer-events: none;
+  animation: microphone-wave 2.4s ease-out infinite;
+}
+.mic-listening[data-recording="true"]::after {
+  animation-delay: -1.2s;
+}
+@keyframes microphone-wave {
+  0% { transform: scale(1); opacity: 0.28; }
+  80%, 100% { transform: scale(1.45); opacity: 0; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .mic-listening[data-recording="true"]::before {
+    animation: none;
+    opacity: 0.28;
+  }
+  .mic-listening[data-recording="true"]::after { display: none; }
+}
 :root {
   --background: oklch(1 0 0);
   --foreground: oklch(0.27 0.055 257);

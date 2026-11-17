@@ -1,8 +1,8 @@
 import { useEffect, useRef, useState, type ReactNode, type RefObject } from "react";
 import { Link } from "@tanstack/react-router";
 import { ArrowUp } from "lucide-react";
-import krcLogo from "@/assets/krc-logo.png";
-import serviceLogo from "@/assets/malhaenong-logo.png";
+import krcLogo from "@/assets/krc-logo.webp";
+import serviceLogo from "@/assets/malhaenong-logo.webp";
 import { SiteSearch } from "@/components/SiteSearch";
 import { SiteNavigation } from "@/components/SiteNavigation";
 import { BackButton } from "@/components/BackButton";

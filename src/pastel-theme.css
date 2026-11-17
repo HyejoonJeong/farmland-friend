@@ -223,6 +223,82 @@ textarea {
   max-width: 720px;
   margin: 22px auto 0;
 }
+
+/* The viewport frame owns the dock; only the content pane scrolls. */
+.app-shell.chat-shell {
+  position: fixed;
+  inset-inline: 0;
+  top: 0;
+  height: 100dvh;
+  min-height: 0;
+  overflow: hidden;
+}
+.chat-shell > .site-header { flex: 0 0 auto; }
+.chat-shell > main {
+  min-height: 0;
+  overflow: hidden;
+  padding: 0;
+}
+.chat-scroll {
+  flex: 1 1 0;
+  min-height: 0;
+  overflow-y: auto;
+  overflow-x: hidden;
+  overscroll-behavior-y: contain;
+  overflow-anchor: none;
+  scrollbar-gutter: stable;
+}
+.chat-content { padding: 8px 20px 20px; }
+.chat-content .home-conversation { margin-top: 12px; }
+.chat-content .site-footer { padding: 24px 12px 16px; }
+.chat-dock {
+  flex: 0 0 auto;
+  background: var(--background);
+  padding: 8px max(20px, env(safe-area-inset-right)) max(12px, env(safe-area-inset-bottom)) max(20px, env(safe-area-inset-left));
+  z-index: 11;
+}
+.chat-dock .home-conversation { margin: 0 auto; }
+.chat-dock .home-mascot { height: 156px; }
+.chat-dock .home-chat-form { margin-top: 8px; }
+.chat-dock .home-chat-hints { margin: 0 0 8px; }
+.chat-dock .home-mic-caption { margin: 4px auto; }
+.chat-shell .floating-actions { bottom: calc(var(--chat-dock-height, 0px) + 12px); }
+.standalone-composer {
+  display: grid;
+  grid-template-columns: 140px minmax(0, 1fr);
+  align-items: center;
+  gap: 12px;
+}
+.standalone-composer > div { margin-top: 0; padding-top: 0; border: 0; min-width: 0; }
+.standalone-composer > div:first-child > div { width: 140px; height: 140px; }
+.standalone-composer p { font-size: 16px; margin-top: 4px; }
+.standalone-composer label { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); }
+.standalone-composer textarea { height: 76px; min-height: 76px; resize: none; padding: 8px; }
+.standalone-composer .btn-huge { margin-top: 8px; }
+.chat-shell[data-keyboard] .home-mascot,
+.chat-shell[data-keyboard] .home-chat-hints { display: none; }
+.chat-shell[data-keyboard] .chat-dock .home-conversation {
+  display: grid;
+  grid-template-columns: 96px minmax(0, 1fr);
+  align-items: center;
+  gap: 12px;
+}
+.chat-shell[data-keyboard] .home-mic-stage { display: block; }
+.chat-shell[data-keyboard] .home-microphone { width: 96px; height: 96px; }
+.chat-shell[data-keyboard] .home-microphone > svg { width: 48px; height: 48px; }
+.chat-shell[data-keyboard] .home-mic-caption { grid-column: 1 / -1; order: 2; }
+.chat-shell[data-keyboard] .home-chat-form { margin: 0; }
+@media (max-width: 640px) {
+  .home-shell.chat-shell { padding-inline: 0; }
+  .home-shell.chat-shell > .site-header { margin-inline: 18px; }
+  .home-shell.chat-shell > main { padding: 0; }
+  .chat-content { padding-inline: 18px; }
+  .chat-dock { padding-inline: max(12px, env(safe-area-inset-left)) max(12px, env(safe-area-inset-right)); }
+  .standalone-composer { grid-template-columns: 112px minmax(0, 1fr); }
+  .standalone-composer > div:first-child > div { width: 112px; height: 112px; }
+  .standalone-composer .mic-listening { width: 96px; height: 96px; }
+  .standalone-composer p { font-size: 14px; }
+}
 .home-mic-stage {
   display: grid;
   grid-template-columns: minmax(0, 1fr) 156px minmax(0, 1fr);

@@ -1,16 +1,14 @@
 import { backendFetch } from "@/lib/backend-fetch";
-import { clearFeedback, keepFeedbackDomain, rememberFeedback, type FeedbackReceipt } from "@/lib/answer-feedback";
-import { createFileRoute, Link } from "@tanstack/react-router";
-import { useEffect, useRef, useState } from "react";
 import {
-  Keyboard,
-  MapPin,
-  Loader2,
-  MessageCircleQuestion,
-  Mic,
-  Phone,
-  Send,
-} from "lucide-react";
+  clearFeedback,
+  keepFeedbackDomain,
+  rememberFeedback,
+  type FeedbackReceipt,
+} from "@/lib/answer-feedback";
+import { createFileRoute, Link } from "@tanstack/react-router";
+import { useEffect, useRef, useState, type ReactNode } from "react";
+import { MapPin, Loader2, MessageCircleQuestion, Mic, Phone, Send } from "lucide-react";
+import { useChatScroll } from "@/components/useChatScroll";
 import { PageShell } from "@/components/PageShell";
 import { SpeakButton } from "@/components/SpeakButton";
 import { startRecorder, type Recorder } from "@/lib/recorder";
@@ -30,7 +28,8 @@ export const Route = createFileRoute("/survey-consult")({
       { property: "og:title", content: "농지 전수조사 음성 상담 · 말해농" },
       {
         property: "og:description",
-        content: "처분 걱정, 이행강제금, 양성화 특례기간 등 농지 전수조사 궁금증을 말로 물어보세요.",
+        content:
+          "처분 걱정, 이행강제금, 양성화 특례기간 등 농지 전수조사 궁금증을 말로 물어보세요.",
       },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },
@@ -55,24 +54,37 @@ interface Turn {
 }
 
 function SurveyConsultPage() {
+  return <SurveyConversation />;
+}
+
+export function SurveyConversation({
+  guide,
+  onContact,
+}: {
+  guide?: ReactNode;
+  onContact?: () => void;
+}) {
   const pageActive = useRef(false);
   const questionSequence = useRef(0);
-  useEffect(() => { pageActive.current = true; keepFeedbackDomain('survey'); return () => { pageActive.current = false; }; }, []);
+  useEffect(() => {
+    pageActive.current = true;
+    keepFeedbackDomain("survey");
+    return () => {
+      pageActive.current = false;
+    };
+  }, []);
   const [turns, setTurns] = useState<Turn[]>([]);
-  const [status, setStatus] = useState<"idle" | "recording" | "processing" | "thinking">(
-    "idle",
-  );
+  const [status, setStatus] = useState<"idle" | "recording" | "processing" | "thinking">("idle");
   const [error, setError] = useState<string | null>(null);
   const [level, setLevel] = useState(0);
   const [typed, setTyped] = useState("");
-  const [showText, setShowText] = useState(false);
 
   const recRef = useRef<Recorder | null>(null);
   const startedAt = useRef(0);
   const lastVoiceAt = useRef(0);
   const spokeRef = useRef(false);
   const vadTimer = useRef<number | null>(null);
-  const lastTurnRef = useRef<HTMLDivElement | null>(null);
+  const chat = useChatScroll(turns, status);
 
   const clearVad = () => {
     if (vadTimer.current) {
@@ -89,15 +101,9 @@ function SurveyConsultPage() {
     [],
   );
 
-  // 새 질문/답변이 추가되면 그 말풍선으로 자동 스크롤해 바로 보이게 한다.
-  useEffect(() => {
-    if (turns.length > 0) {
-      lastTurnRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
-    }
-  }, [turns, status]);
-
   const ask = async (question: string) => {
     const currentRequest = ++questionSequence.current;
+    chat.followLatest();
     clearFeedback();
     const history = turns.slice(-6);
     setTurns((t) => [...t, { role: "user", content: question }]);
@@ -112,7 +118,7 @@ function SurveyConsultPage() {
       if (!res.ok) throw new Error(await res.text());
       const data = (await res.json()) as { answer: string; feedback?: FeedbackReceipt };
       if (!pageActive.current || currentRequest !== questionSequence.current) return;
-      rememberFeedback(data.feedback, 'survey', question, data.answer);
+      rememberFeedback(data.feedback, "survey", question, data.answer);
       setTurns((t) => [...t, { role: "assistant", content: data.answer }]);
     } catch (e) {
       if (!pageActive.current || currentRequest !== questionSequence.current) return;
@@ -198,77 +204,9 @@ function SurveyConsultPage() {
   const recording = status === "recording";
   const busy = status === "processing" || status === "thinking";
 
-  return (
-    <PageShell back="/farmland-survey">
-      <div className="mt-2 flex items-center gap-2 text-primary">
-        <MessageCircleQuestion className="h-6 w-6" />
-        <span className="text-lg font-bold">농지 전수조사 음성 상담</span>
-      </div>
-      <h1 className="mt-2 text-[28px] leading-tight font-black">
-        {recording ? "듣고 있어요..." : "궁금한 점을 말씀해 주세요"}
-      </h1>
-      <p className="mt-2 text-[19px] text-muted-foreground">
-        처분 걱정 · 이행강제금 · 시설 양성화 · 임대차 등
-      </p>
-      <div className="mt-2">
-        <SpeakButton text={PROMPT} label="안내 듣기" />
-      </div>
-
-      {turns.length === 0 && (
-        <div className="mt-6">
-          <p className="text-[18px] font-bold text-foreground/80">
-            이렇게 물어보실 수 있어요
-          </p>
-          <div className="mt-3 space-y-2">
-            {SUGGESTIONS.map((s) => (
-              <button
-                key={s}
-                type="button"
-                onClick={() => void ask(s)}
-                disabled={busy}
-                className="w-full rounded-2xl border-2 border-primary/30 bg-secondary px-4 py-4 text-left text-[19px] font-semibold text-secondary-foreground transition active:scale-[0.98] disabled:opacity-60"
-              >
-                {s}
-              </button>
-            ))}
-          </div>
-        </div>
-      )}
-
-      {turns.length > 0 && (
-        <div className="mt-6 space-y-4">
-          {turns.map((t, i) => (
-            <div
-              key={i}
-              ref={i === turns.length - 1 ? lastTurnRef : undefined}
-              className={
-                t.role === "user"
-                  ? "ml-auto max-w-[92%] scroll-mt-24 rounded-2xl bg-primary px-4 py-3 text-[19px] leading-relaxed font-semibold text-primary-foreground"
-                  : "max-w-full scroll-mt-24 rounded-2xl border-2 border-primary/25 bg-card px-4 py-4 text-[20px] leading-relaxed whitespace-pre-line"
-              }
-            >
-              {t.content}
-              {t.role === "assistant" && (
-                <div className="mt-3">
-                  <SpeakButton text={t.content} label="답변 듣기" />
-                </div>
-              )}
-            </div>
-          ))}
-          {status === "thinking" && (
-            <div className="flex items-center gap-2 text-[19px] font-semibold text-muted-foreground">
-              <Loader2 className="h-6 w-6 animate-spin" /> 답변을 찾고 있어요...
-            </div>
-          )}
-        </div>
-      )}
-
-      {error && (
-        <div className="mt-4 rounded-2xl bg-destructive/10 p-4 text-[19px] font-semibold text-destructive">
-          {error}
-        </div>
-      )}
-
+  const composer = (
+    <div className="standalone-composer">
+      {" "}
       <div className="mt-8 grid place-items-center">
         <div className="relative grid h-40 w-40 place-items-center">
           <button
@@ -280,11 +218,7 @@ function SurveyConsultPage() {
             className="mic-listening relative grid h-32 w-32 place-items-center rounded-full bg-primary text-primary-foreground shadow-xl transition active:scale-95 disabled:opacity-60"
             style={{ transform: recording ? `scale(${1 + level * 0.15})` : undefined }}
           >
-            {busy ? (
-              <Loader2 className="h-14 w-14 animate-spin" />
-            ) : (
-              <Mic className="h-14 w-14" />
-            )}
+            {busy ? <Loader2 className="h-14 w-14 animate-spin" /> : <Mic className="h-14 w-14" />}
           </button>
         </div>
         <p className="mt-3 text-center text-[20px] font-bold">
@@ -295,70 +229,147 @@ function SurveyConsultPage() {
               : "버튼을 눌러 질문하기"}
         </p>
       </div>
-
       <div className="mt-8 border-t-2 border-dashed border-border pt-5">
-        {!showText ? (
+        <div className="space-y-3">
+          <label className="block text-[19px] font-bold text-foreground/80">
+            궁금한 점을 적어 주세요
+          </label>
+          <textarea
+            aria-label="전수조사 질문 입력"
+            disabled={busy || recording}
+            maxLength={3000}
+            onKeyDown={(event) => {
+              if (event.key === "Enter" && !event.shiftKey && !event.nativeEvent.isComposing) {
+                event.preventDefault();
+                if (!busy && !recording) submitTyped();
+              }
+            }}
+            value={typed}
+            onChange={(e) => setTyped(e.target.value)}
+            rows={3}
+            placeholder="예) 주말농장 하려고 산 땅을 놀리고 있어요"
+            className="w-full rounded-2xl border-2 border-border bg-card p-4 text-[20px] leading-relaxed focus:border-primary focus:outline-none"
+          />
           <button
             type="button"
-            onClick={() => setShowText(true)}
-            className="mx-auto flex items-center gap-2 rounded-full bg-secondary px-5 py-3 text-[19px] font-bold text-secondary-foreground"
+            onClick={submitTyped}
+            disabled={busy || recording || typed.trim().length < 3}
+            className="btn-huge flex w-full items-center justify-center gap-2 bg-primary text-primary-foreground disabled:opacity-60"
+            style={{ minHeight: 64, fontSize: 22 }}
           >
-            <Keyboard className="h-6 w-6" />
-            말씀이 불편하시면 글로 묻기
+            <Send className="h-6 w-6" /> 물어보기
           </button>
-        ) : (
-          <div className="space-y-3">
-            <label className="block text-[19px] font-bold text-foreground/80">
-              궁금한 점을 적어 주세요
-            </label>
-            <textarea
-              value={typed}
-              onChange={(e) => setTyped(e.target.value)}
-              rows={3}
-              placeholder="예) 주말농장 하려고 산 땅을 놀리고 있어요"
-              className="w-full rounded-2xl border-2 border-border bg-card p-4 text-[20px] leading-relaxed focus:border-primary focus:outline-none"
-            />
-            <button
-              type="button"
-              onClick={submitTyped}
-              disabled={busy}
-              className="btn-huge flex w-full items-center justify-center gap-2 bg-primary text-primary-foreground disabled:opacity-60"
-              style={{ minHeight: 64, fontSize: 22 }}
-            >
-              <Send className="h-6 w-6" /> 물어보기
-            </button>
+        </div>
+      </div>
+    </div>
+  );
+  return (
+    <PageShell back="/farmland-survey" composer={composer} chat={chat}>
+      {guide}
+      <section aria-label="농지전수조사 상담">
+        <div className="mt-2 flex items-center gap-2 text-primary">
+          <MessageCircleQuestion className="h-6 w-6" />
+          <span className="text-lg font-bold">농지 전수조사 음성 상담</span>
+        </div>
+        <h1 className="mt-2 text-[28px] leading-tight font-black">
+          {recording ? "듣고 있어요..." : "궁금한 점을 말씀해 주세요"}
+        </h1>
+        <p className="mt-2 text-[19px] text-muted-foreground">
+          처분 걱정 · 이행강제금 · 시설 양성화 · 임대차 등
+        </p>
+        <div className="mt-2">
+          <SpeakButton text={PROMPT} label="안내 듣기" />
+        </div>
+
+        {turns.length === 0 && (
+          <div className="mt-6">
+            <p className="text-[18px] font-bold text-foreground/80">이렇게 물어보실 수 있어요</p>
+            <div className="mt-3 space-y-2">
+              {SUGGESTIONS.map((s) => (
+                <button
+                  key={s}
+                  type="button"
+                  onClick={() => void ask(s)}
+                  disabled={busy}
+                  className="w-full rounded-2xl border-2 border-primary/30 bg-secondary px-4 py-4 text-left text-[19px] font-semibold text-secondary-foreground transition active:scale-[0.98] disabled:opacity-60"
+                >
+                  {s}
+                </button>
+              ))}
+            </div>
           </div>
         )}
-      </div>
 
-      <div className="mt-8 space-y-3 pb-6">
-        <p className="text-[17px] text-muted-foreground">
-          안내는 상담센터 매뉴얼을 바탕으로 한 참고용입니다. 특별조치법과 특례기간은 국회 협의 중이라
-          바뀔 수 있습니다.
-        </p>
-        <a
-          href={`tel:${SURVEY_CENTER_PHONE}`}
-          className="flex min-h-16 w-full flex-col items-center justify-center rounded-2xl border-2 border-primary bg-accent px-4 py-4 text-[20px] font-bold text-accent-foreground"
-        >
-          <span className="flex items-center gap-2">
-            <Phone className="h-6 w-6" /> 전수조사 상담센터 {SURVEY_CENTER_PHONE}
-          </span>
-          <span className="text-[16px] font-semibold">평일 9시~16시 · 위반 신고 접수</span>
-        </a>
-        <Link
-          to="/farmland-survey"
-          hash="contact"
-          className="flex min-h-16 w-full items-center justify-center gap-2 rounded-2xl bg-secondary px-4 py-4 text-[20px] font-bold text-secondary-foreground"
-        >
-          <MapPin className="h-6 w-6" /> 우리 지역 담당자 찾기
-        </Link>
-        <a
-          href={`tel:${HUMAN_SUPPORT_PHONE}`}
-          className="flex min-h-16 w-full items-center justify-center gap-2 rounded-2xl bg-secondary px-4 py-4 text-[20px] font-bold text-secondary-foreground"
-        >
-          <Phone className="h-6 w-6" /> 농지은행 {HUMAN_SUPPORT_PHONE}
-        </a>
-      </div>
+        <div className="mt-8 space-y-3 pb-6">
+          <p className="text-[17px] text-muted-foreground">
+            안내는 상담센터 매뉴얼을 바탕으로 한 참고용입니다. 특별조치법과 특례기간은 국회 협의
+            중이라 바뀔 수 있습니다.
+          </p>
+          <a
+            href={`tel:${SURVEY_CENTER_PHONE}`}
+            className="flex min-h-16 w-full flex-col items-center justify-center rounded-2xl border-2 border-primary bg-accent px-4 py-4 text-[20px] font-bold text-accent-foreground"
+          >
+            <span className="flex items-center gap-2">
+              <Phone className="h-6 w-6" /> 전수조사 상담센터 {SURVEY_CENTER_PHONE}
+            </span>
+            <span className="text-[16px] font-semibold">평일 9시~16시 · 위반 신고 접수</span>
+          </a>
+
+          <a
+            href={`tel:${HUMAN_SUPPORT_PHONE}`}
+            className="flex min-h-16 w-full items-center justify-center gap-2 rounded-2xl bg-secondary px-4 py-4 text-[20px] font-bold text-secondary-foreground"
+          >
+            <Phone className="h-6 w-6" /> 농지은행 {HUMAN_SUPPORT_PHONE}
+          </a>
+        </div>
+
+        {turns.length > 0 && (
+          <div className="mt-6 space-y-4">
+            {turns.map((t, i) => (
+              <div
+                key={i}
+                className={
+                  t.role === "user"
+                    ? "ml-auto max-w-[92%] scroll-mt-24 rounded-2xl bg-primary px-4 py-3 text-[19px] leading-relaxed font-semibold text-primary-foreground"
+                    : "max-w-full scroll-mt-24 rounded-2xl border-2 border-primary/25 bg-card px-4 py-4 text-[20px] leading-relaxed whitespace-pre-line"
+                }
+              >
+                {t.content}
+                {t.role === "assistant" && (
+                  <div className="mt-3">
+                    <SpeakButton text={t.content} label="답변 듣기" />
+                  </div>
+                )}
+              </div>
+            ))}
+            {status === "thinking" && (
+              <div className="flex items-center gap-2 text-[19px] font-semibold text-muted-foreground">
+                <Loader2 className="h-6 w-6 animate-spin" /> 답변을 찾고 있어요...
+              </div>
+            )}
+          </div>
+        )}
+
+        {error && (
+          <div className="mt-4 rounded-2xl bg-destructive/10 p-4 text-[19px] font-semibold text-destructive">
+            {error}
+          </div>
+        )}
+
+        {onContact ? (
+          <button type="button" onClick={onContact} className="home-connect">
+            <MapPin className="h-6 w-6" /> 우리 지역 담당자 찾아 연결하기
+          </button>
+        ) : (
+          <Link
+            to="/farmland-survey"
+            hash="contact"
+            className="flex min-h-16 w-full items-center justify-center gap-2 rounded-2xl bg-secondary px-4 py-4 text-[20px] font-bold text-secondary-foreground"
+          >
+            <MapPin className="h-6 w-6" /> 우리 지역 담당자 찾기
+          </Link>
+        )}
+      </section>
     </PageShell>
   );
 }

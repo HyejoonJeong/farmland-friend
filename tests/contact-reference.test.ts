@@ -21,7 +21,7 @@ Deno.test('every supplied office and business phone resolves to its source works
   else {assert.ok(item.examples.length>0);assert.ok(!item.examples.includes('null'));}
  }
  for(const row of sheets[1].values.slice(1)){const actual=matchContact('farming_tech',row[0]);assert.equal(actual.phone,row[4]);assert.equal(actual.duty,row[2]);verified++;}
- for(const row of sheets[2].values.slice(1)){const actual=matchContact('gap_certification',row[1]);assert.equal(actual.phone,row[2]);assert.equal(actual.duty,row[3]);verified++;}
+ for(const row of sheets[2].values.slice(1)){const actual=matchContact('gap_certification',row[1]);assert.equal(actual.phone,row[2]);assert.equal(actual.duty,row[3]);assert.deepEqual(NAQS_OFFICES.find(o=>o.region===row[1])?.keywords,row[4].split(',').map((s:string)=>s.trim()));verified++;}
  for(const row of sheets[3].values.slice(1)){const actual=matchContact('farmland_survey',row[1]);assert.equal(actual.phone,row[2]);assert.equal(actual.duty,row[3]);verified++;}
  assert.equal(verified,244);
  assert.equal(EXTENSION_OFFICES.length,15);assert.equal(NAQS_OFFICES.length,13);assert.equal(MUNICIPAL_OFFICES.length,14);
@@ -34,8 +34,8 @@ Deno.test('updated institutional keywords are supplied to the AI without changin
   const item=INTENTS.find(i=>i.key===key);
   // Application routing was corrected by the user: registration/certification remains NAQS,
   // payment applications now belong to municipal 읍·면·동 offices.
-  const moved=['공익직불금 신청','기본형 직불금 문의','소농직불금 자격','면적직불금 문의','전략작물직불금 문의','직불금 신청 기간','직불금 지급 확인','직불금 대상 확인'];
-  const retained=key==='gap_certification'?expected.filter((s:string)=>!moved.includes(s)):expected;
+  // Geographic keywords belong to the office reference, not the global business classifier.
+  const retained=key==='gap_certification'?expected.filter((s:string)=>s!=='전주'):expected;
   assert.deepEqual(item?.keywords,retained);
   for(const keyword of retained)assert.ok(prompt.includes(keyword),keyword);
  }

@@ -1,3 +1,4 @@
+import { answerFeedback, adminFeedback } from './feedback.ts';
 import { adminReviews } from './reviews.ts';
 import { adminLogs, sameSecret } from './admin.ts';
 import { synthesize, transcribe, type ConnectSocket } from './audio.ts';
@@ -62,7 +63,7 @@ export function makeHandler(env: Env, connect: ConnectSocket, limit: RateLimit) 
       if (request.method !== 'POST') return finish(new Response('POST 요청만 가능합니다.', { status: 405, headers: { Allow: 'POST, OPTIONS' } }));
       const segments = new URL(request.url).pathname.split('/').filter(Boolean);
       const action = segments.at(-1) ?? '';
-      if (!['intent', 'consult', 'stt', 'tts', 'admin-logs', 'admin-reviews', 'health'].includes(action)) throw new ApiError(404, 'API 경로를 찾을 수 없습니다.');
+      if (!['intent', 'consult', 'stt', 'tts', 'admin-logs', 'admin-reviews', 'answer-feedback', 'admin-feedback', 'health'].includes(action)) throw new ApiError(404, 'API 경로를 찾을 수 없습니다.');
       if (!await validApiKey(request, env)) throw new ApiError(401, '앱 API 키가 올바르지 않습니다.');
       const length = Number(request.headers.get('content-length') ?? 0);
       if (length > (action === 'stt' ? 11 * 1024 * 1024 : 64 * 1024)) throw new ApiError(413, '요청 크기가 너무 큽니다.');
@@ -72,6 +73,8 @@ export function makeHandler(env: Env, connect: ConnectSocket, limit: RateLimit) 
       const response = action === 'consult' ? await consult(input, env) :
         action === 'intent' ? await classify(input, env) :
         action === 'stt' ? await transcribe(input, env) :
+        action === 'answer-feedback' ? await answerFeedback(input, env) :
+        action === 'admin-feedback' ? await adminFeedback(input, env) :
         action === 'admin-reviews' ? await adminReviews(input, env) :
         action === 'tts' ? await synthesize(input, env, connect) : await adminLogs(input, env);
       return finish(response);

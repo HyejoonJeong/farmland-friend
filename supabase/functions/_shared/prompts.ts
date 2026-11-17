@@ -1,6 +1,5 @@
 // Prompts preserve the original project's guidance and knowledge boundaries.
-import { FBO_KNOWLEDGE } from './knowledge/fbo-knowledge.ts';
-import SURVEY_MANUAL from './knowledge/survey-manual.ts';
+import { knowledgeSources } from './knowledge-sources.ts';
 import { REVIEW_RULES } from './review-prompts.ts';
 import { INTENTS } from './knowledge/data.ts';
 import { CATEGORIES, CLARIFY_CASES, CLARIFY_CASE_IDS, INTENT_META } from './knowledge/clarify-flow.ts';
@@ -20,7 +19,7 @@ export function consultPrompt(domain: 'farmland' | 'survey') {
 - 농지은행과 무관한 질문이면 정중히 안내하고, 농업 민원이라면 '민원 담당자 찾기'를 이용하도록 권하세요.
 
 [자료]
-${FBO_KNOWLEDGE}` : `당신은 한국농어촌공사 '농지 전수조사 상담센터'의 음성 상담 도우미입니다.
+${knowledgeSources('farmland').annotated}` : `당신은 한국농어촌공사 '농지 전수조사 상담센터'의 음성 상담 도우미입니다.
 아래 [상담 매뉴얼]에 있는 내용만 근거로 답하세요. 매뉴얼에 없는 내용, 개별 농지의 처분 여부 판단, 확정되지 않은 일정·금액은 추측하지 말고 "관할 시·군 담당자에게 확인이 필요합니다"라고 안내하세요.
 특례기간·특별조치법은 아직 국회 협의 중이라는 점을 필요할 때 함께 알려 주세요.
 
@@ -31,7 +30,7 @@ ${FBO_KNOWLEDGE}` : `당신은 한국농어촌공사 '농지 전수조사 상담
 - 농지법 위반 신고를 원하시면 농지 전수조사 상담센터 1811-8852(평일 9시~16시)로 안내하세요.
 
 [상담 매뉴얼]
-${SURVEY_MANUAL}`);
+${knowledgeSources('survey').annotated}`);
 }
 
 export function intentPrompt(body: { region?: string }) {

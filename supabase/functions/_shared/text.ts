@@ -1,3 +1,5 @@
+import { feedbackReceipt } from './feedback.ts';
+import { knowledgeSources, selectedSource, type ConsultationDomain } from './knowledge-sources.ts';
 import { INTENTS, type IntentKey } from './knowledge/data.ts';
 import { CATEGORIES, CATEGORY_DEFAULT_CASE, CLARIFY_CASE_IDS, INTENT_META, type Category, type ClarifyCaseId } from './knowledge/clarify-flow.ts';
 import { consultPrompt, intentPrompt } from './prompts.ts';
@@ -68,13 +70,34 @@ export async function classify(request: Request, env: Env): Promise<Response> {
 
 export const CONSULT_SCHEMA = {
   type: 'object', additionalProperties: false,
-  required: ['intent', 'answer', 'reference_ids'],
+  required: ['intent', 'answer', 'reference_ids', 'reuse_source_id'],
   properties: {
     intent: { type: 'string', enum: validKeys },
     answer: { type: 'string' },
+    reuse_source_id: { type: 'string', enum: [''] },
     reference_ids: { type: 'array', maxItems: 3, items: { type: 'string' } },
   },
 };
+
+export function consultationSchema(domain: ConsultationDomain) {
+  return { ...CONSULT_SCHEMA, properties: { ...CONSULT_SCHEMA.properties,
+    reuse_source_id: { type: 'string', enum: ['', ...knowledgeSources(domain).sources.map(source => source.id)] },
+  } };
+}
+
+// Expand a matching excerpt to complete source lines, preserving nearby conditions/negation.
+// The returned text can only originate in our public knowledge, never in user history.
+export function groundedExcerpt(source: string, candidate: unknown): string {
+  if (typeof candidate !== 'string') return '';
+  const excerpt = candidate.trim();
+  if (excerpt.length < 20 || excerpt.length > 1200) return '';
+  const position = source.indexOf(excerpt);
+  if (position < 0) return '';
+  const start = source.lastIndexOf('\n', position - 1) + 1;
+  const nextLine = source.indexOf('\n', position + excerpt.length);
+  const complete = source.slice(start, nextLine < 0 ? source.length : nextLine).trim();
+  return complete.length <= 1200 ? complete : '';
+}
 
 export async function consult(request: Request, env: Env): Promise<Response> {
   const body = await request.json();
@@ -86,10 +109,10 @@ export async function consult(request: Request, env: Env): Promise<Response> {
   const catalogue = INTENTS.map(i => ({ intent: i.key, category: INTENT_META[i.key].category, meaning: i.meaning, business: i.business }));
   const raw = await generateText(env, [
     { role: 'system', content: consultPrompt(body.domain) + '\n업무 목록: ' + JSON.stringify(catalogue) },
-    { role: 'user', content: JSON.stringify({ reference_type: 'approved_examples', items: examples }) },
+    { role: 'user', content: JSON.stringify({ reference_type: 'satisfied_examples', items: examples }) },
     ...history, { role: 'user', content: question },
-  ], CONSULT_SCHEMA, undefined, request.signal);
-  let value: { intent?: unknown; answer?: unknown; reference_ids?: unknown };
+  ], consultationSchema(body.domain), undefined, request.signal);
+  let value: { intent?: unknown; answer?: unknown; reference_ids?: unknown; reuse_source_id?: unknown };
   try { value = JSON.parse(raw); } catch { throw new ApiError(502, '답변 형식을 확인하지 못했습니다.'); }
   if (!value || !validKeys.includes(value.intent as IntentKey) || typeof value.answer !== 'string' || !value.answer.trim() || value.answer.length > 6000 ||
       !Array.isArray(value.reference_ids) || value.reference_ids.length > 3 || !value.reference_ids.every(id => examples.some(e => e.id === id && e.intent === value.intent))) {
@@ -98,7 +121,9 @@ export async function consult(request: Request, env: Env): Promise<Response> {
   const answer = value.answer.trim();
   const intent = value.intent as IntentKey;
   const category = INTENT_META[intent].category;
-  // Persist before returning success so an answered consultation never silently misses the review queue.
-  await saveAnswerDraft(env, { domain: body.domain, question, answer, intent, category, reference_ids: [...new Set(value.reference_ids)], conversation_context: history }, request.signal);
-  return Response.json({ answer, intent, category });
+  // Only exact current public-source excerpts can cross sessions; never original user text.
+  const reusable = selectedSource(body.domain, value.reuse_source_id, intent);
+  const topic = INTENTS.find(i=>i.key===intent)!;
+  const id = await saveAnswerDraft(env, { domain: body.domain, question, answer, intent, category, reference_ids: [...new Set(value.reference_ids)], conversation_context: history, reuse_question: reusable ? `${category}: ${topic.business} — ${topic.meaning}`.slice(0,500) : '', reuse_answer: reusable }, request.signal);
+  return Response.json({ answer, intent, category, feedback: await feedbackReceipt(env, id) });
 }

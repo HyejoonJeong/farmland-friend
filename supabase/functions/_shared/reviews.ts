@@ -23,7 +23,7 @@ export function redactPersonalData(text: string) {
 
 type Example = { id: string; intent: string; category: string; question: string; answer: string; source_reference: string };
 export async function approvedAnswers(env: Env, domain: string, query: string, signal?: AbortSignal): Promise<Example[]> {
-  const response = await reviewDatabase(env, 'rpc/search_approved_answers', {
+  const response = await reviewDatabase(env, 'rpc/search_satisfied_answers', {
     method: 'POST', body: JSON.stringify({ search_text: query.slice(0, 4000), search_domain: domain, current_version: KNOWLEDGE_VERSION }),
   }, signal);
   const rows = await response.json();
@@ -31,14 +31,16 @@ export async function approvedAnswers(env: Env, domain: string, query: string, s
   return rows;
 }
 
-export async function saveAnswerDraft(env: Env, value: {domain: string; question: string; answer: string; intent: string; category: string; reference_ids: unknown[]; conversation_context: {role: string; content: string}[]}, signal?: AbortSignal) {
+export async function saveAnswerDraft(env: Env, value: {domain: string; question: string; answer: string; intent: string; category: string; reference_ids: unknown[]; conversation_context: {role: string; content: string}[]; reuse_question: string; reuse_answer: string}, signal?: AbortSignal) {
+  const id = crypto.randomUUID();
   await reviewDatabase(env, 'consultation_answers', {
     method: 'POST', headers: { Prefer: 'return=minimal' },
-    body: JSON.stringify({ ...value, question: redactPersonalData(value.question), answer: redactPersonalData(value.answer),
+    body: JSON.stringify({ ...value, id, reuse_valid_until: new Date(Date.now()+90*86400000).toISOString(), question: redactPersonalData(value.question), answer: redactPersonalData(value.answer),
       original_question: redactPersonalData(value.question), original_answer: redactPersonalData(value.answer),
       conversation_context: value.conversation_context.map(item => ({ role: item.role, content: redactPersonalData(item.content) })),
       status: 'pending', knowledge_version: KNOWLEDGE_VERSION }),
   }, signal);
+  return id;
 }
 
 const validStatuses = ['pending', 'approved', 'rejected', 'retired'];
@@ -75,6 +77,8 @@ export async function adminReviews(request: Request, env: Env): Promise<Response
     expires = new Date(expiry).toISOString();
   }
   const patch = { intent, category: INTENT_META[intent].category, question, answer, status,
+    // Legacy administrator edits must never revalidate a user-rated excerpt.
+    reuse_question: '', reuse_answer: '', reuse_valid_until: null,
     source_reference: source, reviewer, reviewed_at: status === 'approved' ? new Date().toISOString() : null,
     valid_until: expires, knowledge_version: KNOWLEDGE_VERSION };
   const response = await reviewDatabase(env, `consultation_answers?id=eq.${id}&revision=eq.${body.revision}`, {

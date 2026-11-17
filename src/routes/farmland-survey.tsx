@@ -12,7 +12,7 @@ import {
   Sprout,
   Users,
 } from "lucide-react";
-import { PageShell } from "@/components/PageShell";
+import { SurveyConversation } from "@/routes/survey-consult";
 import { SpeakButton } from "@/components/SpeakButton";
 import {
   Accordion,
@@ -170,224 +170,235 @@ function FarmlandSurveyPage() {
   }, [region, topic]);
 
   return (
-    <PageShell back="/">
-      <section className="pt-3">
-        <p className="font-bold text-primary">2026년도 안내</p>
-        <h1 className="mt-1 text-[34px] leading-tight font-black">
-          농지전수조사,
-          <br />왜 하나요?
-        </h1>
-        <p className="mt-4 text-[19px] font-semibold leading-relaxed text-foreground/80">
-          법 위반 농지를 찾아 모두 처분하기 위해서가 아닙니다. 전국 농지의 소유·이용 실태를 정확히
-          파악하고, 현실에 맞는 농지 관리와 제도 개선에 활용하기 위한 조사입니다.
-        </p>
-        <div className="mt-4">
-          <SpeakButton text={SPEAK_TEXT} label="안내 듣기" />
-        </div>
-      </section>
-
-      <section className="mt-7">
-        <h2 className="text-[25px] font-black">자주 묻는 질문</h2>
-        <Accordion type="single" collapsible className="mt-3 space-y-3">
-          {FAQS.map((faq, index) => (
-            <AccordionItem
-              key={faq.question}
-              value={`faq-${index}`}
-              className="overflow-hidden rounded-2xl border-2 border-border bg-card px-4"
-            >
-              <AccordionTrigger className="gap-3 py-5 text-[19px] leading-snug font-bold no-underline hover:no-underline">
-                <span className="flex min-w-0 items-start gap-3">
-                  <span className="mt-0.5 grid h-8 w-8 shrink-0 place-items-center rounded-full bg-primary text-base font-black text-primary-foreground">
-                    Q
-                  </span>
-                  <span>{faq.question}</span>
-                </span>
-              </AccordionTrigger>
-              <AccordionContent className="pl-11 text-[18px] leading-relaxed text-foreground/80">
-                {faq.answer}
-              </AccordionContent>
-            </AccordionItem>
-          ))}
-        </Accordion>
-      </section>
-
-      <section className="mt-7 rounded-2xl border-2 border-destructive/35 bg-destructive/5 p-5">
-        <div className="flex items-center gap-2 text-destructive">
-          <CircleAlert className="h-6 w-6" />
-          <h2 className="text-[22px] font-black">투기·중대한 불법 전용은 조치합니다</h2>
-        </div>
-        <div className="mt-4 space-y-4 text-[17px] leading-relaxed">
-          <div>
-            <h3 className="font-black">투기에 해당하는 경우</h3>
-            <p className="mt-1 text-foreground/80">
-              시세차익·개발이익·보상 등을 재산상 이익으로 취하기 위해 거짓·부정한 방식으로 농지를
-              취득한 행위입니다.
+    <SurveyConversation
+      onContact={() => askRef.current?.scrollIntoView({ behavior: "smooth", block: "start" })}
+      guide={
+        <>
+          <section className="pt-3">
+            <p className="font-bold text-primary">2026년도 안내</p>
+            <h1 className="mt-1 text-[34px] leading-tight font-black">
+              농지전수조사,
+              <br />왜 하나요?
+            </h1>
+            <p className="mt-4 text-[19px] font-semibold leading-relaxed text-foreground/80">
+              법 위반 농지를 찾아 모두 처분하기 위해서가 아닙니다. 전국 농지의 소유·이용 실태를
+              정확히 파악하고, 현실에 맞는 농지 관리와 제도 개선에 활용하기 위한 조사입니다.
             </p>
-            <ul className="mt-2 space-y-1 font-semibold">
-              <li>① 토지거래허가구역에서 거짓으로 농지 취득 후 무단 휴경·불법 임대</li>
-              <li>② 농업법인의 부동산업 영위</li>
-              <li>③ 경매 등으로 공유 취득한 후 무단 휴경·불법 임대</li>
-            </ul>
-            <p className="mt-2 font-black text-destructive">처분명령이 부과될 수 있습니다.</p>
-          </div>
-          <div className="border-t border-destructive/20 pt-4">
-            <h3 className="font-black">중대한 불법 전용</h3>
-            <p className="mt-1 text-foreground/80">
-              농업진흥지역에 설치할 수 없는 야영장 등을 설치하거나, 다른 법률에서 금지한 시설로
-              농지를 불법 전용한 경우입니다.
-            </p>
-            <p className="mt-2 font-black text-destructive">원상회복 명령이 내려질 수 있습니다.</p>
-          </div>
-        </div>
-      </section>
+            <div className="mt-4">
+              <SpeakButton text={SPEAK_TEXT} label="안내 듣기" />
+            </div>
+          </section>
 
-      <section className="mt-8">
-        <h2 className="text-[25px] font-black">조사 결과는 이렇게 활용합니다</h2>
-        <div className="mt-3 grid gap-3">
-          {USES.map(({ icon: Icon, title, items }) => (
-            <article key={title} className="rounded-2xl border-2 border-border bg-card p-5">
-              <div className="flex items-start gap-3">
-                <div>
-                  <div className="flex items-center gap-2 text-primary">
-                    <Icon className="h-5 w-5" />
-                    <h3 className="text-[19px] font-black leading-snug">{title}</h3>
-                  </div>
-                  <ul className="mt-3 space-y-2 text-[17px] font-semibold text-foreground/80">
-                    {items.map((item) => (
-                      <li key={item} className="flex gap-2">
-                        <Check className="mt-1 h-4 w-4 shrink-0 text-primary" />
-                        {item}
-                      </li>
-                    ))}
-                  </ul>
-                </div>
+          <section className="mt-7">
+            <h2 className="text-[25px] font-black">자주 묻는 질문</h2>
+            <Accordion type="single" collapsible className="mt-3 space-y-3">
+              {FAQS.map((faq, index) => (
+                <AccordionItem
+                  key={faq.question}
+                  value={`faq-${index}`}
+                  className="overflow-hidden rounded-2xl border-2 border-border bg-card px-4"
+                >
+                  <AccordionTrigger className="gap-3 py-5 text-[19px] leading-snug font-bold no-underline hover:no-underline">
+                    <span className="flex min-w-0 items-start gap-3">
+                      <span className="mt-0.5 grid h-8 w-8 shrink-0 place-items-center rounded-full bg-primary text-base font-black text-primary-foreground">
+                        Q
+                      </span>
+                      <span>{faq.question}</span>
+                    </span>
+                  </AccordionTrigger>
+                  <AccordionContent className="pl-11 text-[18px] leading-relaxed text-foreground/80">
+                    {faq.answer}
+                  </AccordionContent>
+                </AccordionItem>
+              ))}
+            </Accordion>
+          </section>
+
+          <section className="mt-7 rounded-2xl border-2 border-destructive/35 bg-destructive/5 p-5">
+            <div className="flex items-center gap-2 text-destructive">
+              <CircleAlert className="h-6 w-6" />
+              <h2 className="text-[22px] font-black">투기·중대한 불법 전용은 조치합니다</h2>
+            </div>
+            <div className="mt-4 space-y-4 text-[17px] leading-relaxed">
+              <div>
+                <h3 className="font-black">투기에 해당하는 경우</h3>
+                <p className="mt-1 text-foreground/80">
+                  시세차익·개발이익·보상 등을 재산상 이익으로 취하기 위해 거짓·부정한 방식으로
+                  농지를 취득한 행위입니다.
+                </p>
+                <ul className="mt-2 space-y-1 font-semibold">
+                  <li>① 토지거래허가구역에서 거짓으로 농지 취득 후 무단 휴경·불법 임대</li>
+                  <li>② 농업법인의 부동산업 영위</li>
+                  <li>③ 경매 등으로 공유 취득한 후 무단 휴경·불법 임대</li>
+                </ul>
+                <p className="mt-2 font-black text-destructive">처분명령이 부과될 수 있습니다.</p>
               </div>
-            </article>
-          ))}
-        </div>
-        <p className="mt-4 rounded-2xl bg-primary p-5 text-center text-[20px] font-black leading-relaxed text-primary-foreground">
-          투기는 근절하고, 농업인이 안심하고 농사지을 수 있도록 추진합니다.
-        </p>
-      </section>
-
-      <section id="contact" ref={askRef} className="mt-8 scroll-mt-4 pb-8">
-        <div className="flex items-center gap-2 text-primary">
-          <MapPin className="h-6 w-6" />
-          <h2 className="text-[25px] font-black">더 궁금한 점이 있으신가요?</h2>
-        </div>
-
-        {step === "region" && (
-          <div
-            className="animate-in fade-in slide-in-from-bottom-4 duration-300"
-            aria-live="polite"
-          >
-            <p className="mt-2 text-[18px] font-semibold text-foreground/75">
-              농지 소재지(시·군)를 선택해 주세요.
-            </p>
-            <div className="mt-4 grid grid-cols-2 gap-2">
-              {REGIONS.map((item) => (
-                <Button
-                  key={item}
-                  type="button"
-                  variant="outline"
-                  onClick={() => {
-                    setRegion(item);
-                    goToStep("topic");
-                  }}
-                  className="h-14 rounded-xl text-[18px] font-bold"
-                >
-                  {item}
-                </Button>
-              ))}
-            </div>
-          </div>
-        )}
-
-        {step === "topic" && region && (
-          <div
-            className="mt-2 animate-in fade-in slide-in-from-bottom-4 duration-300"
-            aria-live="polite"
-          >
-            <div className="flex items-center justify-between gap-3 rounded-2xl bg-secondary px-4 py-3">
-              <p className="text-[18px] font-black text-primary">선택하신 농지 소재지: {region}</p>
-              <Button
-                type="button"
-                variant="ghost"
-                size="sm"
-                onClick={() => {
-                  setTopic(null);
-                  setStep("region");
-                }}
-                className="h-10 shrink-0 rounded-xl text-[16px] font-bold"
-              >
-                지역 다시 선택
-              </Button>
-            </div>
-            <p className="mt-4 text-[18px] font-semibold text-foreground/75">
-              어떤 점이 궁금하신가요? 내용에 맞는 문의처를 알려드립니다.
-            </p>
-            <div className="mt-4 grid gap-3">
-              {TOPICS.map((item) => (
-                <button
-                  key={item.key}
-                  type="button"
-                  onClick={() => {
-                    setTopic(item.key);
-                    goToStep("contact");
-                  }}
-                  className="rounded-2xl border-2 border-border bg-card p-5 text-left transition-colors hover:border-primary"
-                >
-                  <p className="text-[20px] font-black text-foreground">{item.title}</p>
-                  <p className="mt-1 text-[16px] font-semibold leading-relaxed text-foreground/70">
-                    {item.description}
-                  </p>
-                </button>
-              ))}
-            </div>
-          </div>
-        )}
-
-        {step === "contact" && contact && (
-          <div
-            className="mt-2 animate-in fade-in slide-in-from-bottom-4 duration-300"
-            aria-live="polite"
-          >
-            <Button
-              type="button"
-              variant="ghost"
-              size="sm"
-              onClick={() => {
-                setTopic(null);
-                setStep("topic");
-              }}
-              className="mb-3 h-10 rounded-xl text-[16px] font-bold"
-            >
-              ← 문의 주제 다시 선택
-            </Button>
-            <div className="rounded-2xl border-2 border-primary bg-primary/[0.06] p-5">
-              <div className="flex items-center gap-2 text-primary">
-                {contact.kind === "지자체" ? (
-                  <Landmark className="h-6 w-6" />
-                ) : (
-                  <Building2 className="h-6 w-6" />
-                )}
-                <p className="text-[17px] font-bold">
-                  {region} 관할 {contact.kind} 문의처
+              <div className="border-t border-destructive/20 pt-4">
+                <h3 className="font-black">중대한 불법 전용</h3>
+                <p className="mt-1 text-foreground/80">
+                  농업진흥지역에 설치할 수 없는 야영장 등을 설치하거나, 다른 법률에서 금지한 시설로
+                  농지를 불법 전용한 경우입니다.
+                </p>
+                <p className="mt-2 font-black text-destructive">
+                  원상회복 명령이 내려질 수 있습니다.
                 </p>
               </div>
-              <h3 className="mt-2 text-[23px] leading-tight font-black">{contact.branch}</h3>
-              <p className="mt-1 text-[17px] font-semibold text-foreground/75">{contact.duty}</p>
-              <p className="mt-3 text-[30px] font-black text-primary">{contact.phone}</p>
-              <Button asChild className="mt-4 h-16 w-full rounded-xl text-[22px] font-black">
-                <a href={`tel:${contact.phone}`}>
-                  <Phone className="h-6 w-6" />
-                  전화로 문의하기
-                </a>
-              </Button>
             </div>
-          </div>
-        )}
-      </section>
-    </PageShell>
+          </section>
+
+          <section className="mt-8">
+            <h2 className="text-[25px] font-black">조사 결과는 이렇게 활용합니다</h2>
+            <div className="mt-3 grid gap-3">
+              {USES.map(({ icon: Icon, title, items }) => (
+                <article key={title} className="rounded-2xl border-2 border-border bg-card p-5">
+                  <div className="flex items-start gap-3">
+                    <div>
+                      <div className="flex items-center gap-2 text-primary">
+                        <Icon className="h-5 w-5" />
+                        <h3 className="text-[19px] font-black leading-snug">{title}</h3>
+                      </div>
+                      <ul className="mt-3 space-y-2 text-[17px] font-semibold text-foreground/80">
+                        {items.map((item) => (
+                          <li key={item} className="flex gap-2">
+                            <Check className="mt-1 h-4 w-4 shrink-0 text-primary" />
+                            {item}
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                  </div>
+                </article>
+              ))}
+            </div>
+            <p className="mt-4 rounded-2xl bg-primary p-5 text-center text-[20px] font-black leading-relaxed text-primary-foreground">
+              투기는 근절하고, 농업인이 안심하고 농사지을 수 있도록 추진합니다.
+            </p>
+          </section>
+
+          <section id="contact" ref={askRef} className="mt-8 scroll-mt-4 pb-8">
+            <div className="flex items-center gap-2 text-primary">
+              <MapPin className="h-6 w-6" />
+              <h2 className="text-[25px] font-black">더 궁금한 점이 있으신가요?</h2>
+            </div>
+
+            {step === "region" && (
+              <div
+                className="animate-in fade-in slide-in-from-bottom-4 duration-300"
+                aria-live="polite"
+              >
+                <p className="mt-2 text-[18px] font-semibold text-foreground/75">
+                  농지 소재지(시·군)를 선택해 주세요.
+                </p>
+                <div className="mt-4 grid grid-cols-2 gap-2">
+                  {REGIONS.map((item) => (
+                    <Button
+                      key={item}
+                      type="button"
+                      variant="outline"
+                      onClick={() => {
+                        setRegion(item);
+                        goToStep("topic");
+                      }}
+                      className="h-14 rounded-xl text-[18px] font-bold"
+                    >
+                      {item}
+                    </Button>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {step === "topic" && region && (
+              <div
+                className="mt-2 animate-in fade-in slide-in-from-bottom-4 duration-300"
+                aria-live="polite"
+              >
+                <div className="flex items-center justify-between gap-3 rounded-2xl bg-secondary px-4 py-3">
+                  <p className="text-[18px] font-black text-primary">
+                    선택하신 농지 소재지: {region}
+                  </p>
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => {
+                      setTopic(null);
+                      setStep("region");
+                    }}
+                    className="h-10 shrink-0 rounded-xl text-[16px] font-bold"
+                  >
+                    지역 다시 선택
+                  </Button>
+                </div>
+                <p className="mt-4 text-[18px] font-semibold text-foreground/75">
+                  어떤 점이 궁금하신가요? 내용에 맞는 문의처를 알려드립니다.
+                </p>
+                <div className="mt-4 grid gap-3">
+                  {TOPICS.map((item) => (
+                    <button
+                      key={item.key}
+                      type="button"
+                      onClick={() => {
+                        setTopic(item.key);
+                        goToStep("contact");
+                      }}
+                      className="rounded-2xl border-2 border-border bg-card p-5 text-left transition-colors hover:border-primary"
+                    >
+                      <p className="text-[20px] font-black text-foreground">{item.title}</p>
+                      <p className="mt-1 text-[16px] font-semibold leading-relaxed text-foreground/70">
+                        {item.description}
+                      </p>
+                    </button>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {step === "contact" && contact && (
+              <div
+                className="mt-2 animate-in fade-in slide-in-from-bottom-4 duration-300"
+                aria-live="polite"
+              >
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => {
+                    setTopic(null);
+                    setStep("topic");
+                  }}
+                  className="mb-3 h-10 rounded-xl text-[16px] font-bold"
+                >
+                  ← 문의 주제 다시 선택
+                </Button>
+                <div className="rounded-2xl border-2 border-primary bg-primary/[0.06] p-5">
+                  <div className="flex items-center gap-2 text-primary">
+                    {contact.kind === "지자체" ? (
+                      <Landmark className="h-6 w-6" />
+                    ) : (
+                      <Building2 className="h-6 w-6" />
+                    )}
+                    <p className="text-[17px] font-bold">
+                      {region} 관할 {contact.kind} 문의처
+                    </p>
+                  </div>
+                  <h3 className="mt-2 text-[23px] leading-tight font-black">{contact.branch}</h3>
+                  <p className="mt-1 text-[17px] font-semibold text-foreground/75">
+                    {contact.duty}
+                  </p>
+                  <p className="mt-3 text-[30px] font-black text-primary">{contact.phone}</p>
+                  <Button asChild className="mt-4 h-16 w-full rounded-xl text-[22px] font-black">
+                    <a href={`tel:${contact.phone}`}>
+                      <Phone className="h-6 w-6" />
+                      전화로 문의하기
+                    </a>
+                  </Button>
+                </div>
+              </div>
+            )}
+          </section>
+        </>
+      }
+    />
   );
 }

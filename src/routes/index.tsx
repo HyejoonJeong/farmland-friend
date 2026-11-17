@@ -1,5 +1,4 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { PageShell } from "@/components/PageShell";
 import { QuestionConversation } from "@/routes/ask";
 
 export const Route = createFileRoute("/")({
@@ -22,19 +21,23 @@ export const Route = createFileRoute("/")({
 
 function Home() {
   return (
-    <PageShell back={null} home>
-      <section className="welcome-panel welcome-chat-panel" aria-labelledby="welcome-title">
-        <div className="welcome-copy">
-          <p className="welcome-eyebrow">
-            <span /> 농지은행 AI 음성 민원 안내
-          </p>
-          <h1 id="welcome-title">
-            농지 이야기, <br />
-            편하게 <span>말해농</span>
-          </h1>
-        </div>
-        <QuestionConversation embedded />
-      </section>
-    </PageShell>
+    <QuestionConversation
+      embedded
+      intro={
+        <>
+          <section className="welcome-panel welcome-chat-panel" aria-labelledby="welcome-title">
+            <div className="welcome-copy">
+              <p className="welcome-eyebrow">
+                <span /> 농지은행 AI 음성 민원 안내
+              </p>
+              <h1 id="welcome-title">
+                농지 이야기, <br />
+                편하게 <span>말해농</span>
+              </h1>
+            </div>
+          </section>
+        </>
+      }
+    />
   );
 }

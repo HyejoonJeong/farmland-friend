@@ -241,6 +241,32 @@ export function QuestionConversation({ embedded = false }: { embedded?: boolean 
   if (embedded) {
     return (
       <div className="home-conversation">
+        {turns.length > 0 && (
+        <div className="home-chat-messages" aria-live="polite" aria-busy={busy}>
+          {turns.map((turn, index) => (
+            <div
+              key={index}
+              ref={index === turns.length - 1 ? lastTurnRef : undefined}
+              className={`home-chat-bubble ${turn.role}`}
+            >
+              {turn.role === "assistant" ? (
+                <>
+                  <BusinessAnswer text={turn.content} />
+                  <SpeakButton text={businessAnswerSpeech(turn.content)} label="답변 듣기" />
+                </>
+              ) : (
+                <p>{turn.content}</p>
+              )}
+            </div>
+          ))}
+          {status === "thinking" && (
+            <p className="home-thinking" role="status">
+              <Loader2 className="animate-spin" size={20} aria-hidden="true" /> 답변을 찾고
+              있어요...
+            </p>
+          )}
+        </div>
+        )}
         <div className="home-mic-stage">
           <img
             src={greenMascot}
@@ -287,30 +313,6 @@ export function QuestionConversation({ embedded = false }: { embedded?: boolean 
             {error}
           </p>
         )}
-        <div className="home-chat-messages" aria-live="polite" aria-busy={busy}>
-          {turns.map((turn, index) => (
-            <div
-              key={index}
-              ref={index === turns.length - 1 ? lastTurnRef : undefined}
-              className={`home-chat-bubble ${turn.role}`}
-            >
-              {turn.role === "assistant" ? (
-                <>
-                  <BusinessAnswer text={turn.content} />
-                  <SpeakButton text={businessAnswerSpeech(turn.content)} label="답변 듣기" />
-                </>
-              ) : (
-                <p>{turn.content}</p>
-              )}
-            </div>
-          ))}
-          {status === "thinking" && (
-            <p className="home-thinking" role="status">
-              <Loader2 className="animate-spin" size={20} aria-hidden="true" /> 답변을 찾고
-              있어요...
-            </p>
-          )}
-        </div>
         <form
           className="home-chat-form"
           onSubmit={(event) => {

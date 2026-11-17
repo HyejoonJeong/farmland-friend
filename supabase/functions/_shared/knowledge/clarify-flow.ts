@@ -13,6 +13,11 @@ export const CATEGORIES = [
   "농업경영 위기·부채",
   "고령농 은퇴·농지이양",
   "스마트팜",
+  "농지연금",
+  "훼손농지",
+  "영농기술·재배·농기계",
+  "농업경영체·직불제·인증",
+  "농지 전수조사",
   "기타 / 분류 불확실",
 ] as const;
 export type Category = (typeof CATEGORIES)[number];
@@ -23,7 +28,7 @@ export interface IntentMeta {
   description: string;
 }
 
-export const INTENT_META: Partial<Record<IntentKey, IntentMeta>> = {
+export const INTENT_META: Record<IntentKey, IntentMeta> = {
   farmland_trade_sell: { category: "농지 팔기", displayName: "농지은행에 농지 팔기", description: "가지고 계신 농지를 농지은행(한국농어촌공사)에 직접 파는 사업입니다." },
   public_reserve_purchase: { category: "농지 팔기", displayName: "공공임대용으로 농지 팔기", description: "농지은행이 농지를 사들여 청년농 등에게 빌려주는 데 쓰는 사업입니다." },
   farmland_sale_trust: { category: "농지 팔기", displayName: "살 사람 찾아 주기 (매도수탁)", description: "농지은행이 대신 농지를 살 사람을 찾아 팔아 드리는 사업입니다." },
@@ -42,7 +47,11 @@ export const INTENT_META: Partial<Record<IntentKey, IntentMeta>> = {
   reserve_smartfarm: { category: "스마트팜", displayName: "스마트팜 시설 빌리기", description: "청년농에게 농지은행 비축농지에 지은 스마트팜을 빌려주는 사업입니다." },
   land_exchange: { category: "농지 바꾸기·모으기", displayName: "농지 바꾸기·모으기 (교환분합)", description: "흩어진 농지를 서로 바꾸거나 합쳐 농사짓기 편하게 만드는 사업입니다." },
   retirement_direct_payment: { category: "고령농 은퇴·농지이양", displayName: "은퇴하며 농지 넘기기 (이양은퇴직불)", description: "고령 농업인이 농지를 넘기고 은퇴하면 매달 직불금을 받을 수 있는 사업입니다." },
-  farmland_pension: { category: "고령농 은퇴·농지이양", displayName: "농지연금", description: "농지를 담보로 매달 연금을 받는 제도입니다." },
+  farmland_pension: { category: "농지연금", displayName: "농지연금", description: "농지를 담보로 매달 연금을 받는 제도입니다." },
+  damaged_farmland: { category: "훼손농지", displayName: "훼손농지 문의", description: "훼손농지 사업과 담당자 문의입니다." },
+  farming_tech: { category: "영농기술·재배·농기계", displayName: "영농기술·재배·농기계", description: "재배, 토양, 병해충, 농기계와 영농교육 문의입니다." },
+  gap_certification: { category: "농업경영체·직불제·인증", displayName: "경영체·직불제·인증", description: "경영체 등록, 공익직불, 인증, 품질·안전·원산지 문의입니다." },
+  farmland_survey: { category: "농지 전수조사", displayName: "농지 전수조사", description: "전수조사 대상, 방법, 일정과 후속조치 문의입니다." },
   general_consult: { category: "기타 / 분류 불확실", displayName: "농지은행 일반 상담", description: "정확한 안내를 위해 농지은행 담당자가 직접 상담해 드립니다." },
 };
 

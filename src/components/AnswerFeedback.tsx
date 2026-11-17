@@ -28,7 +28,7 @@ export function AnswerFeedback() {
     if (receipt?.contactAttempted && !receipt.dismissed && !receipt.submitted) panel.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
   }, [receipt?.answerId, receipt?.contactAttempted, receipt?.dismissed, receipt?.submitted]);
   if (!receipt) return null;
-  if (!receipt.contactAttempted) return <button type="button" className="my-3 min-h-12 rounded-xl border border-primary/40 px-3 py-3 text-base font-semibold" onClick={() => updateFeedback(receipt.answerId, { contactAttempted: true, dismissed: false })}>담당자와 상담을 마치셨나요? 이용 경험 알려주기</button>;
+  if (!receipt.contactAttempted) return <button type="button" className="my-3 min-h-12 rounded-xl border border-primary/40 px-3 py-3 text-base font-semibold" onClick={() => updateFeedback(receipt.answerId, { contactAttempted: true, dismissed: false })}>탭하여 만족도 평가</button>;
   if (receipt.submitted) return receipt.dismissed ? null : <section className="my-5 rounded-2xl border-2 border-primary bg-secondary p-5" aria-label="만족도 평가 완료">
     <p role="status" className="text-xl font-bold">평가를 남겨 주셔서 감사합니다.</p>
     <p className="mt-2 text-lg">더 나은 상담 안내에 반영하겠습니다.</p>

@@ -292,7 +292,8 @@ function VoicePage() {
                 </span>
                 <button
                   type={hasText && status === "idle" ? "submit" : "button"}
-                  className="opinion-action"
+                  className="opinion-action mic-listening"
+                  data-recording={recording}
                   onClick={
                     recording
                       ? () => void stop()

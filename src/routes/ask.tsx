@@ -251,7 +251,8 @@ export function QuestionConversation({ embedded = false }: { embedded?: boolean 
           />
           <button
             type="button"
-            className={`home-microphone ${recording ? "is-recording" : ""}`}
+            className={`home-microphone mic-listening ${recording ? "is-recording" : ""}`}
+            data-recording={recording}
             onClick={recording ? stop : start}
             disabled={busy}
             aria-label={recording ? "말씀 완료" : "질문 말하기"}
@@ -278,6 +279,38 @@ export function QuestionConversation({ embedded = false }: { embedded?: boolean 
               : "말씀을 글로 옮기는 중이에요..."}
           </p>
         )}
+        <div className="home-chat-hints">
+          <SpeakButton text={PROMPT} label="안내 듣기" />
+        </div>
+        {error && (
+          <p className="home-chat-error" role="alert">
+            {error}
+          </p>
+        )}
+        <div className="home-chat-messages" aria-live="polite" aria-busy={busy}>
+          {turns.map((turn, index) => (
+            <div
+              key={index}
+              ref={index === turns.length - 1 ? lastTurnRef : undefined}
+              className={`home-chat-bubble ${turn.role}`}
+            >
+              {turn.role === "assistant" ? (
+                <>
+                  <BusinessAnswer text={turn.content} />
+                  <SpeakButton text={businessAnswerSpeech(turn.content)} label="답변 듣기" />
+                </>
+              ) : (
+                <p>{turn.content}</p>
+              )}
+            </div>
+          ))}
+          {status === "thinking" && (
+            <p className="home-thinking" role="status">
+              <Loader2 className="animate-spin" size={20} aria-hidden="true" /> 답변을 찾고
+              있어요...
+            </p>
+          )}
+        </div>
         <form
           className="home-chat-form"
           onSubmit={(event) => {
@@ -312,38 +345,6 @@ export function QuestionConversation({ embedded = false }: { embedded?: boolean 
             <Send aria-hidden="true" />
           </button>
         </form>
-        <div className="home-chat-hints">
-          <SpeakButton text={PROMPT} label="안내 듣기" />
-        </div>
-        {error && (
-          <p className="home-chat-error" role="alert">
-            {error}
-          </p>
-        )}
-        <div className="home-chat-messages" aria-live="polite" aria-busy={busy}>
-          {turns.map((turn, index) => (
-            <div
-              key={index}
-              ref={index === turns.length - 1 ? lastTurnRef : undefined}
-              className={`home-chat-bubble ${turn.role}`}
-            >
-              {turn.role === "assistant" ? (
-                <>
-                  <BusinessAnswer text={turn.content} />
-                  <SpeakButton text={businessAnswerSpeech(turn.content)} label="답변 듣기" />
-                </>
-              ) : (
-                <p>{turn.content}</p>
-              )}
-            </div>
-          ))}
-          {status === "thinking" && (
-            <p className="home-thinking" role="status">
-              <Loader2 className="animate-spin" size={20} aria-hidden="true" /> 답변을 찾고
-              있어요...
-            </p>
-          )}
-        </div>
         {turns.some((turn) => turn.role === "assistant") && (
           <button
             type="button"
@@ -429,24 +430,13 @@ export function QuestionConversation({ embedded = false }: { embedded?: boolean 
 
       <div className="mt-8 grid place-items-center">
         <div className="relative grid h-40 w-40 place-items-center">
-          {recording && (
-            <>
-              <span
-                className="mic-ring absolute inset-0 rounded-full bg-primary/40"
-                style={{ animationDelay: "0s" }}
-              />
-              <span
-                className="mic-ring absolute inset-0 rounded-full bg-primary/30"
-                style={{ animationDelay: "0.5s" }}
-              />
-            </>
-          )}
           <button
             type="button"
+            data-recording={recording}
             onClick={recording ? stop : start}
             disabled={busy}
             aria-label={recording ? "말씀 완료" : "질문 말하기"}
-            className="relative grid h-32 w-32 place-items-center rounded-full bg-primary text-primary-foreground shadow-xl transition active:scale-95 disabled:opacity-60"
+            className="mic-listening relative grid h-32 w-32 place-items-center rounded-full bg-primary text-primary-foreground shadow-xl transition active:scale-95 disabled:opacity-60"
             style={{ transform: recording ? `scale(${1 + level * 0.15})` : undefined }}
           >
             {busy ? <Loader2 className="h-14 w-14 animate-spin" /> : <Mic className="h-14 w-14" />}

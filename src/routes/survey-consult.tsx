@@ -271,24 +271,13 @@ function SurveyConsultPage() {
 
       <div className="mt-8 grid place-items-center">
         <div className="relative grid h-40 w-40 place-items-center">
-          {recording && (
-            <>
-              <span
-                className="mic-ring absolute inset-0 rounded-full bg-primary/40"
-                style={{ animationDelay: "0s" }}
-              />
-              <span
-                className="mic-ring absolute inset-0 rounded-full bg-primary/30"
-                style={{ animationDelay: "0.5s" }}
-              />
-            </>
-          )}
           <button
             type="button"
+            data-recording={recording}
             onClick={recording ? stop : start}
             disabled={busy}
             aria-label={recording ? "말씀 완료" : "질문 말하기"}
-            className="relative grid h-32 w-32 place-items-center rounded-full bg-primary text-primary-foreground shadow-xl transition active:scale-95 disabled:opacity-60"
+            className="mic-listening relative grid h-32 w-32 place-items-center rounded-full bg-primary text-primary-foreground shadow-xl transition active:scale-95 disabled:opacity-60"
             style={{ transform: recording ? `scale(${1 + level * 0.15})` : undefined }}
           >
             {busy ? (
